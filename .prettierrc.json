@@ -1,0 +1,11 @@
+{
+   "trailingComma": "none",
+   "tabWidth": 3,
+   "semi": false,
+   "singleQuote": true,
+   "tabs": true,
+   "bracketSpacing": true,
+   "jsxBracketSameLine": true,
+   "arrowParens": "avoid",
+   "prettierPath": "C:\\Users\\kingm\\AppData\\Roaming\\npm\\node_modules\\prettier"
+}
