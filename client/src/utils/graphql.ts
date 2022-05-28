@@ -105,3 +105,13 @@ export const DELETE_GENERATION = gql`
       }
    }
 `
+
+export const GET_USER = gql(`
+   query Query {
+      getUser {
+         name
+         email
+         isAdmin
+      }
+   }
+`)

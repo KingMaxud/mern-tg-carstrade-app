@@ -1,7 +1,6 @@
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { gql, useLazyQuery } from '@apollo/client'
 import Compressor from 'compressorjs'
 import axios from 'axios'
-import { useState } from 'react'
 
 type UploadPresetData = {
    getUploadPreset: string

@@ -1,14 +1,14 @@
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import { gql, useMutation } from '@apollo/client'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 import tokenService from '../../utils/token.service'
-import { AuthContext } from '../../context/context'
+import { useAuth } from '../../context/context'
 import { signIn } from '../../context/reducer'
 
 const SignUp = () => {
-   const { dispatch } = useContext(AuthContext)
+   const { dispatch } = useAuth()
 
    const [error, setError] = useState('')
    const [loading, setLoading] = useState(false)

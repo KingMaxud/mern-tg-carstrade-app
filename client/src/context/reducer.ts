@@ -1,5 +1,5 @@
-import { AuthState, User } from './state'
-import { ActionType, SignOut, SignIn, AuthActions, SetUser } from './actions'
+import { AuthState } from './state'
+import { ActionType, SignOut, SignIn, AuthActions } from './actions'
 
 export default function authReducer(
    state: AuthState,
@@ -9,9 +9,7 @@ export default function authReducer(
       case ActionType.SignIn:
          return { ...state, isAuthed: true }
       case ActionType.SignOut:
-         return { ...state, isAuthed: true }
-      case ActionType.SetUser:
-         return {...state, user: action.payload}
+         return { ...state, isAuthed: false }
       default:
          return state
    }
@@ -23,9 +21,4 @@ export const signIn = (): SignIn => ({
 
 export const signOut = (): SignOut => ({
    type: ActionType.SignOut
-})
-
-export const setUser = (user: User): SetUser => ({
-   type: ActionType.SetUser,
-   payload: user
 })

@@ -1,15 +1,14 @@
 import { NavLink } from 'react-router-dom'
-import { useContext } from 'react'
 
-import { AuthContext } from '../context/context'
+import { useAuth } from '../context/context'
 import { signOut } from '../context/reducer'
 import tokenService from '../utils/token.service'
 import { gql, useMutation } from '@apollo/client'
 
 const Navbar = () => {
-   const { state, dispatch } = useContext(AuthContext)
+   const { state, dispatch } = useAuth()
 
-   const [removeRefreshToken,{ data, error, loading }] = useMutation(LOGOUT)
+   const [removeRefreshToken] = useMutation(LOGOUT)
 
    const handleClick = () => {
       tokenService.removeLocalAccessToken()
