@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 import { useAuth } from '../context/context'
 import { signOut } from '../context/reducer'
-import tokenService from '../utils/token.service'
+import tokenService from '../shared/utils/token.service'
 import { gql, useMutation } from '@apollo/client'
 
 const Navbar = () => {
@@ -20,7 +20,10 @@ const Navbar = () => {
       <nav>
          <NavLink to={'/'}>Home</NavLink>
          {state.isAuthed ? (
-            <button onClick={handleClick}>Logout</button>
+            <div>
+               <div>My Announcements</div>
+               <button onClick={handleClick}>Log Out</button>
+            </div>
          ) : (
             <div>
                <NavLink to={'/signin'}>Sign In</NavLink>

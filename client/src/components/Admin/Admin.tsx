@@ -8,7 +8,7 @@ import {
    DELETE_MARK,
    DELETE_MODEL,
    DELETE_GENERATION
-} from '../../utils/graphql'
+} from '../../shared/utils/graphql'
 import {
    MarksData,
    ModelsData,
@@ -18,7 +18,7 @@ import {
    MutationDetails,
    ModelHandleVars,
    deleteGenerationVars
-} from './Admin.types'
+} from '../../shared/types'
 import AddGeneration from './AddGeneration'
 import AddModel from './AddModel'
 import AddMark from './AddMark'

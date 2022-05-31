@@ -1,4 +1,4 @@
-import tokenService from '../utils/token.service'
+import tokenService from '../shared/utils/token.service'
 
 export interface AuthState {
    isAuthed: boolean

@@ -9,20 +9,22 @@ const modelSchema = new mongoose.Schema({
       type: String,
       required: true
    },
-   generations: [{
-      name: {
-         type: String
-      },
-      startYear: {
-         type: Number
-      },
-      endYear: {
-         type: Number
-      },
-      photoUrl: {
-         type: String
+   generations: [
+      {
+         name: {
+            type: String
+         },
+         startYear: {
+            type: Number
+         },
+         endYear: {
+            type: Number
+         },
+         photoUrl: {
+            type: String
+         }
       }
-   }]
+   ]
 })
 
 export default mongoose.model('Model', modelSchema)

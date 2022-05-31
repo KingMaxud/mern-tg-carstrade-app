@@ -5,6 +5,7 @@ export default gql`
       name: String!
       email: String!
       isAdmin: Boolean!
+      _id: String!
    }
 
    type TokenData {
@@ -37,23 +38,25 @@ export default gql`
    }
 
    type Announcement {
-      user: String!
-      mark: String!
-      model: String!
-      generation: String!
-      condition: String!
-      price: String!
-      year: String!
-      mileage: String!
-      color: String!
-      bodyStyle: String!
-      transmission: String!
-      fuelType: String!
-      driveInit: String!
-      engineCapacity: String!
-      power: String!
-      phoneNumber: String!
-      createdAt: String!
+      _id: ID
+      user: String
+      photo: [String]
+      mark: String
+      model: String
+      generation: String
+      condition: String
+      price: Int
+      year: Int
+      mileage: Int
+      color: String
+      bodyStyle: String
+      transmission: String
+      fuelType: String
+      driveInit: String
+      engineCapacity: Float
+      power: Int
+      phoneNumber: Int
+      createdAt: String
    }
 
    input FilterInput {
@@ -97,6 +100,8 @@ export default gql`
          sort: SortInput
          pagination: PaginationInput!
       ): [Announcement]!
+      getFilteredAnnouncementCount(filter: FilterInput): Int!
+      getAnnouncement(id: String!): Announcement!
       getAnnouncementsCount: Int!
    }
 

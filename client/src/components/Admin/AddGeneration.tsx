@@ -10,9 +10,9 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 import 'filepond/dist/filepond.min.css'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 
-import { addGenerationVars, MutationDetails } from './Admin.types'
-import { ADD_GENERATION } from '../../utils/graphql'
-import useAddPhoto from '../../hooks/useAddPhoto'
+import { ADD_GENERATION } from '../../shared/utils/graphql'
+import useAddPhoto from '../../shared/hooks/useAddPhoto'
+import { addGenerationVars, MutationDetails } from '../../shared/types'
 
 registerPlugin(
    FilePondPluginImagePreview,

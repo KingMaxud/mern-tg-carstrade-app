@@ -1,49 +1,25 @@
-import { useLazyQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 
-import { GET_USER } from '../../utils/graphql'
-import { useAuth } from '../../context/context'
-import AccessDenied from './AccessDenied'
 import Admin from './Admin'
+import useGetUser from '../../shared/hooks/useGetUser'
 
-type User = {
-   name: string
-   email: string
-   isAdmin: boolean
-}
-
-type UserData = {
-   getUser: User
-}
+type IsAdmin = [boolean, boolean]
 
 const AdminProtected = () => {
-   const { state, dispatch } = useAuth()
-   const [loading, setLoading] = useState(true)
-   const [isAdmin, setIsAdmin] = useState<boolean>(false)
-
-   const [getUser] = useLazyQuery<UserData>(GET_USER, {
-      onCompleted: ({ getUser }) => {
-         setIsAdmin(getUser.isAdmin)
-         setLoading(false)
-      },
-      onError: error => {
-         setLoading(false)
-         console.log(error)
-      }
-   })
+   const [isAdmin, setIsAdmin] = useState<IsAdmin>([false, false])
+   const {getIsAdmin} = useGetUser()
 
    useEffect(() => {
-      if (state.isAuthed) {
-         getUser()
-      }
+      getIsAdmin().then(data => setIsAdmin(data))
    }, [])
 
    return (
       <>
-         {!state.isAuthed && !isAdmin ? (
-            <AccessDenied />
-         ) : loading ? (
+         {!isAdmin[1] ? (
             <div>Loading</div>
+         ) : !isAdmin[0] ? (
+            <Navigate to="/" replace={true} />
          ) : (
             <Admin />
          )}

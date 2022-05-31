@@ -50,3 +50,27 @@ export type deleteGenerationVars = {
    modelName: string
    generationName: string
 }
+export type AddAnnouncementData = {
+   success: boolean
+   message: string
+}
+
+export type AddAnnouncementVars = {
+   user: string
+   mark: string
+   model: string
+   generation: string
+   condition: string
+   price: string
+   year: string
+   mileage: string
+   color: string
+   bodyStyle: string
+   transmission: string
+   fuelType: string
+   driveInit: string
+   engineCapacity: string
+   power: string
+   phoneNumber: string
+}
+

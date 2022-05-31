@@ -1,10 +1,10 @@
 import { useMutation } from '@apollo/client'
-
-import { ModelHandleVars, MutationDetails } from './Admin.types'
-import { ADD_MODEL } from '../../utils/graphql'
 import React, { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+
+import { ADD_MODEL } from '../../shared/utils/graphql'
+import { ModelHandleVars, MutationDetails } from '../../shared/types'
 
 type AddMarkProps = {
    mark: string

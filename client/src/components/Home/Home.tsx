@@ -1,13 +1,17 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 
-import { GET_GENERATIONS, GET_MARKS, GET_MODELS } from '../../utils/graphql'
 import {
-   GenerationsData,
-   GenerationsVars,
+   GET_GENERATIONS,
+   GET_MARKS,
+   GET_MODELS
+} from '../../shared/utils/graphql'
+import {
    MarksData,
+   ModelsVars,
    ModelsData,
-   ModelsVars
-} from './AnnouncementsList/AnnouncementsList.types'
+   GenerationsData,
+   GenerationsVars
+} from '../../shared/types'
 
 const Home = () => {
    const {
@@ -32,9 +36,7 @@ const Home = () => {
       variables: { markName: '', modelName: '' }
    })
 
-   return <div>
-      Home
-   </div>
+   return <div>Home</div>
 }
 
 export default Home

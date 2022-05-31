@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import { useAuth } from '../../context/context'
 import { useFormik } from 'formik'
 import { signIn } from '../../context/reducer'
-import tokenService from '../../utils/token.service'
+import tokenService from '../../shared/utils/token.service'
 
 const SignIn = () => {
    const { dispatch } = useAuth()

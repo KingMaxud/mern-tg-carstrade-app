@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
-import tokenService from '../../utils/token.service'
+import tokenService from '../../shared/utils/token.service'
 import { useAuth } from '../../context/context'
 import { signIn } from '../../context/reducer'
 

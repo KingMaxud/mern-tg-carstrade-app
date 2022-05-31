@@ -7,6 +7,10 @@ const modelSchema = new mongoose.Schema(
          ref: 'User',
          required: true
       },
+      photos: {
+         type: [{ type: String }],
+         validate: [arrayLimit, '{PATH} exceeds the limit of 9']
+      },
       mark: {
          type: String,
          required: true
@@ -74,5 +78,9 @@ const modelSchema = new mongoose.Schema(
    },
    { timestamps: true }
 )
+
+function arrayLimit(val) {
+   return val.length <= 9
+}
 
 export default mongoose.model('Announcement', modelSchema)

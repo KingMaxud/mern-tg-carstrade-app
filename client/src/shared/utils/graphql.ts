@@ -112,6 +112,50 @@ export const GET_USER = gql(`
          name
          email
          isAdmin
+         _id
       }
    }
 `)
+
+export const ADD_ANNOUNCEMENT = gql`
+    mutation Mutation(
+        $user: String!
+        $mark: String!
+        $model: String!
+        $generation: String!
+        $condition: String!
+        $price: String!
+        $year: String!
+        $mileage: String!
+        $color: String!
+        $bodyStyle: String!
+        $transmission: String!
+        $fuelType: String!
+        $driveInit: String!
+        $engineCapacity: String!
+        $power: String!
+        $phoneNumber: String!
+    ) {
+        addAnnouncement(
+            user: $user
+            mark: $mark
+            model: $model
+            generation: $generation
+            condition: $condition
+            price: $price
+            year: $year
+            mileage: $mileage
+            color: $color
+            bodyStyle: $bodyStyle
+            transmission: $transmission
+            fuelType: $fuelType
+            driveInit: $driveInit
+            engineCapacity: $engineCapacity
+            power: $power
+            phoneNumber: $phoneNumber
+        ) {
+            success
+            message
+        }
+    }
+`

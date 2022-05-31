@@ -22,7 +22,7 @@ export default {
                process.env.JWT_SECRET
             )
             const user = await User.findById(decoded.sub).select(
-               'name email isAdmin'
+               'name email isAdmin _id'
             )
             return user
          } catch (e) {

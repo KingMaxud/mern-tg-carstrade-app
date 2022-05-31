@@ -1,3 +1,5 @@
+import { UserInputError } from 'apollo-server-errors'
+
 import Announcement from '../../models/announcement.model.js'
 
 const createFilterObject = filter => {
@@ -46,6 +48,19 @@ export default {
             .skip((Number(pagination.page) - 1) * Number(pagination.limit))
             .exec()
          return announcements
+      },
+      getFilteredAnnouncementCount: async (_, { filter }) => {
+         const filterObj = createFilterObject(filter)
+         const count = await Announcement.find(filterObj).count()
+         return count
+      },
+      getAnnouncement: async (_, { id }) => {
+         const announcement = await Announcement.findOne({ _id: id })
+         if (!announcement) {
+            console.log('I am here')
+            throw new UserInputError('Announcement is not find!')
+         }
+         return announcement
       },
       getAnnouncementsCount: async () => {
          const count = Announcement.count()

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import * as Yup from 'yup'
-
-import { ModelsVars, MutationDetails } from './Admin.types'
-import { ADD_MARK } from '../../utils/graphql'
 import { useFormik } from 'formik'
+
+import { ADD_MARK } from '../../shared/utils/graphql'
+import { ModelsVars, MutationDetails } from '../../shared/types'
 
 const AddMark = (): JSX.Element => {
    const [error, setError] = useState('')

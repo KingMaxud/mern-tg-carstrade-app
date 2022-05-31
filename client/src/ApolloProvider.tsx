@@ -9,9 +9,9 @@ import { onError } from '@apollo/client/link/error'
 import { setContext } from '@apollo/client/link/context'
 
 import App from './App'
-import TokenService from './utils/token.service'
+import TokenService from './shared/utils/token.service'
 import jwtDecode from 'jwt-decode'
-import tokenService from './utils/token.service'
+import tokenService from './shared/utils/token.service'
 
 interface DecodedToken {
    exp: number
