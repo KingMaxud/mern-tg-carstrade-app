@@ -31,6 +31,7 @@ export default gql`
 
    type Generation {
       name: String!
+      bodyStyles: [String!]
       startYear: Int!
       endYear: Int!
       photoUrl: String!
@@ -40,7 +41,7 @@ export default gql`
    type Announcement {
       _id: ID
       user: String
-      photo: [String]
+      photos: [String]
       mark: String
       model: String
       generation: String
@@ -64,16 +65,21 @@ export default gql`
       model: String
       generation: [String]
       condition: [String]
-      price: [String]
-      year: [String]
-      mileage: [String]
+      minPrice: String
+      maxPrice: String
+      minYear: String
+      maxYear: String
+      minMileage: String
+      maxMileage: String
       color: [String]
       bodyStyle: [String]
       transmission: [String]
       fuelType: [String]
       driveInit: [String]
-      engineCapacity: [String]
-      power: [String]
+      minEngineCapacity: String
+      maxEngineCapacity: String
+      minPower: String
+      maxPower: String
    }
 
    input SortInput {
@@ -119,6 +125,7 @@ export default gql`
       addGeneration(
          markName: String!
          modelName: String!
+         bodyStyles: [String!]
          generationName: String!
          startYear: String!
          endYear: String!
@@ -146,6 +153,7 @@ export default gql`
          driveInit: String!
          engineCapacity: String!
          power: String!
+         photos: [String]
          phoneNumber: String!
       ): ReturnedType!
       deleteAnnouncement(announcementId: ID!): ReturnedType!

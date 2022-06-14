@@ -5,4 +5,5 @@ const string = 'https://res.cloudinary.com/dxl170evw/image/upload/v1653322977/im
    const [stringStart, stringEnd] = string.split('upload')
    const imageUrl = stringStart.concat(widthAndHeight, stringEnd)
 
-Add Mark (with image), Add Model, Add Generation (with image) (or delete)
+
+Remake Plan: Add Announcement Home (Filter)

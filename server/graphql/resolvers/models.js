@@ -85,7 +85,7 @@ export default {
       },
       addGeneration: async (
          _,
-         { markName, modelName, generationName, startYear, endYear, photoUrl }
+         { markName, modelName, bodyStyles,generationName, startYear, endYear, photoUrl }
       ) => {
          const mark = await Mark.exists({ name: markName })
          if (!mark) {
@@ -104,6 +104,7 @@ export default {
                name: generationName,
                startYear: Number(startYear),
                endYear: Number(endYear),
+               bodyStyles,
                photoUrl
             }
          ]

@@ -14,6 +14,9 @@ const modelSchema = new mongoose.Schema({
          name: {
             type: String
          },
+         bodyStyles: {
+            type: [String]
+         },
          startYear: {
             type: Number
          },

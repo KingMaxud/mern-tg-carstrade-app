@@ -3,40 +3,44 @@ import { UserInputError } from 'apollo-server-errors'
 import Announcement from '../../models/announcement.model.js'
 
 const createFilterObject = filter => {
-   const keysWithFloatingValues = [
-      'price',
-      'year',
-      'mileage',
-      'engineCapacity',
-      'power'
-   ]
-   const filterObj = {}
+   const {
+      minPrice,
+      maxPrice,
+      minYear,
+      maxYear,
+      minEngineCapacity,
+      maxEngineCapacity,
+      minPower,
+      maxPower,
+      ...rest
+   } = filter
 
-   for (const key in filter) {
-      if (keysWithFloatingValues.includes(key)) {
-         if (filter[key][0]) {
-            filterObj[key] = {
-               $gte: Number(filter[key][0])
-            }
-         }
-         if (filter[key][1]) {
-            filterObj[key] = {
-               ...filterObj[key],
-               $lte: Number(filter[key][1])
-            }
-         }
-      } else {
-         filterObj[key] = filter[key]
+   const minMaxKeys = {
+      price: {
+         $gte: minPrice || 0,
+         $lte: maxPrice || 999999
+      },
+      year: {
+         $gte: minYear || 1940,
+         $lte: maxYear || 9999
+      },
+      engineCapacity: {
+         $gte: minEngineCapacity || 0,
+         $lte: maxEngineCapacity || 10
+      },
+      power: {
+         $gte: minPower || 0,
+         $lte: maxPower || 9999
       }
    }
 
-   return filterObj
+   return { ...minMaxKeys, ...rest }
 }
 
 export default {
    Query: {
       getAnnouncements: async (_, { filter, sort, pagination }) => {
-         const filterObj = createFilterObject(filter)
+         const filterObj = createFilterObject({ ...filter })
 
          const sortObj = {
             [sort?.key]: Number(sort?.direction),
@@ -50,14 +54,13 @@ export default {
          return announcements
       },
       getFilteredAnnouncementCount: async (_, { filter }) => {
-         const filterObj = createFilterObject(filter)
+         const filterObj = createFilterObject({ ...filter })
          const count = await Announcement.find(filterObj).count()
          return count
       },
       getAnnouncement: async (_, { id }) => {
          const announcement = await Announcement.findOne({ _id: id })
          if (!announcement) {
-            console.log('I am here')
             throw new UserInputError('Announcement is not find!')
          }
          return announcement
@@ -86,6 +89,7 @@ export default {
             driveInit,
             engineCapacity,
             power,
+            photos,
             phoneNumber
          }
       ) => {
@@ -105,6 +109,7 @@ export default {
             driveInit,
             engineCapacity: Number(engineCapacity),
             power: Number(power),
+            photos,
             phoneNumber: Number(phoneNumber)
          })
 
