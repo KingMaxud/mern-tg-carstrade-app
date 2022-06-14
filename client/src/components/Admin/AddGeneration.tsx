@@ -2,59 +2,56 @@ import React, { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useMutation } from '@apollo/client'
-import { FilePond, registerPlugin } from 'react-filepond'
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
-import FilePondPluginImageValidateSize from 'filepond-plugin-image-validate-size'
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
-import 'filepond/dist/filepond.min.css'
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+import { Checkbox, Button } from '@chakra-ui/react'
 
 import { ADD_GENERATION } from '../../shared/utils/graphql'
 import useAddPhoto from '../../shared/hooks/useAddPhoto'
-import { addGenerationVars, MutationDetails } from '../../shared/types'
-
-registerPlugin(
-   FilePondPluginImagePreview,
-   FilePondPluginImageValidateSize,
-   FilePondPluginImageExifOrientation,
-   FilePondPluginFileValidateType
-)
+import { AddGenerationVars, MutationDetails } from '../../shared/types'
+import { bodyStyles } from '../../shared/data'
 
 type AddGenerationProps = {
    mark: string
    model: string
 }
 
+type FormikValues = {
+   generationName: string
+   bodyStyles: string[]
+   startYear: string
+   endYear: string
+}
+
 const AddGeneration = ({ mark, model }: AddGenerationProps): JSX.Element => {
    const [error, setError] = useState('')
    const [loading, setLoading] = useState(false)
    const [photoUrlError, setPhotoUrlError] = useState('')
-   const [images, setImages] = useState<any>([])
-   const addPhoto = useAddPhoto()
+   const { addPhoto, addPhotoComponent } = useAddPhoto()
 
    const AddGenerationSchema = Yup.object().shape({
       generationName: Yup.string().required('Required'),
+      bodyStyles: Yup.array().of(Yup.string()).required('Required'),
       startYear: Yup.string().required('Required'),
       endYear: Yup.string().required('Required')
    })
 
-   const formik = useFormik({
+   const formik = useFormik<FormikValues>({
       initialValues: {
          generationName: '',
+         bodyStyles: [],
          startYear: '',
          endYear: ''
       },
       validationSchema: AddGenerationSchema,
       onSubmit: async values => {
          setLoading(true)
-         const photoUrl = await addPhoto(images)
+         const photoUrl = await addPhoto()
          if (photoUrl) {
             addGeneration({
                variables: {
                   markName: mark,
                   modelName: model,
                   generationName: values.generationName,
+                  bodyStyles: values.bodyStyles,
                   startYear: values.startYear,
                   endYear: values.endYear,
                   photoUrl: photoUrl[0]
@@ -68,7 +65,7 @@ const AddGeneration = ({ mark, model }: AddGenerationProps): JSX.Element => {
 
    const [addGeneration] = useMutation<
       { addGeneration: MutationDetails },
-      addGenerationVars
+      AddGenerationVars
    >(ADD_GENERATION, {
       update() {
          setLoading(false)
@@ -119,22 +116,28 @@ const AddGeneration = ({ mark, model }: AddGenerationProps): JSX.Element => {
             {formik.touched.endYear && formik.errors.endYear ? (
                <div>{formik.errors.endYear}</div>
             ) : null}
-            <label htmlFor="modelName">Photo: </label>
-            <FilePond
-               // @ts-ignore
-               files={images}
-               // @ts-ignore
-               onupdatefiles={setImages}
-               allowMultiple={false}
-               name="files"
-               acceptedFileTypes={['image/png', 'image/jpeg', 'image/jpg']}
-               imageValidateSizeMinWidth={320}
-               imageValidateSizeMinHeight={240}
-               labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-            />
+            {bodyStyles.map(b => (
+               <Checkbox key={b}
+                  onChange={() => {
+                     if (formik.values.bodyStyles.includes(b)) {
+                        formik.setFieldValue(
+                           'bodyStyles',
+                           formik.values.bodyStyles.filter(v => v !== b)
+                        )
+                     } else {
+                        formik.values.bodyStyles.push(b)
+                     }
+                  }}>
+                  {b}
+               </Checkbox>
+            ))}
+            {formik.touched.bodyStyles && formik.errors.bodyStyles ? (
+               <div>{formik.errors.bodyStyles}</div>
+            ) : null}
+            {addPhotoComponent}
             {photoUrlError}
-            <button type="submit">Add</button>
             {error && error}
+            <Button type="submit">Add</Button>
          </form>
       </>
    )

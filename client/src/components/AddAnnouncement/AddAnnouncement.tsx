@@ -1,14 +1,16 @@
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import { FilePond, registerPlugin } from 'react-filepond'
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
-import FilePondPluginImageValidateSize from 'filepond-plugin-image-validate-size'
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
-import 'filepond/dist/filepond.min.css'
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+import {
+   VStack,
+   Button,
+   Select,
+   RadioGroup,
+   Radio,
+   FormLabel,
+   Input
+} from '@chakra-ui/react'
 
 import useAddPhoto from '../../shared/hooks/useAddPhoto'
 import {
@@ -20,6 +22,7 @@ import {
 import {
    AddAnnouncementData,
    AddAnnouncementVars,
+   Generation,
    GenerationsData,
    GenerationsVars,
    MarksData,
@@ -27,13 +30,14 @@ import {
    ModelsVars
 } from '../../shared/types'
 import useGetUser from '../../shared/hooks/useGetUser'
-
-registerPlugin(
-   FilePondPluginImagePreview,
-   FilePondPluginImageValidateSize,
-   FilePondPluginImageExifOrientation,
-   FilePondPluginFileValidateType
-)
+import {
+   colors,
+   driveInits,
+   engineCapacity,
+   fuelTypes,
+   getYears,
+   transmission
+} from '../../shared/data'
 
 const AddAnnouncement = () => {
    const [announcementLoading, setAnnouncementLoading] = useState(true)
@@ -47,7 +51,10 @@ const AddAnnouncement = () => {
    })
    const [generation, setGeneration] = useState('')
    const [userId, setUserId] = useState('')
-   const addPhoto = useAddPhoto()
+   const [years, setYears] = useState(getYears(1940, 2022))
+   const [bodyStyles, setBodyStyles] = useState<string[]>([])
+
+   const { addPhoto, addPhotoComponent } = useAddPhoto()
    const { getUserId } = useGetUser()
 
    useQuery<MarksData>(GET_MARKS, {
@@ -66,7 +73,9 @@ const AddAnnouncement = () => {
       GET_GENERATIONS,
       {
          variables: { markName: mark, modelName: model },
-         onCompleted: data => setGenerationsData(data)
+         onCompleted: data => {
+            setGenerationsData(data)
+         }
       }
    )
 
@@ -94,7 +103,7 @@ const AddAnnouncement = () => {
 
    const formik = useFormik({
       initialValues: {
-         condition: '',
+         condition: 'Used',
          price: '',
          year: '',
          mileage: '',
@@ -105,14 +114,47 @@ const AddAnnouncement = () => {
          driveInit: '',
          engineCapacity: '',
          power: '',
-         phoneNumber: ''
+         phoneNumber: '123456789'
       },
       // validationSchema: AddGenerationSchema,
-      onSubmit: values => {
-         console.log(values)
+      onSubmit: async values => {
+         const photoUrl = await addPhoto()
+         addAnnouncement({
+            variables: {
+               user: userId,
+               mark,
+               model,
+               generation,
+               condition: values.condition,
+               price: values.price,
+               year: values.year,
+               mileage: values.mileage,
+               color: values.color,
+               bodyStyle: values.bodyStyle,
+               transmission: values.transmission,
+               fuelType: values.fuelType,
+               driveInit: values.driveInit,
+               engineCapacity: values.engineCapacity,
+               power: values.power,
+               photos: photoUrl || [],
+               phoneNumber: '123456789'
+            }
+         })
          setAnnouncementLoading(true)
       }
    })
+
+   useEffect(() => {
+      if (mark) {
+         loadModels()
+      }
+   }, [mark])
+
+   useEffect(() => {
+      if (model) {
+         loadGenerations()
+      }
+   }, [model])
 
    const [addAnnouncement] = useMutation<
       AddAnnouncementData,
@@ -125,67 +167,205 @@ const AddAnnouncement = () => {
 
    const handleMarksSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setMark(e.target.value)
-      loadModels()
    }
    const handleModelsSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setModel(e.target.value)
-      loadGenerations()
    }
    const handleGenerationsSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
-      setGeneration(e.target.value)
+      const g: Generation = JSON.parse(e.target.value)
+      setGeneration(g.name)
+      setYears(getYears(g.startYear, g.endYear))
+      setBodyStyles(g.bodyStyles)
+   }
+   const handleConditionSelection = (nextValue: string) => {
+      formik.setFieldValue('condition', nextValue)
    }
 
    return (
       <>
          <form onSubmit={formik.handleSubmit}>
-            <label htmlFor="mark">Select Mark:</label>
-            <select value={mark} id="mark" onChange={handleMarksSelection}>
-               <option value="" label="-- Mark --" />
-               {marksData.getMarks.map(mark => (
-                  <option value={mark.name} label={mark.name} key={mark._id} />
-               ))}
-            </select>
-            <label htmlFor="mark">Select Model:</label>
-            <select value={model} id="mark" onChange={handleModelsSelection}>
-               <option value="" label="-- Model --" />
-               {modelsData.getModels.map(model => (
-                  <option
-                     value={model.name}
-                     label={model.name}
-                     key={model._id}
-                  />
-               ))}
-            </select>
-            <label htmlFor="generation">Select Generation:</label>
-            <select
-               value={generation}
-               id="generation"
-               onChange={handleGenerationsSelection}>
-               <option value="" label="-- Generation --" />
-               {generationsData.getGenerations.map(generation => (
-                  <option
-                     value={generation.name}
-                     label={generation.name}
-                     key={generation._id}
-                  />
-               ))}
-            </select>
-            <button type="submit">Submit</button>
-            <input type="checkbox" name="name" id="id" />
-            <label htmlFor="price">Price: </label>
-            <input
-               id="price"
-               name="price"
-               type="text"
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               value={formik.values.price}
-            />
-            {formik.touched.price && formik.errors.price ? (
-               <div>{formik.errors.price}</div>
-            ) : null}
+            <VStack>
+               <FormLabel htmlFor="mark">Select Mark:</FormLabel>
+               <Select value={mark} id="mark" onChange={handleMarksSelection}>
+                  <option value="" label="-- Mark --" />
+                  {marksData.getMarks.map(mark => (
+                     <option
+                        value={mark.name}
+                        label={mark.name}
+                        key={mark._id}
+                     />
+                  ))}
+               </Select>
+
+               <FormLabel htmlFor="mark">Select Model:</FormLabel>
+               <select value={model} id="mark" onChange={handleModelsSelection}>
+                  <option value="" label="-- Model --" />
+                  {modelsData.getModels.map(model => (
+                     <option
+                        value={model.name}
+                        label={model.name}
+                        key={model._id}
+                     />
+                  ))}
+               </select>
+
+               <FormLabel htmlFor="generation">Select Generation:</FormLabel>
+               <select
+                  value={generation}
+                  id="generation"
+                  onChange={handleGenerationsSelection}>
+                  <option value="" label="-- Generation --" />
+                  {generationsData.getGenerations.map(generation => {
+                     return (
+                        <option
+                           value={JSON.stringify(generation)}
+                           label={generation.name}
+                           key={generation._id}
+                        />
+                     )
+                  })}
+               </select>
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Year"
+                  id="year"
+                  name="year">
+                  {years.map(year => (
+                     <option value={year} label={year.toString()} key={year} />
+                  ))}
+               </Select>
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Body Style"
+                  id="bodyStyle"
+                  name="bodyStyle">
+                  {bodyStyles.map(bodyStyle => (
+                     <option
+                        value={bodyStyle}
+                        label={bodyStyle}
+                        key={bodyStyle}
+                     />
+                  ))}
+               </Select>
+
+               <RadioGroup
+                  onChange={handleConditionSelection}
+                  value={formik.values.condition}
+                  name="condition"
+                  id="condition">
+                  <Radio value="Used">Used</Radio>
+                  <Radio value="New">New</Radio>
+               </RadioGroup>
+
+               <FormLabel htmlFor="mileage">Mileage</FormLabel>
+               <Input
+                  id="mileage"
+                  name="mileage"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.mileage}
+               />
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Color"
+                  id="color"
+                  name="color">
+                  {colors.map(color => (
+                     <option
+                        value={color.color}
+                        label={color.color}
+                        key={color.hex}
+                     />
+                  ))}
+               </Select>
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Transmission"
+                  id="transmission"
+                  name="transmission">
+                  {transmission.map(transmission => (
+                     <option
+                        value={transmission}
+                        label={transmission}
+                        key={transmission}
+                     />
+                  ))}
+               </Select>
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Fuel Type"
+                  id="fuelType"
+                  name="fuelType">
+                  {fuelTypes.map(fuelType => (
+                     <option value={fuelType} label={fuelType} key={fuelType} />
+                  ))}
+               </Select>
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Drive Init"
+                  id="driveInit"
+                  name="driveInit">
+                  {driveInits.map(driveInit => (
+                     <option
+                        value={driveInit}
+                        label={driveInit}
+                        key={driveInit}
+                     />
+                  ))}
+               </Select>
+
+               <Select
+                  onChange={formik.handleChange}
+                  placeholder="Select Engine Capacity"
+                  id="engineCapacity"
+                  name="engineCapacity">
+                  {engineCapacity.map(e => (
+                     <option
+                        value={e.toString()}
+                        label={e.toString()}
+                        key={e}
+                     />
+                  ))}
+               </Select>
+
+               <FormLabel htmlFor="power">Power</FormLabel>
+               <Input
+                  id="power"
+                  name="power"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.power}
+               />
+
+               <FormLabel htmlFor="phoneNumber">Price</FormLabel>
+               <Input
+                  id="price"
+                  name="price"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.price}
+               />
+
+               <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
+               <Input
+                  isDisabled={true}
+                  id="power"
+                  name="power"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.phoneNumber}
+               />
+               {addPhotoComponent}
+               <Button type="submit">Publish Announcement</Button>
+            </VStack>
          </form>
       </>
    )

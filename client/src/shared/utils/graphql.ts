@@ -22,6 +22,7 @@ export const GET_GENERATIONS = gql`
    query GetGenerations($markName: String!, $modelName: String!) {
       getGenerations(markName: $markName, modelName: $modelName) {
          name
+         bodyStyles
          startYear
          endYear
          photoUrl
@@ -67,21 +68,23 @@ export const DELETE_MODEL = gql`
 `
 
 export const ADD_GENERATION = gql`
-   mutation AddGeneration(
+   mutation Mutation(
       $markName: String!
-      $modelName: String!
       $generationName: String!
       $startYear: String!
       $endYear: String!
       $photoUrl: String!
+      $bodyStyles: [String!]
+      $modelName: String!
    ) {
       addGeneration(
          markName: $markName
-         modelName: $modelName
          generationName: $generationName
          startYear: $startYear
          endYear: $endYear
          photoUrl: $photoUrl
+         bodyStyles: $bodyStyles
+         modelName: $modelName
       ) {
          success
          message
@@ -118,44 +121,70 @@ export const GET_USER = gql(`
 `)
 
 export const ADD_ANNOUNCEMENT = gql`
-    mutation Mutation(
-        $user: String!
-        $mark: String!
-        $model: String!
-        $generation: String!
-        $condition: String!
-        $price: String!
-        $year: String!
-        $mileage: String!
-        $color: String!
-        $bodyStyle: String!
-        $transmission: String!
-        $fuelType: String!
-        $driveInit: String!
-        $engineCapacity: String!
-        $power: String!
-        $phoneNumber: String!
-    ) {
-        addAnnouncement(
-            user: $user
-            mark: $mark
-            model: $model
-            generation: $generation
-            condition: $condition
-            price: $price
-            year: $year
-            mileage: $mileage
-            color: $color
-            bodyStyle: $bodyStyle
-            transmission: $transmission
-            fuelType: $fuelType
-            driveInit: $driveInit
-            engineCapacity: $engineCapacity
-            power: $power
-            phoneNumber: $phoneNumber
-        ) {
-            success
-            message
+   mutation Mutation(
+      $user: String!
+      $mark: String!
+      $model: String!
+      $generation: String!
+      $condition: String!
+      $price: String!
+      $year: String!
+      $mileage: String!
+      $color: String!
+      $bodyStyle: String!
+      $transmission: String!
+      $fuelType: String!
+      $driveInit: String!
+      $engineCapacity: String!
+      $power: String!
+      $photos: [String]
+      $phoneNumber: String!
+   ) {
+      addAnnouncement(
+         user: $user
+         mark: $mark
+         model: $model
+         generation: $generation
+         condition: $condition
+         price: $price
+         year: $year
+         mileage: $mileage
+         color: $color
+         bodyStyle: $bodyStyle
+         transmission: $transmission
+         fuelType: $fuelType
+         driveInit: $driveInit
+         engineCapacity: $engineCapacity
+         power: $power
+         photos: $photos
+         phoneNumber: $phoneNumber
+      ) {
+         success
+         message
+      }
+   }
+`
+
+export const GET_ANNOUNCEMENTS = gql`
+    query GetGenerations($pagination: PaginationInput!, $sort: SortInput, $filter: FilterInput) {
+        getAnnouncements(pagination: $pagination, sort: $sort, filter: $filter) {
+            photos
+            condition
+            price
+            year
+            mileage
+            transmission
+            fuelType
+            mark
+            model
+            driveInit
+            _id
         }
+    }
+`
+
+export const GET_FILTERED_ANNOUNCEMENTS_COUNT = gql`
+    query Query($filter: FilterInput) {
+        getFilteredAnnouncementCount(filter: $filter)
     }
 `

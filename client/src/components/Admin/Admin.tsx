@@ -1,5 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Box, Button } from '@chakra-ui/react'
 
 import {
    GET_MARKS,
@@ -17,7 +18,7 @@ import {
    GenerationsVars,
    MutationDetails,
    ModelHandleVars,
-   deleteGenerationVars
+   DeleteGenerationVars
 } from '../../shared/types'
 import AddGeneration from './AddGeneration'
 import AddModel from './AddModel'
@@ -51,6 +52,18 @@ const Admin = () => {
       variables: { markName: selectedMark, modelName: selectedModel }
    })
 
+   useEffect(() => {
+      if (selectedMark) {
+         loadModels()
+      }
+   }, [selectedMark])
+
+   useEffect(() => {
+      if (selectedModel) {
+         loadGenerations()
+      }
+   }, [selectedModel])
+
    const [deleteMark] = useMutation<
       { deleteMark: MutationDetails },
       ModelsVars
@@ -63,7 +76,7 @@ const Admin = () => {
 
    const [deleteGeneration] = useMutation<
       { deleteGeneration: MutationDetails },
-      deleteGenerationVars
+      DeleteGenerationVars
    >(DELETE_GENERATION)
 
    return (
@@ -77,35 +90,33 @@ const Admin = () => {
          )}
          {marksData &&
             marksData.getMarks.map(mark => (
-               <div key={mark._id}>
+               <Box key={mark._id}>
                   <div
                      onClick={() => {
                         setSelectedMark(mark.name)
-                        loadModels()
                      }}>
                      {mark.name}
                   </div>
-                  <span
+                  <Button
                      onClick={() =>
                         deleteMark({ variables: { markName: mark.name } })
                      }>
                      delete
-                  </span>
-               </div>
+                  </Button>
+               </Box>
             ))}
          <div>
             {!selectedMark && 'Select Mark'}
             {modelsData &&
                modelsData.getModels.map(model => (
-                  <div key={model._id}>
+                  <Box key={model._id}>
                      <div
                         onClick={() => {
                            setSelectedModel(model.name)
-                           loadGenerations()
                         }}>
                         {model.name}
                      </div>
-                     <span
+                     <Button
                         onClick={() =>
                            deleteModel({
                               variables: {
@@ -115,17 +126,17 @@ const Admin = () => {
                            })
                         }>
                         delete
-                     </span>
-                  </div>
+                     </Button>
+                  </Box>
                ))}
          </div>
          <div>
             {!selectedModel && 'Select Model'}
             {generationsData &&
                generationsData.getGenerations.map(generation => (
-                  <div key={generation._id}>
+                  <Box key={generation._id}>
                      {generation.name}
-                     <span
+                     <Button
                         onClick={() =>
                            deleteGeneration({
                               variables: {
@@ -136,8 +147,8 @@ const Admin = () => {
                            })
                         }>
                         delete
-                     </span>
-                  </div>
+                     </Button>
+                  </Box>
                ))}
          </div>
       </>

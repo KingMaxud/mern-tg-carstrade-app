@@ -15,8 +15,9 @@ export type ModelsData = {
 export type ModelsVars = {
    markName: string
 }
-type Generation = {
+export type Generation = {
    name: string
+   bodyStyles: string[]
    startYear: number
    endYear: number
    photo: number
@@ -37,15 +38,16 @@ export type ModelHandleVars = {
    markName: string
    modelName: string
 }
-export type addGenerationVars = {
+export type AddGenerationVars = {
    markName: string
    modelName: string
+   bodyStyles: string[]
    generationName: string
    startYear: string
    endYear: string
    photoUrl: string
 }
-export type deleteGenerationVars = {
+export type DeleteGenerationVars = {
    markName: string
    modelName: string
    generationName: string
@@ -71,6 +73,70 @@ export type AddAnnouncementVars = {
    driveInit: string
    engineCapacity: string
    power: string
+   photos: string[]
    phoneNumber: string
 }
 
+export type SearchParams = {
+   mark?: string
+   model?: string
+   generation?: string[]
+   condition?: string[]
+   minPrice?: string
+   maxPrice?: string
+   minYear?: string
+   maxYear?: string
+   minMileage?: string
+   maxMileage?: string
+   color?: string[]
+   bodyStyle?: string[]
+   transmission?: string[]
+   fuelType?: string[]
+   driveInit?: string[]
+   minEngineCapacity?: string
+   maxEngineCapacity?: string
+   minPower?: string
+   maxPower?: string
+}
+
+type Sort = {
+   key: string
+   direction: string
+}
+
+type Pagination = {
+   page: string
+   limit: string
+}
+
+export type Announcement = {
+   photos: string[]
+   condition: string
+   price: number
+   year: number
+   mileage: number
+   transmission: string
+   fuelType: string
+   mark: string
+   model: string
+   driveInit: string
+   _id: string
+}
+
+export type GetAnnouncementsData = {
+   getAnnouncements: Announcement[]
+}
+
+export type GetAnnouncementsVars = {
+   filter?: SearchParams
+   sort?: Sort
+   pagination: Pagination
+}
+
+export type GetFilteredAnnouncementCountData = {
+   getFilteredAnnouncementCount: number
+}
+
+export type GetFilteredAnnouncementCountVars = {
+   filter?: SearchParams
+}
