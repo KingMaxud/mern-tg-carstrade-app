@@ -9,7 +9,7 @@ import useAddPhoto from '../../shared/hooks/useAddPhoto'
 import { AddGenerationVars, MutationDetails } from '../../shared/types'
 import { bodyStyles } from '../../shared/data'
 
-type AddGenerationProps = {
+type Props = {
    mark: string
    model: string
 }
@@ -21,7 +21,7 @@ type FormikValues = {
    endYear: string
 }
 
-const AddGeneration = ({ mark, model }: AddGenerationProps): JSX.Element => {
+const AddGeneration = ({ mark, model }: Props): JSX.Element => {
    const [error, setError] = useState('')
    const [loading, setLoading] = useState(false)
    const [photoUrlError, setPhotoUrlError] = useState('')

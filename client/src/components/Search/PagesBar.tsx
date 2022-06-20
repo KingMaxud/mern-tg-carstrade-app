@@ -1,9 +1,10 @@
 import { Button, HStack } from '@chakra-ui/react'
+import { Dispatch, SetStateAction } from 'react'
 
 type Props = {
    count: number
    selectedPage: number
-   setPage: (value: number) => void
+   setPage: Dispatch<SetStateAction<number>>
    incrementPage: () => void
    decrementPage: () => void
 }

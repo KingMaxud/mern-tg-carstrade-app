@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
+import { useSearchParams } from 'react-router-dom'
 
 import {
    CheckboxKeys,
@@ -16,7 +17,6 @@ import {
    arrayKeys,
    bodyStyles,
    colors,
-   conditions,
    driveInits,
    fuelTypes,
    getEngineCapacities,
@@ -34,15 +34,16 @@ import {
 } from '../../../shared/utils/graphql'
 import useCustomSearchParams from '../../../shared/hooks/useCustomSearchParams'
 import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
-import { useSearchParams } from 'react-router-dom'
 
-const AdvancedFilter = () => {
+type Props = {
+   params: SearchParams
+   setParams: Dispatch<SetStateAction<SearchParams>>
+}
+
+const AdvancedFilter = ({ params, setParams }: Props) => {
    const [, setSearch] = useSearchParams()
    const [search] = useCustomSearchParams()
 
-   const [params, setParams] = useState<SearchParams>({
-      condition: ['Used', 'New']
-   })
    const [loaded, setLoaded] = useState(false)
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)

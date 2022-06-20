@@ -22,7 +22,9 @@ const Search = () => {
    const [search, setSearch] = useCustomSearchParams()
 
    const [count, setCount] = useState(0)
-   const [params, setParams] = useState<SearchParams>({})
+   const [params, setParams] = useState<SearchParams>({
+      condition: ['Used', 'New']
+   })
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
    const [page, setPage] = useState(1)
 
@@ -66,13 +68,11 @@ const Search = () => {
       loadAnnouncements()
    }, [])
 
-   useEffect(() => {
-
-   }, [search])
+   useEffect(() => {}, [search])
 
    return (
       <div>
-         <AdvancedFilter />
+         <AdvancedFilter params={params} setParams={setParams} />
          <AnnouncementsList announcements={announcements} />
          <PagesBar
             count={count}

@@ -6,8 +6,6 @@ export function getYears(min: number, max: number) {
    return years.reverse()
 }
 
-export const conditions = ['Used', 'New', 'Used & New']
-
 export const bodyStyles = [
    'Sedan',
    'Wagon',
