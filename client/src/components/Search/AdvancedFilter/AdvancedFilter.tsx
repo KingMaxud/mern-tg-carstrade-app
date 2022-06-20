@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useSearchParams } from 'react-router-dom'
 
 import {
+   CheckboxKeys,
    GenerationsData,
    GenerationsVars,
    MarksData,
    ModelsData,
-   ModelsVars, SearchParams
+   ModelsVars,
+   SearchParams,
+   SelectKeys
 } from '../../../shared/types'
 import {
+   arrayKeys,
    bodyStyles,
    colors,
    conditions,
@@ -21,6 +24,7 @@ import {
    getPowers,
    getPrices,
    getYears,
+   stringKeys,
    transmission
 } from '../../../shared/data'
 import {
@@ -28,50 +32,38 @@ import {
    GET_MARKS,
    GET_MODELS
 } from '../../../shared/utils/graphql'
-import useCustomSearchParams from "../../../shared/hooks/useCustomSearchParams";
-
-type Props = {
-   searchParamsFilter: {}
-}
+import useCustomSearchParams from '../../../shared/hooks/useCustomSearchParams'
+import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
+import { useSearchParams } from 'react-router-dom'
 
 const AdvancedFilter = () => {
-   const [search, setSearch] = useCustomSearchParams()
+   const [, setSearch] = useSearchParams()
+   const [search] = useCustomSearchParams()
 
-   const [params, setParams] = useState<SearchParams>({})
-   const [condition, setCondition] = useState<string[]>(['Used'])
+   const [params, setParams] = useState<SearchParams>({
+      condition: ['Used', 'New']
+   })
+   const [loaded, setLoaded] = useState(false)
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)
-   const [mark, setMark] = useState('')
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
-   const [model, setModel] = useState('')
    const [generationsData, setGenerationsData] = useState<GenerationsData>({
       getGenerations: []
    })
-   const [generations, setGenerations] = useState<string[]>([])
    const [yearsFrom, setYearsFrom] = useState(getYears(1940, 2022))
    const [yearsTo, setYearsTo] = useState(getYears(1940, 2022))
-   const [minYear, setMinYear] = useState<number>(1940)
-   const [maxYear, setMaxYear] = useState<number>(2022)
    const [pricesFrom, setPricesFrom] = useState(getPrices(0, 100000))
    const [pricesTo, setPricesTo] = useState(getPrices(0, 100000))
-   const [minPrice, setMinPrice] = useState(0)
-   const [maxPrice, setMaxPrice] = useState(100001)
    const [mileagesFrom, setMileagesFrom] = useState(getMileages(0, 300000))
    const [mileagesTo, setMileagesTo] = useState(getMileages(0, 300000))
-   const [minMileage, setMinMileage] = useState(0)
-   const [maxMileage, setMaxMileage] = useState(100001)
    const [engineCapacitiesFrom, setEngineCapacitiesFrom] = useState(
       getEngineCapacities(0, 6.5)
    )
    const [engineCapacitiesTo, setEngineCapacitiesTo] = useState(
       getEngineCapacities(0, 6.5)
    )
-   const [minEngineCapacity, setMinEngineCapacity] = useState(0)
-   const [maxEngineCapacity, setMaxEngineCapacity] = useState(100001)
    const [powersFrom, setPowersFrom] = useState(getPowers(0, 600))
    const [powersTo, setPowersTo] = useState(getPowers(0, 600))
-   const [minPower, setMinPower] = useState(0)
-   const [maxPower, setMaxPower] = useState(601)
 
    useQuery<MarksData>(GET_MARKS, {
       onCompleted: data => {
@@ -81,7 +73,7 @@ const AdvancedFilter = () => {
    })
 
    const [loadModels] = useLazyQuery<ModelsData, ModelsVars>(GET_MODELS, {
-      variables: { markName: mark },
+      variables: { markName: params.mark || '' },
       onCompleted: data => setModelsData(data)
    })
 
@@ -89,219 +81,386 @@ const AdvancedFilter = () => {
       GET_GENERATIONS,
       {
          variables: {
-            markName: mark,
-            modelName: model
+            markName: params.mark || '',
+            modelName: params.model || ''
          },
          onCompleted: data => setGenerationsData(data)
       }
    )
 
+   // Load models when mark changes
+   useDidMountEffect(() => {
+      loadModels()
+      setGenerationsData({ getGenerations: [] })
+      const temp = { ...params }
+      delete temp['model']
+      delete temp['generation']
+      setParams(temp)
+   }, [params.mark])
+
+   // Load generations when model changes
+   useDidMountEffect(() => {
+      loadGenerations()
+      const temp = { ...params }
+      delete temp['generation']
+      setParams(temp)
+   }, [params.model])
+
+   // Effect to generations will not be deleted when they got from search params
+   useDidMountEffect(() => {
+      const temp = { ...params }
+      setParams(temp)
+   }, [params.generation])
+
+   // Set params object from search params when page loads
+   useEffect(() => {
+      for (const item in search) {
+         if (arrayKeys.includes(item)) {
+            setParams(prevState => ({
+               ...prevState,
+               [item]: search[item]
+            }))
+         } else if (stringKeys.includes(item)) {
+            setParams(prevState => ({
+               ...prevState,
+               [item]: search[item][0]
+            }))
+         }
+      }
+      setLoaded(true)
+   }, [])
+
+   // Set search params, when one of filter values changes
+   useDidMountEffect(() => {
+      setSearch(params, { replace: true })
+   }, [params])
+
+   // Handle selection data arrays
+   useDidMountEffect(() => {
+      setYearsTo(getYears(Number(params.minYear) || 1940, 2022))
+   }, [params.minYear])
+   useDidMountEffect(() => {
+      setYearsFrom(getYears(1940, Number(params.maxYear) || 2022))
+   }, [params.maxYear])
+   useDidMountEffect(() => {
+      setPricesTo(getPrices(Number(params.minPrice) || 0, 2000001))
+   }, [params.minPrice])
+   useDidMountEffect(() => {
+      setPricesFrom(getPrices(0, Number(params.maxPrice) || 2000001))
+   }, [params.maxPrice])
+   useDidMountEffect(() => {
+      setMileagesTo(getMileages(Number(params.minMileage) || 0, 300001))
+   }, [params.minMileage])
+   useDidMountEffect(() => {
+      setMileagesFrom(getMileages(0, Number(params.maxMileage) || 300001))
+   }, [params.maxMileage])
+   useDidMountEffect(() => {
+      setEngineCapacitiesTo(
+         getEngineCapacities(Number(params.minEngineCapacity) || 0, 6.6)
+      )
+   }, [params.minEngineCapacity])
+   useDidMountEffect(() => {
+      setEngineCapacitiesFrom(
+         getEngineCapacities(0, Number(params.maxEngineCapacity) || 6.6)
+      )
+   }, [params.maxEngineCapacity])
+   useDidMountEffect(() => {
+      setPowersTo(getPowers(Number(params.minPower) || 0, 601))
+   }, [params.minPower])
+   useDidMountEffect(() => {
+      setPowersFrom(getPowers(0, Number(params.maxPower) || 601))
+   }, [params.maxPower])
+
    const handleConditionSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
       if (e.target.value === 'Used & New') {
-         setCondition(['Used', 'New'])
+         setParams(prevState => ({
+            ...prevState,
+            condition: ['Used', 'New']
+         }))
       } else {
-         setCondition([e.target.value])
+         setParams(prevState => ({
+            ...prevState,
+            condition: [e.target.value]
+         }))
       }
    }
-   const handleMarksSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setMark(e.target.value)
-      loadModels()
-   }
-   const handleModelsSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setModel(e.target.value)
-      loadGenerations()
-   }
-   const handleMinYearSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setMinYear(Number(e.target.value))
-      setYearsTo(getYears(Number(e.target.value), 2022))
-   }
-   const handleMaxYearSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setMaxYear(Number(e.target.value))
-      setYearsFrom(getYears(1940, Number(e.target.value)))
-   }
-   const handleMinPriceSelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
+
+   const handleSelection = (
+      e: React.ChangeEvent<HTMLSelectElement>,
+      key: SelectKeys
    ) => {
-      setMinPrice(Number(e.target.value))
-      setPricesTo(getPrices(Number(e.target.value), 2000001))
+      if (e.target.value === '') {
+         const temp = { ...params }
+         delete temp[key]
+         setParams(temp)
+      } else {
+         setParams(prevState => ({
+            ...prevState,
+            [key]: e.target.value
+         }))
+      }
    }
-   const handleMaxPriceSelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMaxPrice(Number(e.target.value))
-      setPricesFrom(getPrices(0, Number(e.target.value)))
+
+   const handleCheckbox = (key: CheckboxKeys, value: string) => {
+      if (Object.keys(params).includes(key)) {
+         if (params[key]?.includes(value)) {
+            setParams(prevState => ({
+               ...prevState,
+               [key]: prevState[key]?.filter(g => g !== value)
+            }))
+         } else {
+            const tempArray: string[] = []
+            params[key]?.map(g => tempArray.push(g))
+            setParams(prevState => ({
+               ...prevState,
+               [key]: [...tempArray, value]
+            }))
+         }
+      } else {
+         setParams(prevState => ({
+            ...prevState,
+            [key]: [value]
+         }))
+      }
    }
-   const handleMinMileageSelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMinMileage(Number(e.target.value))
-      setMileagesTo(getPrices(Number(e.target.value), 2000001))
-   }
-   const handleMaxMileageSelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMaxMileage(Number(e.target.value))
-      setMileagesFrom(getPrices(0, Number(e.target.value)))
-   }
-   const handleMinEngineCapacitySelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMinEngineCapacity(Number(e.target.value))
-      setEngineCapacitiesTo(getEngineCapacities(Number(e.target.value), 6.6))
-   }
-   const handleMaxEngineCapacitySelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMaxEngineCapacity(Number(e.target.value))
-      setEngineCapacitiesFrom(getEngineCapacities(0, Number(e.target.value)))
-   }
-   const handleMinPowerSelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMinPower(Number(e.target.value))
-      setPowersTo(getPowers(Number(e.target.value), 601))
-   }
-   const handleMaxPowerSelection = (
-      e: React.ChangeEvent<HTMLSelectElement>
-   ) => {
-      setMaxPower(Number(e.target.value))
-      setPowersFrom(getPowers(0, Number(e.target.value)))
-   }
+
+   const conditionDefaultValue = (function () {
+      let value = 'Used & New'
+
+      if (params.condition) {
+         if (params.condition.length === 1) {
+            value = params.condition[0]
+         }
+      }
+
+      return value
+   })()
 
    return (
       <div>
-         <Select id="condition" onChange={handleConditionSelection}>
-            {conditions.map(condition => (
-               <option value={condition} label={condition} key={condition} />
-            ))}
-         </Select>
+         {loaded && (
+            <div>
+               <Select
+                  defaultValue={conditionDefaultValue}
+                  id="condition"
+                  onChange={handleConditionSelection}>
+                  <option value="Used & New" label="Used & New" />
+                  <option value="Used" label="Used" />
+                  <option value="New" label="New" />
+               </Select>
 
-         <Select placeholder="All" id="mark" onChange={handleMarksSelection}>
-            {marksData.getMarks.map(m => (
-               <option value={m.name} label={m.name} key={m._id} />
-            ))}
-         </Select>
+               {marksData.getMarks.length > 0 && (
+                  <Select
+                     defaultValue={params.mark || ''}
+                     id="mark"
+                     onChange={e => {
+                        handleSelection(e, 'mark')
+                     }}>
+                     <option value="" label={'All marks'} />
+                     {marksData.getMarks.map(m => (
+                        <option value={m.name} label={m.name} key={m._id} />
+                     ))}
+                  </Select>
+               )}
 
-         <Select placeholder="All" id="model" onChange={handleModelsSelection}>
-            {modelsData.getModels.map(mark => (
-               <option value={mark.name} label={mark.name} key={mark._id} />
-            ))}
-         </Select>
+               {marksData.getMarks.length === 0 && (
+                  <Select id="mark">
+                     <option value="" label={'All marks'} />
+                  </Select>
+               )}
 
-         <Select
-            placeholder="All"
-            id="generation"
-            onChange={handleModelsSelection}>
-            {generationsData.getGenerations.map(g => (
-               <option value={g.name} label={g.name} key={g._id} />
-            ))}
-         </Select>
+               {modelsData?.getModels.length > 0 && (
+                  <Select
+                     defaultValue={params.model}
+                     id="model"
+                     onChange={e => handleSelection(e, 'model')}>
+                     <option value="" label={'All models'} />
+                     {modelsData.getModels.map(mark => (
+                        <option
+                           value={mark.name}
+                           label={mark.name}
+                           key={mark._id}
+                        />
+                     ))}
+                  </Select>
+               )}
 
-         <FormLabel htmlFor="bodyStyle">Select Body Style:</FormLabel>
-         <Box>
-            {bodyStyles.map(b => (
-               <Checkbox key={b}>{b}</Checkbox>
-            ))}
-         </Box>
+               {(modelsData?.getModels.length === 0 || !modelsData) && (
+                  <Select id="model">
+                     <option value="" label={'All models'} />
+                  </Select>
+               )}
 
-         <Select onChange={handleMinYearSelection}>
-            <option value={1940} label={'Year from'} />
-            {yearsFrom.map(year => (
-               <option value={year} label={year.toString()} key={year} />
-            ))}
-         </Select>
-         <Select onChange={handleMaxYearSelection}>
-            <option value={2022} label={'To'} />
-            {yearsTo.map(year => (
-               <option value={year} label={year.toString()} key={year} />
-            ))}
-         </Select>
+               {generationsData &&
+                  generationsData.getGenerations.map(g => (
+                     <Checkbox
+                        isChecked={params.generation?.includes(g.name)}
+                        onChange={() => handleCheckbox('generation', g.name)}
+                        key={g._id}>
+                        {g.name}
+                     </Checkbox>
+                  ))}
 
-         <Select onChange={handleMinPriceSelection}>
-            <option value={0} label={'Price from'} />
-            {pricesFrom.map(price => (
-               <option value={price} label={price.toString()} key={price} />
-            ))}
-         </Select>
-         <Select onChange={handleMaxPriceSelection}>
-            <option value={200001} label={'To'} />
-            {pricesTo.map(price => (
-               <option value={price} label={price.toString()} key={price} />
-            ))}
-         </Select>
+               <FormLabel htmlFor="bodyStyle">Select Body Style:</FormLabel>
+               <Box>
+                  {bodyStyles.map(b => (
+                     <Checkbox
+                        isChecked={params.bodyStyle?.includes(b)}
+                        onChange={() => handleCheckbox('bodyStyle', b)}
+                        key={b}>
+                        {b}
+                     </Checkbox>
+                  ))}
+               </Box>
 
-         <Select onChange={handleMinMileageSelection}>
-            <option value={0} label={'Mileage from'} />
-            {mileagesFrom.map(mileage => (
-               <option
-                  value={mileage}
-                  label={mileage.toString()}
-                  key={mileage}
-               />
-            ))}
-         </Select>
-         <Select onChange={handleMaxMileageSelection}>
-            <option value={300001} label={'To'} />
-            {mileagesTo.map(mileage => (
-               <option
-                  value={mileage}
-                  label={mileage.toString()}
-                  key={mileage}
-               />
-            ))}
-         </Select>
+               <Select
+                  defaultValue={params.minYear}
+                  onChange={e => handleSelection(e, 'minYear')}>
+                  <option value="" label={'Year from'} />
+                  {yearsFrom.map(year => (
+                     <option value={year} label={year.toString()} key={year} />
+                  ))}
+               </Select>
+               <Select
+                  defaultValue={params.maxYear}
+                  onChange={e => handleSelection(e, 'maxYear')}>
+                  <option value="" label={'To'} />
+                  {yearsTo.map(year => (
+                     <option value={year} label={year.toString()} key={year} />
+                  ))}
+               </Select>
 
-         <Box>
-            {colors.map(b => (
-               <Checkbox key={b.hex}>{b.color}</Checkbox>
-            ))}
-         </Box>
+               <Select
+                  defaultValue={params.minPrice}
+                  onChange={e => handleSelection(e, 'minPrice')}>
+                  <option value="" label={'Price from'} />
+                  {pricesFrom.map(price => (
+                     <option
+                        value={price}
+                        label={price.toString()}
+                        key={price}
+                     />
+                  ))}
+               </Select>
+               <Select
+                  defaultValue={params.maxPrice}
+                  onChange={e => handleSelection(e, 'maxPrice')}>
+                  <option value="" label={'To'} />
+                  {pricesTo.map(price => (
+                     <option
+                        value={price}
+                        label={price.toString()}
+                        key={price}
+                     />
+                  ))}
+               </Select>
 
-         <Box>
-            {transmission.map(t => (
-               <Checkbox key={t}>{t}</Checkbox>
-            ))}
-         </Box>
+               <Select
+                  defaultValue={params.minMileage}
+                  onChange={e => handleSelection(e, 'minMileage')}>
+                  <option value="" label={'Mileage from'} />
+                  {mileagesFrom.map(mileage => (
+                     <option
+                        value={mileage}
+                        label={mileage.toString()}
+                        key={mileage}
+                     />
+                  ))}
+               </Select>
+               <Select
+                  defaultValue={params.maxMileage}
+                  onChange={e => handleSelection(e, 'maxMileage')}>
+                  <option value="" label={'To'} />
+                  {mileagesTo.map(mileage => (
+                     <option
+                        value={mileage}
+                        label={mileage.toString()}
+                        key={mileage}
+                     />
+                  ))}
+               </Select>
 
-         <Box>
-            {fuelTypes.map(t => (
-               <Checkbox key={t}>{t}</Checkbox>
-            ))}
-         </Box>
+               <Box>
+                  {colors.map(b => (
+                     <Checkbox
+                        key={b.hex}
+                        isChecked={params.color?.includes(b.color)}
+                        onChange={() => handleCheckbox('color', b.color)}>
+                        {b.color}
+                     </Checkbox>
+                  ))}
+               </Box>
 
-         <Box>
-            {driveInits.map(d => (
-               <Checkbox key={d}>{d}</Checkbox>
-            ))}
-         </Box>
+               <Box>
+                  {transmission.map(t => (
+                     <Checkbox
+                        key={t}
+                        isChecked={params.transmission?.includes(t)}
+                        onChange={() => handleCheckbox('transmission', t)}>
+                        {t}
+                     </Checkbox>
+                  ))}
+               </Box>
 
-         <Select onChange={handleMinEngineCapacitySelection}>
-            <option value={0} label={'Engine Capacity from'} />
-            {engineCapacitiesFrom.map(e => (
-               <option value={e} label={e.toString()} key={e} />
-            ))}
-         </Select>
-         <Select onChange={handleMaxEngineCapacitySelection}>
-            <option value={6.6} label={'To'} />
-            {engineCapacitiesTo.map(e => (
-               <option value={e} label={e.toString()} key={e} />
-            ))}
-         </Select>
+               <Box>
+                  {fuelTypes.map(t => (
+                     <Checkbox
+                        key={t}
+                        isChecked={params.fuelType?.includes(t)}
+                        onChange={() => handleCheckbox('fuelType', t)}>
+                        {t}
+                     </Checkbox>
+                  ))}
+               </Box>
 
-         <Select onChange={handleMinPowerSelection}>
-            <option value={0} label={'Power from'} />
-            {powersFrom.map(p => (
-               <option value={p} label={p.toString()} key={p} />
-            ))}
-         </Select>
-         <Select onChange={handleMaxPowerSelection}>
-            <option value={601} label={'To'} />
-            {powersTo.map(p => (
-               <option value={p} label={p.toString()} key={p} />
-            ))}
-         </Select>
+               <Box>
+                  {driveInits.map(d => (
+                     <Checkbox
+                        key={d}
+                        isChecked={params.driveInit?.includes(d)}
+                        onChange={() => handleCheckbox('driveInit', d)}>
+                        {d}
+                     </Checkbox>
+                  ))}
+               </Box>
+
+               <Select
+                  defaultValue={params.minEngineCapacity}
+                  onChange={e => handleSelection(e, 'minEngineCapacity')}>
+                  <option value="" label={'Engine Capacity from'} />
+                  {engineCapacitiesFrom.map(e => (
+                     <option value={e} label={e.toString()} key={e} />
+                  ))}
+               </Select>
+               <Select
+                  defaultValue={params.maxEngineCapacity}
+                  onChange={e => handleSelection(e, 'maxEngineCapacity')}>
+                  <option value="" label={'To'} />
+                  {engineCapacitiesTo.map(e => (
+                     <option value={e} label={e.toString()} key={e} />
+                  ))}
+               </Select>
+
+               <Select
+                  defaultValue={params.minPower}
+                  onChange={e => handleSelection(e, 'minPower')}>
+                  <option value="" label={'Power from'} />
+                  {powersFrom.map(p => (
+                     <option value={p} label={p.toString()} key={p} />
+                  ))}
+               </Select>
+               <Select
+                  defaultValue={params.maxPower}
+                  onChange={e => handleSelection(e, 'maxPower')}>
+                  <option value="" label={'To'} />
+                  {powersTo.map(p => (
+                     <option value={p} label={p.toString()} key={p} />
+                  ))}
+               </Select>
+            </div>
+         )}
       </div>
    )
 }

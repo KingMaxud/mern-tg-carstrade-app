@@ -2,9 +2,17 @@ import { useSearchParams } from 'react-router-dom'
 
 const useCustomSearchParams = () => {
    const [search, setSearch] = useSearchParams()
-   const searchAsObject = Object.fromEntries(new URLSearchParams(search))
 
-   return [searchAsObject, setSearch]
+   const searchObject: any = {}
+   search.forEach(function (value, key) {
+      if (Object.keys(searchObject).includes(key)) {
+         searchObject[key].push(value)
+      } else {
+         searchObject[key] = [value]
+      }
+   })
+
+   return [searchObject, setSearch]
 }
 
 export default useCustomSearchParams

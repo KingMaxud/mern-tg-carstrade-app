@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
-import { useSearchParams } from 'react-router-dom'
 
 import {
    Announcement,
@@ -66,6 +65,10 @@ const Search = () => {
    useEffect(() => {
       loadAnnouncements()
    }, [])
+
+   useEffect(() => {
+
+   }, [search])
 
    return (
       <div>

@@ -78,6 +78,7 @@ export type AddAnnouncementVars = {
 }
 
 export type SearchParams = {
+   page?: string
    mark?: string
    model?: string
    generation?: string[]
@@ -140,3 +141,24 @@ export type GetFilteredAnnouncementCountData = {
 export type GetFilteredAnnouncementCountVars = {
    filter?: SearchParams
 }
+
+export type SelectKeys =
+   | 'mark'
+   | 'model'
+   | 'minYear'
+   | 'maxYear'
+   | 'minPrice'
+   | 'maxPrice'
+   | 'minMileage'
+   | 'maxMileage'
+   | 'minEngineCapacity'
+   | 'maxEngineCapacity'
+   | 'minPower'
+   | 'maxPower'
+export type CheckboxKeys =
+   | 'generation'
+   | 'bodyStyle'
+   | 'color'
+   | 'transmission'
+   | 'fuelType'
+   | 'driveInit'

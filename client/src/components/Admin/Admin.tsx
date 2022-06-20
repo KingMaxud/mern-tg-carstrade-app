@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Box, Button } from '@chakra-ui/react'
 
 import {
@@ -18,15 +18,18 @@ import {
    GenerationsVars,
    MutationDetails,
    ModelHandleVars,
-   DeleteGenerationVars
+   DeleteGenerationVars,
+   Generation
 } from '../../shared/types'
 import AddGeneration from './AddGeneration'
 import AddModel from './AddModel'
 import AddMark from './AddMark'
+import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 
 const Admin = () => {
    const [selectedMark, setSelectedMark] = useState('')
    const [selectedModel, setSelectedModel] = useState('')
+   const [generationsData, setGenerationsData] = useState<Generation[]>([])
 
    const {
       data: marksData,
@@ -41,27 +44,23 @@ const Admin = () => {
       variables: { markName: selectedMark }
    })
 
-   const [
-      loadGenerations,
+   const [loadGenerations] = useLazyQuery<GenerationsData, GenerationsVars>(
+      GET_GENERATIONS,
       {
-         data: generationsData,
-         loading: generationsLoading,
-         error: generationsError
+         variables: { markName: selectedMark, modelName: selectedModel },
+         onCompleted: data => {
+            data && setGenerationsData(data.getGenerations)
+         }
       }
-   ] = useLazyQuery<GenerationsData, GenerationsVars>(GET_GENERATIONS, {
-      variables: { markName: selectedMark, modelName: selectedModel }
-   })
+   )
 
-   useEffect(() => {
-      if (selectedMark) {
-         loadModels()
-      }
+   useDidMountEffect(() => {
+      loadModels()
+      setGenerationsData([])
    }, [selectedMark])
 
-   useEffect(() => {
-      if (selectedModel) {
-         loadGenerations()
-      }
+   useDidMountEffect(() => {
+      loadGenerations()
    }, [selectedModel])
 
    const [deleteMark] = useMutation<
@@ -94,6 +93,7 @@ const Admin = () => {
                   <div
                      onClick={() => {
                         setSelectedMark(mark.name)
+                        setSelectedModel('')
                      }}>
                      {mark.name}
                   </div>
@@ -133,7 +133,7 @@ const Admin = () => {
          <div>
             {!selectedModel && 'Select Model'}
             {generationsData &&
-               generationsData.getGenerations.map(generation => (
+               generationsData.map(generation => (
                   <Box key={generation._id}>
                      {generation.name}
                      <Button

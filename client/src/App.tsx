@@ -14,8 +14,8 @@ import Admin from './components/Admin/Admin'
 import { gql } from '@apollo/client'
 import AdminProtected from './components/Admin/AdminProtected'
 import VehicleDetail from './components/VehicleDetail/VehicleDetail'
-import AddAnnouncement from "./components/AddAnnouncement/AddAnnouncement";
-import Search from "./components/Search/Search";
+import AddAnnouncement from './components/AddAnnouncement/AddAnnouncement'
+import Search from './components/Search/Search'
 
 const App = () => {
    const [state, dispatch] = useReducer(authReducer, initialAuthState)
@@ -29,14 +29,8 @@ const App = () => {
                path="vehicledetail/:vehicleid"
                element={<VehicleDetail />}
             />
-            <Route
-               path="addannouncement"
-               element={<AddAnnouncement />}
-            />
-            <Route
-               path="search"
-               element={<Search />}
-            />
+            <Route path="addannouncement" element={<AddAnnouncement />} />
+            <Route path="search" element={<Search />} />
             <Route
                path="signup"
                element={

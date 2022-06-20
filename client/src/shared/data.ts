@@ -84,7 +84,7 @@ const engineCapacitiesFilter = [
    6.5
 ]
 
-export function getEngineCapacities(min:number, max: number) {
+export function getEngineCapacities(min: number, max: number) {
    return engineCapacitiesFilter.filter(e => e >= min && e <= max)
 }
 
@@ -137,28 +137,6 @@ export const sorts = [
    }
 ]
 
-export const filterKeys = [
-   'mark',
-   'model',
-   'generation',
-   'condition',
-   'maxPrice',
-   'minPrice',
-   'maxYear',
-   'minYear',
-   'minMileage',
-   'maxMileage',
-   'color',
-   'bodyStyle',
-   'transmission',
-   'fuelType',
-   'driveInit',
-   'minEngineCapacity',
-   'maxEngineCapacity',
-   'minPower',
-   'maxPower'
-]
-
 export const arrayKeys = [
    'generation',
    'condition',
@@ -169,8 +147,24 @@ export const arrayKeys = [
    'driveInit'
 ]
 
+export const stringKeys = [
+   'page',
+   'mark',
+   'model',
+   'minPrice',
+   'maxPrice',
+   'minYear',
+   'maxYear',
+   'minMileage',
+   'maxMileage',
+   'minEngineCapacity',
+   'maxEngineCapacity',
+   'minPower',
+   'maxPower'
+]
+
 const powers = [100, 150, 200, 250, 300, 350, 400, 500, 600]
 
-export function getPowers(min: number, max:number) {
+export function getPowers(min: number, max: number) {
    return powers.filter(p => p >= min && p <= max)
 }

@@ -8,7 +8,8 @@ import {
    MarksData,
    ModelsData,
    ModelsVars,
-   SearchParams
+   SearchParams,
+   SelectKeys
 } from '../../../shared/types'
 import React, { useEffect, useState } from 'react'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -18,7 +19,7 @@ import {
    GET_MODELS
 } from '../../../shared/utils/graphql'
 import { getYears, prices } from '../../../shared/data'
-import useDidMountEffect from "../../../shared/hooks/useDidMountEffect";
+import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
 
 const Filter = () => {
    const navigate = useNavigate()
@@ -55,44 +56,29 @@ const Filter = () => {
 
    useDidMountEffect(() => {
       loadModels()
+      const temp = { ...params }
+      delete temp['model']
+      setParams(temp)
    }, [params.mark])
 
    useEffect(() => {
       loadCount()
    }, [params])
 
-   const handleMarksSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setParams(prevState => ({
-         ...prevState,
-         mark: e.target.value
-      }))
-   }
-   const handleModelsSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setParams(prevState => ({
-         ...prevState,
-         model: e.target.value
-      }))
-   }
-   const handlePricesSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setParams(prevState => ({
-         ...prevState,
-         maxPrice: e.target.value
-      }))
-   }
-
-   const handleMinYearSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setParams(prevState => ({
-         ...prevState,
-         minYear: e.target.value
-      }))
-      setYearsTo(getYears(Number(e.target.value), 2022))
-   }
-   const handleMaxYearSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setParams(prevState => ({
-         ...prevState,
-         maxYear: e.target.value
-      }))
-      setYearsFrom(getYears(1940, Number(e.target.value)))
+   const handleSelection = (
+      e: React.ChangeEvent<HTMLSelectElement>,
+      key: SelectKeys
+   ) => {
+      if (e.target.value === '') {
+         const temp = { ...params }
+         delete temp[key]
+         setParams(temp)
+      } else {
+         setParams(prevState => ({
+            ...prevState,
+            [key]: e.target.value
+         }))
+      }
    }
 
    const goToSearch = () => {
@@ -104,22 +90,32 @@ const Filter = () => {
 
    return (
       <Box>
-         <Select placeholder="All" id="mark" onChange={handleMarksSelection}>
+         <Select
+            placeholder="All"
+            id="mark"
+            onChange={e => {
+               setModelsData({ getModels: [] })
+               handleSelection(e, 'mark')
+            }}>
             {marksData.getMarks.map(m => (
                <option value={m.name} label={m.name} key={m._id} />
             ))}
          </Select>
 
-         <Select placeholder="All" id="model" onChange={handleModelsSelection}>
-            {modelsData.getModels.map(mark => (
-               <option value={mark.name} label={mark.name} key={mark._id} />
-            ))}
+         <Select
+            placeholder="All"
+            id="model"
+            onChange={e => handleSelection(e, 'model')}>
+            {modelsData &&
+               modelsData.getModels.map(mark => (
+                  <option value={mark.name} label={mark.name} key={mark._id} />
+               ))}
          </Select>
 
          <Select
             placeholder="Maximum price"
             id="price"
-            onChange={handlePricesSelection}>
+            onChange={e => handleSelection(e, 'maxPrice')}>
             {prices.map(price => (
                <option
                   value={price.toString()}
@@ -129,14 +125,22 @@ const Filter = () => {
             ))}
          </Select>
 
-         <Select onChange={handleMinYearSelection}>
+         <Select
+            onChange={e => {
+               handleSelection(e, 'minYear')
+               setYearsTo(getYears(Number(e.target.value), 2022))
+            }}>
             <option value={1940} label={'Year from'} />
             {yearsFrom.map(year => (
                <option value={year} label={year.toString()} key={year} />
             ))}
          </Select>
 
-         <Select onChange={handleMaxYearSelection}>
+         <Select
+            onChange={e => {
+               handleSelection(e, 'maxYear')
+               setYearsFrom(getYears(1940, Number(e.target.value)))
+            }}>
             <option value={2022} label={'To'} />
             {yearsTo.map(year => (
                <option value={year} label={year.toString()} key={year} />
