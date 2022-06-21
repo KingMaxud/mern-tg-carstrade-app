@@ -146,7 +146,6 @@ export const arrayKeys = [
 ]
 
 export const stringKeys = [
-   'page',
    'mark',
    'model',
    'minPrice',

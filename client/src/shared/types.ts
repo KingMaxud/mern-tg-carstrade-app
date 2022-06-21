@@ -78,7 +78,6 @@ export type AddAnnouncementVars = {
 }
 
 export type SearchParams = {
-   page?: string
    mark?: string
    model?: string
    generation?: string[]

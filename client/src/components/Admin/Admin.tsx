@@ -1,6 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { Box, Button } from '@chakra-ui/react'
+import { Box, Button, useDisclosure } from '@chakra-ui/react'
 
 import {
    GET_MARKS,
@@ -25,11 +25,13 @@ import AddGeneration from './AddGeneration'
 import AddModel from './AddModel'
 import AddMark from './AddMark'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
+import DeleteModal from '../DeleteModal'
 
 const Admin = () => {
    const [selectedMark, setSelectedMark] = useState('')
    const [selectedModel, setSelectedModel] = useState('')
    const [generationsData, setGenerationsData] = useState<Generation[]>([])
+   const { isOpen, onOpen, onClose } = useDisclosure()
 
    const {
       data: marksData,
@@ -97,12 +99,25 @@ const Admin = () => {
                      }}>
                      {mark.name}
                   </div>
-                  <Button
-                     onClick={() =>
-                        deleteMark({ variables: { markName: mark.name } })
-                     }>
-                     delete
-                  </Button>
+                  <DeleteModal
+                     isOpen={isOpen}
+                     onOpen={onOpen}
+                     onClose={onClose}
+                     deleteObject={mark.name}>
+                     <Button
+                        colorScheme="blue"
+                        mr={3}
+                        onClick={() => {
+                           deleteMark({
+                              variables: {
+                                 markName: mark.name
+                              }
+                           })
+                           onClose()
+                        }}>
+                        Delete
+                     </Button>
+                  </DeleteModal>
                </Box>
             ))}
          <div>
@@ -116,17 +131,26 @@ const Admin = () => {
                         }}>
                         {model.name}
                      </div>
-                     <Button
-                        onClick={() =>
-                           deleteModel({
-                              variables: {
-                                 markName: selectedMark,
-                                 modelName: model.name
-                              }
-                           })
-                        }>
-                        delete
-                     </Button>
+                     <DeleteModal
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                        deleteObject={model.name}>
+                        <Button
+                           colorScheme="blue"
+                           mr={3}
+                           onClick={() => {
+                              deleteModel({
+                                 variables: {
+                                    markName: selectedMark,
+                                    modelName: model.name
+                                 }
+                              })
+                              onClose()
+                           }}>
+                           Delete
+                        </Button>
+                     </DeleteModal>
                   </Box>
                ))}
          </div>
@@ -136,18 +160,27 @@ const Admin = () => {
                generationsData.map(generation => (
                   <Box key={generation._id}>
                      {generation.name}
-                     <Button
-                        onClick={() =>
-                           deleteGeneration({
-                              variables: {
-                                 markName: selectedMark,
-                                 modelName: selectedModel,
-                                 generationName: generation.name
-                              }
-                           })
-                        }>
-                        delete
-                     </Button>
+                     <DeleteModal
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                        deleteObject={generation.name}>
+                        <Button
+                           colorScheme="blue"
+                           mr={3}
+                           onClick={() => {
+                              deleteGeneration({
+                                 variables: {
+                                    markName: selectedMark,
+                                    modelName: selectedModel,
+                                    generationName: generation.name
+                                 }
+                              })
+                              onClose()
+                           }}>
+                           Delete
+                        </Button>
+                     </DeleteModal>
                   </Box>
                ))}
          </div>

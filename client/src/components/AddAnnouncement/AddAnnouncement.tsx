@@ -167,6 +167,8 @@ const AddAnnouncement = () => {
 
    const handleMarksSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setMark(e.target.value)
+      setModel('')
+      setGeneration('')
    }
    const handleModelsSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setModel(e.target.value)
@@ -174,10 +176,13 @@ const AddAnnouncement = () => {
    const handleGenerationsSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
-      const g: Generation = JSON.parse(e.target.value)
-      setGeneration(g.name)
-      setYears(getYears(g.startYear, g.endYear))
-      setBodyStyles(g.bodyStyles)
+      setGeneration(e.target.value)
+      generationsData.getGenerations.map(g => {
+         if (g.name === e.target.value) {
+            setBodyStyles(g.bodyStyles)
+            setYears(getYears(g.startYear, g.endYear))
+         }
+      })
    }
    const handleConditionSelection = (nextValue: string) => {
       formik.setFieldValue('condition', nextValue)
@@ -200,7 +205,7 @@ const AddAnnouncement = () => {
                </Select>
 
                <FormLabel htmlFor="mark">Select Model:</FormLabel>
-               <select value={model} id="mark" onChange={handleModelsSelection}>
+               <Select value={model} id="mark" onChange={handleModelsSelection}>
                   <option value="" label="-- Model --" />
                   {modelsData.getModels.map(model => (
                      <option
@@ -209,10 +214,10 @@ const AddAnnouncement = () => {
                         key={model._id}
                      />
                   ))}
-               </select>
+               </Select>
 
                <FormLabel htmlFor="generation">Select Generation:</FormLabel>
-               <select
+               <Select
                   value={generation}
                   id="generation"
                   onChange={handleGenerationsSelection}>
@@ -220,13 +225,13 @@ const AddAnnouncement = () => {
                   {generationsData.getGenerations.map(generation => {
                      return (
                         <option
-                           value={JSON.stringify(generation)}
+                           value={generation.name}
                            label={generation.name}
                            key={generation._id}
                         />
                      )
                   })}
-               </select>
+               </Select>
 
                <Select
                   onChange={formik.handleChange}

@@ -38,9 +38,10 @@ import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
 type Props = {
    params: SearchParams
    setParams: Dispatch<SetStateAction<SearchParams>>
+   setPage: Dispatch<SetStateAction<number>>
 }
 
-const AdvancedFilter = ({ params, setParams }: Props) => {
+const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
    const [, setSearch] = useSearchParams()
    const [search] = useCustomSearchParams()
 
@@ -126,6 +127,14 @@ const AdvancedFilter = ({ params, setParams }: Props) => {
                ...prevState,
                [item]: search[item][0]
             }))
+         } else if (item === 'page') {
+            let page: number = (function () {
+               if (Number(search[item]) > 0) {
+                  return Number(search[item])
+               }
+               return 1
+            })()
+            setPage(page)
          }
       }
       setLoaded(true)
@@ -205,12 +214,14 @@ const AdvancedFilter = ({ params, setParams }: Props) => {
    }
 
    const handleCheckbox = (key: CheckboxKeys, value: string) => {
+      // If key already exists, add value, else - add key to object
       if (Object.keys(params).includes(key)) {
          if (params[key]?.includes(value)) {
-            setParams(prevState => ({
-               ...prevState,
-               [key]: prevState[key]?.filter(g => g !== value)
-            }))
+            const tempParams = {
+               ...params,
+               [key]: params[key]?.filter(g => g !== value)
+            }
+            setParams(tempParams)
          } else {
             const tempArray: string[] = []
             params[key]?.map(g => tempArray.push(g))

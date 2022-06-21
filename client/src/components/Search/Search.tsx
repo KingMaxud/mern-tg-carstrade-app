@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
+import { useSearchParams } from 'react-router-dom'
 
 import {
    Announcement,
@@ -15,11 +16,11 @@ import {
 } from '../../shared/utils/graphql'
 import AnnouncementsList from './AnnouncementsList/AnnouncementsList'
 import PagesBar from './PagesBar'
-import useCustomSearchParams from '../../shared/hooks/useCustomSearchParams'
 import AdvancedFilter from './AdvancedFilter/AdvancedFilter'
+import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 
 const Search = () => {
-   const [search, setSearch] = useCustomSearchParams()
+   const [, setSearch] = useSearchParams()
 
    const [count, setCount] = useState(0)
    const [params, setParams] = useState<SearchParams>({
@@ -39,12 +40,6 @@ const Search = () => {
       GetAnnouncementsData,
       GetAnnouncementsVars
    >(GET_ANNOUNCEMENTS, {
-      variables: {
-         pagination: {
-            page: '1',
-            limit: '20'
-         }
-      },
       onCompleted: data => setAnnouncements(data.getAnnouncements)
    })
 
@@ -54,25 +49,54 @@ const Search = () => {
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
       onCompleted: data => {
          setCount(data.getFilteredAnnouncementCount)
-      },
-      variables: {
-         filter: params
       }
    })
 
+   // Load announcements when params or pages changes
    useEffect(() => {
-      loadCount()
+      // clear empty arrays
+      const filter: SearchParams = {}
+      for (const param in params) {
+         // @ts-ignore
+         if (params[param].length !== 0) {
+            // @ts-ignore
+            filter[param] = params[param]
+         }
+      }
+      loadAnnouncements({
+         variables: {
+            filter,
+            pagination: {
+               page: page.toString(),
+               limit: '20'
+            }
+         }
+      })
+      loadCount({
+         variables: {
+            filter
+         }
+      })
+   }, [params, page])
+
+   // Set page and other params to search params
+   useDidMountEffect(() => {
+      const temp = { ...params, page: page.toString() }
+      setSearch(temp, { replace: true })
+   }, [page])
+
+   // Change page when params changes
+   useDidMountEffect(() => {
+      setPage(1)
    }, [params])
-
-   useEffect(() => {
-      loadAnnouncements()
-   }, [])
-
-   useEffect(() => {}, [search])
 
    return (
       <div>
-         <AdvancedFilter params={params} setParams={setParams} />
+         <AdvancedFilter
+            params={params}
+            setParams={setParams}
+            setPage={setPage}
+         />
          <AnnouncementsList announcements={announcements} />
          <PagesBar
             count={count}

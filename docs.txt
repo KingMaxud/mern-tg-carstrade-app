@@ -2,7 +2,3 @@ const string = 'https://res.cloudinary.com/dxl170evw/image/upload/v1653322977/im
    const widthAndHeight = 'upload/w_160,h_120,c_fill'
    const [stringStart, stringEnd] = string.split('upload')
    const imageUrl = stringStart.concat(widthAndHeight, stringEnd)
-
-Move params from AF to S
-Move Set params object from search params when page loads
-Move Set search params, when one of filter values changes
