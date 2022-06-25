@@ -29,7 +29,7 @@ type GetAnnouncementVars = {
    id: string
 }
 
-const VehicleDetail = () => {
+const VehicleDetails = () => {
    const location = useLocation()
    const { loading } = useQuery<GetAnnouncementData, GetAnnouncementVars>(
       GET_ANNOUNCEMENT,
@@ -47,7 +47,7 @@ const VehicleDetail = () => {
    return <div>VehicleDetail</div>
 }
 
-export default VehicleDetail
+export default VehicleDetails
 
 const GET_ANNOUNCEMENT = gql`
    query Query($id: String!) {

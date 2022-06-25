@@ -1,4 +1,5 @@
 import { Box } from '@chakra-ui/react'
+import { Link } from 'react-router-dom'
 
 import { Announcement } from '../../../shared/types'
 
@@ -16,7 +17,9 @@ const AnnouncementsList = ({ announcements }: Props) => {
             const imageUrl = stringStart.concat(widthAndHeight, stringEnd)
 
             return (
-               <img src={imageUrl} alt={`${a.mark} ${a.model}`} key={a._id} />
+               <Link to={`/vehicledetails/${a._id}`} key={a._id}>
+                  <img src={imageUrl} alt={`${a.mark} ${a.model}`} />
+               </Link>
             )
          })}
       </Box>

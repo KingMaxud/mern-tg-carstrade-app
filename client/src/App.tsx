@@ -11,7 +11,7 @@ import authReducer from './context/reducer'
 import { initialAuthState } from './context/state'
 import NotAuthedProtected from './components/NotAuthedProtected'
 import AdminProtected from './components/Admin/AdminProtected'
-import VehicleDetail from './components/VehicleDetail/VehicleDetail'
+import VehicleDetails from './components/VehicleDetails/VehicleDetails'
 import AddAnnouncement from './components/AddAnnouncement/AddAnnouncement'
 import Search from './components/Search/Search'
 
@@ -24,8 +24,8 @@ const App = () => {
          <Routes>
             <Route path="/" element={<Home />} />
             <Route
-               path="vehicledetail/:vehicleid"
-               element={<VehicleDetail />}
+               path="vehicledetails/:vehicleid"
+               element={<VehicleDetails />}
             />
             <Route path="addannouncement" element={<AddAnnouncement />} />
             <Route path="search" element={<Search />} />

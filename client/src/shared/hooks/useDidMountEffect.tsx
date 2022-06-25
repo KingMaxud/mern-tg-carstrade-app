@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react'
 
-const useDidMountEffect = (func: any, deps: any) => {
+const useDidMountEffect = (effect: any, deps: any) => {
    const didMount = useRef(false)
 
    useEffect(() => {
-      if (didMount.current) func()
+      if (didMount.current) effect()
       else didMount.current = true
    }, deps)
 }

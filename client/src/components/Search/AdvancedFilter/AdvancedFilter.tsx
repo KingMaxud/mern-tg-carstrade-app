@@ -1,7 +1,8 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { useSearchParams } from 'react-router-dom'
+import { createSearchParams, useSearchParams } from 'react-router-dom'
+import history from 'history/browser'
 
 import {
    CheckboxKeys,
@@ -39,13 +40,20 @@ type Props = {
    params: SearchParams
    setParams: Dispatch<SetStateAction<SearchParams>>
    setPage: Dispatch<SetStateAction<number>>
+   ifParamsParsed: boolean
+   setIfParamsParsed: Dispatch<SetStateAction<boolean>>
 }
 
-const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
+const AdvancedFilter = ({
+   params,
+   setParams,
+   setPage,
+   ifParamsParsed,
+   setIfParamsParsed
+}: Props) => {
    const [, setSearch] = useSearchParams()
    const [search] = useCustomSearchParams()
 
-   const [loaded, setLoaded] = useState(false)
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
@@ -90,6 +98,37 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
       }
    )
 
+   const parseSearch = () => {
+      for (const item in search) {
+         if (arrayKeys.includes(item)) {
+            setParams(prevState => ({
+               ...prevState,
+               [item]: search[item]
+            }))
+         } else if (stringKeys.includes(item)) {
+            setParams(prevState => ({
+               ...prevState,
+               [item]: search[item][0]
+            }))
+         } else if (item === 'page') {
+            let page: number = (function () {
+               if (Number(search[item]) > 0) {
+                  return Number(search[item])
+               }
+               return 1
+            })()
+            setPage(page)
+         }
+      }
+   }
+
+   // TODO:
+   // history.listen(({ location, action }) => {
+   //    if (action === 'POP') {
+   //       parseSearch()
+   //    }
+   // })
+
    // Load models when mark changes
    useDidMountEffect(() => {
       loadModels()
@@ -116,28 +155,8 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
 
    // Set params object from search params when page loads
    useEffect(() => {
-      for (const item in search) {
-         if (arrayKeys.includes(item)) {
-            setParams(prevState => ({
-               ...prevState,
-               [item]: search[item]
-            }))
-         } else if (stringKeys.includes(item)) {
-            setParams(prevState => ({
-               ...prevState,
-               [item]: search[item][0]
-            }))
-         } else if (item === 'page') {
-            let page: number = (function () {
-               if (Number(search[item]) > 0) {
-                  return Number(search[item])
-               }
-               return 1
-            })()
-            setPage(page)
-         }
-      }
-      setLoaded(true)
+      parseSearch()
+      setIfParamsParsed(true)
    }, [])
 
    // Set search params, when one of filter values changes
@@ -184,10 +203,11 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
    const handleConditionSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
+      setPage(1)
       if (e.target.value === 'Used & New') {
          setParams(prevState => ({
             ...prevState,
-            condition: ['Used', 'New']
+            condition: []
          }))
       } else {
          setParams(prevState => ({
@@ -195,12 +215,14 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
             condition: [e.target.value]
          }))
       }
+      history.push(`/search?${createSearchParams(params)}`)
    }
 
    const handleSelection = (
       e: React.ChangeEvent<HTMLSelectElement>,
       key: SelectKeys
    ) => {
+      setPage(1)
       if (e.target.value === '') {
          const temp = { ...params }
          delete temp[key]
@@ -211,10 +233,12 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
             [key]: e.target.value
          }))
       }
+      history.push(`/search?${createSearchParams(params)}`)
    }
 
    const handleCheckbox = (key: CheckboxKeys, value: string) => {
       // If key already exists, add value, else - add key to object
+      setPage(1)
       if (Object.keys(params).includes(key)) {
          if (params[key]?.includes(value)) {
             const tempParams = {
@@ -236,6 +260,7 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
             [key]: [value]
          }))
       }
+      history.push(`/search?${createSearchParams(params)}`)
    }
 
    const conditionDefaultValue = (function () {
@@ -252,8 +277,20 @@ const AdvancedFilter = ({ params, setParams, setPage }: Props) => {
 
    return (
       <div>
-         {loaded && (
+         {ifParamsParsed && (
             <div>
+               <button
+                  onClick={() => {
+                     history.push(`/search?${createSearchParams(params)}`)
+                  }}>
+                  hello
+               </button>
+               <button
+                  onClick={() => {
+                     history.back()
+                  }}>
+                  back
+               </button>
                <Select
                   defaultValue={conditionDefaultValue}
                   id="condition"

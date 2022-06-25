@@ -23,9 +23,8 @@ const Search = () => {
    const [, setSearch] = useSearchParams()
 
    const [count, setCount] = useState(0)
-   const [params, setParams] = useState<SearchParams>({
-      condition: ['Used', 'New']
-   })
+   const [params, setParams] = useState<SearchParams>({})
+   const [ifParamsParsed, setIfParamsParsed] = useState(false)
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
    const [page, setPage] = useState(1)
 
@@ -54,30 +53,33 @@ const Search = () => {
 
    // Load announcements when params or pages changes
    useEffect(() => {
-      // clear empty arrays
-      const filter: SearchParams = {}
-      for (const param in params) {
-         // @ts-ignore
-         if (params[param].length !== 0) {
+      if (ifParamsParsed) {
+         // clear empty arrays
+         const filter: SearchParams = {}
+         for (const param in params) {
             // @ts-ignore
-            filter[param] = params[param]
-         }
-      }
-      loadAnnouncements({
-         variables: {
-            filter,
-            pagination: {
-               page: page.toString(),
-               limit: '20'
+            if (params[param].length !== 0) {
+               // @ts-ignore
+               filter[param] = params[param]
             }
          }
-      })
-      loadCount({
-         variables: {
-            filter
-         }
-      })
-   }, [params, page])
+
+         loadAnnouncements({
+            variables: {
+               filter,
+               pagination: {
+                  page: page.toString(),
+                  limit: '20'
+               }
+            }
+         })
+         loadCount({
+            variables: {
+               filter
+            }
+         })
+      }
+   }, [params, page, ifParamsParsed])
 
    // Set page and other params to search params
    useDidMountEffect(() => {
@@ -85,17 +87,14 @@ const Search = () => {
       setSearch(temp, { replace: true })
    }, [page])
 
-   // Change page when params changes
-   useDidMountEffect(() => {
-      setPage(1)
-   }, [params])
-
    return (
       <div>
          <AdvancedFilter
             params={params}
             setParams={setParams}
             setPage={setPage}
+            ifParamsParsed={ifParamsParsed}
+            setIfParamsParsed={setIfParamsParsed}
          />
          <AnnouncementsList announcements={announcements} />
          <PagesBar

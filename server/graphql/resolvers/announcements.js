@@ -41,7 +41,6 @@ export default {
    Query: {
       getAnnouncements: async (_, { filter, sort, pagination }) => {
          const filterObj = createFilterObject({ ...filter })
-         console.log(filterObj)
 
          const sortObj = {
             [sort?.key]: Number(sort?.direction),
