@@ -8,6 +8,8 @@ const createFilterObject = filter => {
       maxPrice,
       minYear,
       maxYear,
+      minMileage,
+      maxMileage,
       minEngineCapacity,
       maxEngineCapacity,
       minPower,
@@ -23,6 +25,10 @@ const createFilterObject = filter => {
       year: {
          $gte: minYear || 1940,
          $lte: maxYear || 9999
+      },
+      mileage: {
+         $gte: minMileage || 0,
+         $lte: maxMileage || 9999999
       },
       engineCapacity: {
          $gte: minEngineCapacity || 0,

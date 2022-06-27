@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
-import { useSearchParams } from 'react-router-dom'
+import {createSearchParams, useSearchParams} from 'react-router-dom'
 
 import {
    Announcement,
@@ -18,6 +18,7 @@ import AnnouncementsList from './AnnouncementsList/AnnouncementsList'
 import PagesBar from './PagesBar'
 import AdvancedFilter from './AdvancedFilter/AdvancedFilter'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
+import history from "history/browser";
 
 const Search = () => {
    const [, setSearch] = useSearchParams()
@@ -84,6 +85,7 @@ const Search = () => {
    // Set page and other params to search params
    useDidMountEffect(() => {
       const temp = { ...params, page: page.toString() }
+      history.push(`/search?${createSearchParams(params)}`)
       setSearch(temp, { replace: true })
    }, [page])
 

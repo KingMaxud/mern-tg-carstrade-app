@@ -14,6 +14,7 @@ import AdminProtected from './components/Admin/AdminProtected'
 import VehicleDetails from './components/VehicleDetails/VehicleDetails'
 import AddAnnouncement from './components/AddAnnouncement/AddAnnouncement'
 import Search from './components/Search/Search'
+import Test from './Test'
 
 const App = () => {
    const [state, dispatch] = useReducer(authReducer, initialAuthState)
@@ -27,6 +28,7 @@ const App = () => {
                path="vehicledetails/:vehicleid"
                element={<VehicleDetails />}
             />
+            <Route path="test" element={<Test />} />
             <Route path="addannouncement" element={<AddAnnouncement />} />
             <Route path="search" element={<Search />} />
             <Route

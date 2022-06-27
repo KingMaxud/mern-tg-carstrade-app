@@ -1,7 +1,11 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { createSearchParams, useSearchParams } from 'react-router-dom'
+import {
+   createSearchParams,
+   useLocation,
+   useSearchParams
+} from 'react-router-dom'
 import history from 'history/browser'
 
 import {
@@ -51,8 +55,8 @@ const AdvancedFilter = ({
    ifParamsParsed,
    setIfParamsParsed
 }: Props) => {
-   const [, setSearch] = useSearchParams()
    const [search] = useCustomSearchParams()
+   let location = useLocation()
 
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)
@@ -99,12 +103,16 @@ const AdvancedFilter = ({
    )
 
    const parseSearch = () => {
+      setParams({})
       for (const item in search) {
+         // check if values must be an array or not, clean possible trash values
          if (arrayKeys.includes(item)) {
-            setParams(prevState => ({
-               ...prevState,
-               [item]: search[item]
-            }))
+            setParams(prevState => {
+               return {
+                  ...prevState,
+                  [item]: search[item]
+               }
+            })
          } else if (stringKeys.includes(item)) {
             setParams(prevState => ({
                ...prevState,
@@ -122,12 +130,9 @@ const AdvancedFilter = ({
       }
    }
 
-   // TODO:
-   // history.listen(({ location, action }) => {
-   //    if (action === 'POP') {
-   //       parseSearch()
-   //    }
-   // })
+   useEffect(() => {
+      parseSearch()
+   }, [location])
 
    // Load models when mark changes
    useDidMountEffect(() => {
@@ -142,9 +147,6 @@ const AdvancedFilter = ({
    // Load generations when model changes
    useDidMountEffect(() => {
       loadGenerations()
-      const temp = { ...params }
-      delete temp['generation']
-      setParams(temp)
    }, [params.model])
 
    // Effect to generations will not be deleted when they got from search params
@@ -158,11 +160,6 @@ const AdvancedFilter = ({
       parseSearch()
       setIfParamsParsed(true)
    }, [])
-
-   // Set search params, when one of filter values changes
-   useDidMountEffect(() => {
-      setSearch(params, { replace: true })
-   }, [params])
 
    // Handle selection data arrays
    useDidMountEffect(() => {
@@ -204,18 +201,21 @@ const AdvancedFilter = ({
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
       setPage(1)
+      let tempParams: SearchParams
       if (e.target.value === 'Used & New') {
-         setParams(prevState => ({
-            ...prevState,
+         tempParams = {
+            ...params,
             condition: []
-         }))
+         }
       } else {
-         setParams(prevState => ({
-            ...prevState,
+         tempParams = {
+            ...params,
             condition: [e.target.value]
-         }))
+         }
       }
-      history.push(`/search?${createSearchParams(params)}`)
+
+      setParams(tempParams)
+      history.push(`/search?${createSearchParams(tempParams)}`)
    }
 
    const handleSelection = (
@@ -223,44 +223,60 @@ const AdvancedFilter = ({
       key: SelectKeys
    ) => {
       setPage(1)
+      let tempParams: SearchParams
       if (e.target.value === '') {
          const temp = { ...params }
          delete temp[key]
-         setParams(temp)
+         tempParams = temp
       } else {
-         setParams(prevState => ({
-            ...prevState,
+         tempParams = {
+            ...params,
             [key]: e.target.value
-         }))
+         }
       }
-      history.push(`/search?${createSearchParams(params)}`)
+
+      // If it is mark or model selection, delete waste keys
+      switch (key) {
+         case 'mark':
+            delete tempParams['model']
+            delete tempParams['generation']
+            break
+         case 'model':
+            delete tempParams['generation']
+            break
+      }
+
+      setParams(tempParams)
+      history.push(`/search?${createSearchParams(tempParams)}`)
    }
 
    const handleCheckbox = (key: CheckboxKeys, value: string) => {
+      let tempParams: SearchParams
       // If key already exists, add value, else - add key to object
       setPage(1)
       if (Object.keys(params).includes(key)) {
          if (params[key]?.includes(value)) {
-            const tempParams = {
+            tempParams = {
                ...params,
                [key]: params[key]?.filter(g => g !== value)
             }
-            setParams(tempParams)
          } else {
             const tempArray: string[] = []
             params[key]?.map(g => tempArray.push(g))
-            setParams(prevState => ({
-               ...prevState,
+            tempParams = {
+               ...params,
                [key]: [...tempArray, value]
-            }))
+            }
          }
       } else {
-         setParams(prevState => ({
-            ...prevState,
+         tempParams = {
+            ...params,
             [key]: [value]
-         }))
+         }
       }
-      history.push(`/search?${createSearchParams(params)}`)
+
+      setParams(tempParams)
+      history.push(`/search?${createSearchParams(tempParams)}`)
    }
 
    const conditionDefaultValue = (function () {
@@ -279,20 +295,8 @@ const AdvancedFilter = ({
       <div>
          {ifParamsParsed && (
             <div>
-               <button
-                  onClick={() => {
-                     history.push(`/search?${createSearchParams(params)}`)
-                  }}>
-                  hello
-               </button>
-               <button
-                  onClick={() => {
-                     history.back()
-                  }}>
-                  back
-               </button>
                <Select
-                  defaultValue={conditionDefaultValue}
+                  value={conditionDefaultValue}
                   id="condition"
                   onChange={handleConditionSelection}>
                   <option value="Used & New" label="Used & New" />
@@ -302,7 +306,7 @@ const AdvancedFilter = ({
 
                {marksData.getMarks.length > 0 && (
                   <Select
-                     defaultValue={params.mark || ''}
+                     value={params.mark || ''}
                      id="mark"
                      onChange={e => {
                         handleSelection(e, 'mark')
@@ -322,7 +326,7 @@ const AdvancedFilter = ({
 
                {modelsData?.getModels.length > 0 && (
                   <Select
-                     defaultValue={params.model}
+                     value={params.model || ''}
                      id="model"
                      onChange={e => handleSelection(e, 'model')}>
                      <option value="" label={'All models'} />
@@ -353,7 +357,7 @@ const AdvancedFilter = ({
                   ))}
 
                <FormLabel htmlFor="bodyStyle">Select Body Style:</FormLabel>
-               <Box>
+               <Box key={`${params.bodyStyle?.length} bodyStyle`}>
                   {bodyStyles.map(b => (
                      <Checkbox
                         isChecked={params.bodyStyle?.includes(b)}
@@ -365,7 +369,7 @@ const AdvancedFilter = ({
                </Box>
 
                <Select
-                  defaultValue={params.minYear}
+                  value={params.minYear || ''}
                   onChange={e => handleSelection(e, 'minYear')}>
                   <option value="" label={'Year from'} />
                   {yearsFrom.map(year => (
@@ -373,7 +377,7 @@ const AdvancedFilter = ({
                   ))}
                </Select>
                <Select
-                  defaultValue={params.maxYear}
+                  value={params.maxYear || ''}
                   onChange={e => handleSelection(e, 'maxYear')}>
                   <option value="" label={'To'} />
                   {yearsTo.map(year => (
@@ -382,7 +386,7 @@ const AdvancedFilter = ({
                </Select>
 
                <Select
-                  defaultValue={params.minPrice}
+                  value={params.minPrice || ''}
                   onChange={e => handleSelection(e, 'minPrice')}>
                   <option value="" label={'Price from'} />
                   {pricesFrom.map(price => (
@@ -394,7 +398,7 @@ const AdvancedFilter = ({
                   ))}
                </Select>
                <Select
-                  defaultValue={params.maxPrice}
+                  value={params.maxPrice || ''}
                   onChange={e => handleSelection(e, 'maxPrice')}>
                   <option value="" label={'To'} />
                   {pricesTo.map(price => (
@@ -407,7 +411,7 @@ const AdvancedFilter = ({
                </Select>
 
                <Select
-                  defaultValue={params.minMileage}
+                  value={params.minMileage || ''}
                   onChange={e => handleSelection(e, 'minMileage')}>
                   <option value="" label={'Mileage from'} />
                   {mileagesFrom.map(mileage => (
@@ -419,7 +423,7 @@ const AdvancedFilter = ({
                   ))}
                </Select>
                <Select
-                  defaultValue={params.maxMileage}
+                  value={params.maxMileage || ''}
                   onChange={e => handleSelection(e, 'maxMileage')}>
                   <option value="" label={'To'} />
                   {mileagesTo.map(mileage => (
@@ -431,7 +435,7 @@ const AdvancedFilter = ({
                   ))}
                </Select>
 
-               <Box>
+               <Box key={`${params.color?.length} color`}>
                   {colors.map(b => (
                      <Checkbox
                         key={b.hex}
@@ -442,7 +446,7 @@ const AdvancedFilter = ({
                   ))}
                </Box>
 
-               <Box>
+               <Box key={`${params.transmission?.length} transmission`}>
                   {transmission.map(t => (
                      <Checkbox
                         key={t}
@@ -453,7 +457,7 @@ const AdvancedFilter = ({
                   ))}
                </Box>
 
-               <Box>
+               <Box key={`${params.fuelType?.length} fuelType`}>
                   {fuelTypes.map(t => (
                      <Checkbox
                         key={t}
@@ -464,7 +468,7 @@ const AdvancedFilter = ({
                   ))}
                </Box>
 
-               <Box>
+               <Box key={`${params.driveInit?.length} driveInit`}>
                   {driveInits.map(d => (
                      <Checkbox
                         key={d}
@@ -476,7 +480,7 @@ const AdvancedFilter = ({
                </Box>
 
                <Select
-                  defaultValue={params.minEngineCapacity}
+                  value={params.minEngineCapacity || ''}
                   onChange={e => handleSelection(e, 'minEngineCapacity')}>
                   <option value="" label={'Engine Capacity from'} />
                   {engineCapacitiesFrom.map(e => (
@@ -484,7 +488,7 @@ const AdvancedFilter = ({
                   ))}
                </Select>
                <Select
-                  defaultValue={params.maxEngineCapacity}
+                  value={params.maxEngineCapacity || ''}
                   onChange={e => handleSelection(e, 'maxEngineCapacity')}>
                   <option value="" label={'To'} />
                   {engineCapacitiesTo.map(e => (
@@ -493,7 +497,7 @@ const AdvancedFilter = ({
                </Select>
 
                <Select
-                  defaultValue={params.minPower}
+                  value={params.minPower || ''}
                   onChange={e => handleSelection(e, 'minPower')}>
                   <option value="" label={'Power from'} />
                   {powersFrom.map(p => (
@@ -501,7 +505,7 @@ const AdvancedFilter = ({
                   ))}
                </Select>
                <Select
-                  defaultValue={params.maxPower}
+                  value={params.maxPower || ''}
                   onChange={e => handleSelection(e, 'maxPower')}>
                   <option value="" label={'To'} />
                   {powersTo.map(p => (
