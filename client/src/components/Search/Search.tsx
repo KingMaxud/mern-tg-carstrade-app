@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
-import {createSearchParams, useSearchParams} from 'react-router-dom'
+import { createSearchParams, useSearchParams } from 'react-router-dom'
 
 import {
    Announcement,
@@ -18,7 +18,8 @@ import AnnouncementsList from './AnnouncementsList/AnnouncementsList'
 import PagesBar from './PagesBar'
 import AdvancedFilter from './AdvancedFilter/AdvancedFilter'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
-import history from "history/browser";
+import history from 'history/browser'
+import { getSessionStorageOrDefault } from '../../shared/utils/utils'
 
 const Search = () => {
    const [, setSearch] = useSearchParams()
@@ -27,6 +28,7 @@ const Search = () => {
    const [params, setParams] = useState<SearchParams>({})
    const [ifParamsParsed, setIfParamsParsed] = useState(false)
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
+   const [firstLoaded, setFirstLoaded] = useState(false)
    const [page, setPage] = useState(1)
 
    const incrementPage = () => {
@@ -40,16 +42,17 @@ const Search = () => {
       GetAnnouncementsData,
       GetAnnouncementsVars
    >(GET_ANNOUNCEMENTS, {
-      onCompleted: data => setAnnouncements(data.getAnnouncements)
+      onCompleted: data => {
+         setAnnouncements(data.getAnnouncements)
+         setFirstLoaded(true)
+      }
    })
 
    const [loadCount] = useLazyQuery<
       GetFilteredAnnouncementCountData,
       GetFilteredAnnouncementCountVars
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
-      onCompleted: data => {
-         setCount(data.getFilteredAnnouncementCount)
-      }
+      onCompleted: data => setCount(data.getFilteredAnnouncementCount)
    })
 
    // Load announcements when params or pages changes
@@ -88,6 +91,12 @@ const Search = () => {
       history.push(`/search?${createSearchParams(params)}`)
       setSearch(temp, { replace: true })
    }, [page])
+
+   // Scroll on back
+   useDidMountEffect(() => {
+      window.scrollTo(0, getSessionStorageOrDefault('yScrollPosition', 0))
+      sessionStorage.removeItem('yScrollPosition')
+   }, [firstLoaded])
 
    return (
       <div>

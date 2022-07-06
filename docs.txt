@@ -1,4 +1,6 @@
-const string = 'https://res.cloudinary.com/dxl170evw/image/upload/v1653322977/images/e9xkcm4ciwtciatkd2th.jpg'
-   const widthAndHeight = 'upload/w_160,h_120,c_fill'
-   const [stringStart, stringEnd] = string.split('upload')
-   const imageUrl = stringStart.concat(widthAndHeight, stringEnd)
+TODO: Vehicle page with carousel
+      Photo load component
+      Bugs with authentication
+      Set access on the client side
+      Set access on the server side
+      Design

@@ -56,6 +56,7 @@ export default gql`
       driveInit: String
       engineCapacity: Float
       power: Int
+      description: String
       phoneNumber: Int
       createdAt: String
    }
@@ -154,6 +155,7 @@ export default gql`
          engineCapacity: String!
          power: String!
          photos: [String]
+         description: String!
          phoneNumber: String!
       ): ReturnedType!
       deleteAnnouncement(announcementId: ID!): ReturnedType!
@@ -173,6 +175,7 @@ export default gql`
          fuelType: String
          driveInit: String
          engineCapacity: String
+         description: String
          power: String
       ): ReturnedType!
    }

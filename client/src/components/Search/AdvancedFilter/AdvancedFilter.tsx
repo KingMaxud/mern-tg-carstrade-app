@@ -1,11 +1,13 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import React, {
+   Dispatch,
+   SetStateAction,
+   useEffect,
+   useRef,
+   useState
+} from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import {
-   createSearchParams,
-   useLocation,
-   useSearchParams
-} from 'react-router-dom'
+import { createSearchParams, useLocation } from 'react-router-dom'
 import history from 'history/browser'
 
 import {
@@ -103,21 +105,19 @@ const AdvancedFilter = ({
    )
 
    const parseSearch = () => {
-      setParams({})
+      let params = {}
       for (const item in search) {
          // check if values must be an array or not, clean possible trash values
          if (arrayKeys.includes(item)) {
-            setParams(prevState => {
-               return {
-                  ...prevState,
-                  [item]: search[item]
-               }
-            })
+            params = {
+               ...params,
+               [item]: search[item]
+            }
          } else if (stringKeys.includes(item)) {
-            setParams(prevState => ({
-               ...prevState,
+            params = {
+               ...params,
                [item]: search[item][0]
-            }))
+            }
          } else if (item === 'page') {
             let page: number = (function () {
                if (Number(search[item]) > 0) {
@@ -128,8 +128,11 @@ const AdvancedFilter = ({
             setPage(page)
          }
       }
+      
+      setParams(params)
    }
 
+   // Parse search params when location changes
    useEffect(() => {
       parseSearch()
    }, [location])
@@ -138,10 +141,6 @@ const AdvancedFilter = ({
    useDidMountEffect(() => {
       loadModels()
       setGenerationsData({ getGenerations: [] })
-      const temp = { ...params }
-      delete temp['model']
-      delete temp['generation']
-      setParams(temp)
    }, [params.mark])
 
    // Load generations when model changes
@@ -304,7 +303,7 @@ const AdvancedFilter = ({
                   <option value="New" label="New" />
                </Select>
 
-               {marksData.getMarks.length > 0 && (
+               {marksData.getMarks.length > 0 ? (
                   <Select
                      value={params.mark || ''}
                      id="mark"
@@ -316,31 +315,25 @@ const AdvancedFilter = ({
                         <option value={m.name} label={m.name} key={m._id} />
                      ))}
                   </Select>
-               )}
-
-               {marksData.getMarks.length === 0 && (
+               ) : (
                   <Select id="mark">
                      <option value="" label={'All marks'} />
                   </Select>
                )}
 
-               {modelsData?.getModels.length > 0 && (
+               {modelsData && modelsData.getModels.length > 0 ? (
                   <Select
                      value={params.model || ''}
                      id="model"
-                     onChange={e => handleSelection(e, 'model')}>
+                     onChange={e => {
+                        handleSelection(e, 'model')
+                     }}>
                      <option value="" label={'All models'} />
-                     {modelsData.getModels.map(mark => (
-                        <option
-                           value={mark.name}
-                           label={mark.name}
-                           key={mark._id}
-                        />
+                     {modelsData.getModels.map(m => (
+                        <option value={m.name} label={m.name} key={m._id} />
                      ))}
                   </Select>
-               )}
-
-               {(modelsData?.getModels.length === 0 || !modelsData) && (
+               ) : (
                   <Select id="model">
                      <option value="" label={'All models'} />
                   </Select>

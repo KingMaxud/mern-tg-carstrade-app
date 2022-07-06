@@ -137,6 +137,7 @@ export const ADD_ANNOUNCEMENT = gql`
       $driveInit: String!
       $engineCapacity: String!
       $power: String!
+      $description: String!
       $photos: [String]
       $phoneNumber: String!
    ) {
@@ -156,6 +157,7 @@ export const ADD_ANNOUNCEMENT = gql`
          driveInit: $driveInit
          engineCapacity: $engineCapacity
          power: $power
+         description: $description
          photos: $photos
          phoneNumber: $phoneNumber
       ) {
@@ -186,5 +188,31 @@ export const GET_ANNOUNCEMENTS = gql`
 export const GET_FILTERED_ANNOUNCEMENTS_COUNT = gql`
     query Query($filter: FilterInput) {
         getFilteredAnnouncementCount(filter: $filter)
+    }
+`
+
+export const GET_ANNOUNCEMENT = gql`
+    query Query($id: String!) {
+        getAnnouncement(id: $id) {
+            user
+            photos
+            mark
+            model
+            generation
+            condition
+            price
+            year
+            mileage
+            color
+            bodyStyle
+            transmission
+            fuelType
+            driveInit
+            engineCapacity
+            power
+            phoneNumber
+            description
+            createdAt
+        }
     }
 `

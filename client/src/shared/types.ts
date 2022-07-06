@@ -73,6 +73,7 @@ export type AddAnnouncementVars = {
    driveInit: string
    engineCapacity: string
    power: string
+   description: string
    photos: string[]
    phoneNumber: string
 }

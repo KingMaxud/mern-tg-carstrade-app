@@ -1,9 +1,12 @@
 import { useLocation } from 'react-router-dom'
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
+import { useState } from 'react'
+import { GET_ANNOUNCEMENT } from '../../shared/utils/graphql'
 
 type Announcement = {
    _id: string
    user: string
+   photos: string
    mark: string
    model: string
    generation: string
@@ -18,6 +21,7 @@ type Announcement = {
    driveInit: string
    engineCapacity: number
    power: number
+   description: string
    phoneNumber: number
 }
 
@@ -31,12 +35,14 @@ type GetAnnouncementVars = {
 
 const VehicleDetails = () => {
    const location = useLocation()
+   const [data, setData] = useState<Announcement | null>(null)
+
    const { loading } = useQuery<GetAnnouncementData, GetAnnouncementVars>(
       GET_ANNOUNCEMENT,
       {
          variables: { id: location.pathname.split('/')[2] },
          onCompleted: data => {
-            console.log(data.getAnnouncement)
+            setData(data.getAnnouncement)
          },
          onError: error => {
             console.log(error)
@@ -44,17 +50,7 @@ const VehicleDetails = () => {
       }
    )
 
-   return <div>VehicleDetail</div>
+   return <div>{data && <div>{data.mark}</div>}</div>
 }
 
 export default VehicleDetails
-
-const GET_ANNOUNCEMENT = gql`
-   query Query($id: String!) {
-      getAnnouncement(id: $id) {
-         mark
-         model
-         price
-      }
-   }
-`

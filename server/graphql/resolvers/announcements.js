@@ -96,6 +96,7 @@ export default {
             engineCapacity,
             power,
             photos,
+            description,
             phoneNumber
          }
       ) => {
@@ -115,6 +116,7 @@ export default {
             driveInit,
             engineCapacity: Number(engineCapacity),
             power: Number(power),
+            description,
             photos,
             phoneNumber: Number(phoneNumber)
          })

@@ -1,5 +1,5 @@
-import React, { useReducer } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import React, { useEffect, useReducer } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 
 import './App.css'
 import Home from './components/Home/Home'
@@ -18,6 +18,15 @@ import Test from './Test'
 
 const App = () => {
    const [state, dispatch] = useReducer(authReducer, initialAuthState)
+
+   const location = useLocation()
+
+   // Remove yScrollPosition when it's not needed
+   useEffect(() => {
+      if (!location.pathname.includes('search') && !location.pathname.includes('vehicledetails')) {
+         sessionStorage.removeItem('yScrollPosition')
+      }
+   }, [location])
 
    return (
       <AuthContext.Provider value={{ state, dispatch }}>

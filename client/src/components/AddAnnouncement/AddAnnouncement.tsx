@@ -84,13 +84,12 @@ const AddAnnouncement = () => {
    }, [])
 
    const AddGenerationSchema = Yup.object().shape({
-      mark: Yup.string().required('Required'),
-      model: Yup.string().required('Required'),
-      generation: Yup.string().required('Required'),
       condition: Yup.string().required('Required'),
       price: Yup.string().required('Required'),
       year: Yup.string().required('Required'),
-      mileage: Yup.string().required('Required'),
+      mileage: Yup.string()
+         .required('Required')
+         .max(7, 'Must not be more than 7 characters'),
       color: Yup.string().required('Required'),
       bodyStyle: Yup.string().required('Required'),
       transmission: Yup.string().required('Required'),
@@ -98,6 +97,10 @@ const AddAnnouncement = () => {
       driveInit: Yup.string().required('Required'),
       engineCapacity: Yup.string().required('Required'),
       power: Yup.string().required('Required'),
+      description: Yup.string().max(
+         500,
+         'Must not be more than 500 characters'
+      ),
       phoneNumber: Yup.string().required('Required')
    })
 
@@ -114,9 +117,10 @@ const AddAnnouncement = () => {
          driveInit: '',
          engineCapacity: '',
          power: '',
+         description: '',
          phoneNumber: '123456789'
       },
-      // validationSchema: AddGenerationSchema,
+      validationSchema: AddGenerationSchema,
       onSubmit: async values => {
          const photoUrl = await addPhoto()
          addAnnouncement({
@@ -136,6 +140,7 @@ const AddAnnouncement = () => {
                driveInit: values.driveInit,
                engineCapacity: values.engineCapacity,
                power: values.power,
+               description: values.description,
                photos: photoUrl || [],
                phoneNumber: '123456789'
             }
@@ -143,6 +148,8 @@ const AddAnnouncement = () => {
          setAnnouncementLoading(true)
       }
    })
+
+   console.log(formik.errors)
 
    useEffect(() => {
       if (mark) {
@@ -359,6 +366,18 @@ const AddAnnouncement = () => {
                   value={formik.values.price}
                />
 
+               <FormLabel htmlFor="power">Description</FormLabel>
+               <Input
+                  id="description"
+                  name="description"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.description}
+               />
+               {formik.touched.description && formik.errors.description ? (
+                  <div>{formik.errors.description}</div>
+               ) : null}
+
                <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
                <Input
                   isDisabled={true}
@@ -368,6 +387,7 @@ const AddAnnouncement = () => {
                   onChange={formik.handleChange}
                   value={formik.values.phoneNumber}
                />
+
                {addPhotoComponent}
                <Button type="submit">Publish Announcement</Button>
             </VStack>
