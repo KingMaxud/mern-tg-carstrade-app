@@ -3,13 +3,11 @@ import { Link } from 'react-router-dom'
 import { Skeleton } from '@chakra-ui/react'
 
 import { Announcement } from '../../../shared/types'
-
+import { getImageBySize } from '../../../shared/utils/utils'
 
 const AnnouncementCard = ({ a }: { a: Announcement }) => {
    const img = a.photos[0]
-   const widthAndHeight = 'upload/w_240,h_180,c_fill'
-   const [stringStart, stringEnd] = img.split('upload')
-   const imageUrl = stringStart.concat(widthAndHeight, stringEnd)
+   const imageUrl = getImageBySize(img, 240, 180)
    const [showImageSkeleton, setShowImageSkeleton] = useState(true)
 
    return (

@@ -1,7 +1,6 @@
 export enum ActionType {
    SignIn,
-   SignOut,
-   SetUser
+   SignOut
 }
 
 export interface SignIn {

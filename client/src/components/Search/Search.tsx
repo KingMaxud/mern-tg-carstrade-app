@@ -96,6 +96,7 @@ const Search = () => {
    useDidMountEffect(() => {
       window.scrollTo(0, getSessionStorageOrDefault('yScrollPosition', 0))
       sessionStorage.removeItem('yScrollPosition')
+      debugger
    }, [firstLoaded])
 
    return (

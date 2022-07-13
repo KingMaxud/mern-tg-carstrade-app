@@ -1,12 +1,15 @@
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
+import { Grid, GridItem } from '@chakra-ui/react'
+
 import { GET_ANNOUNCEMENT } from '../../shared/utils/graphql'
+import Photos from './Photos'
 
 type Announcement = {
    _id: string
    user: string
-   photos: string
+   photos: string[]
    mark: string
    model: string
    generation: string
@@ -36,13 +39,18 @@ type GetAnnouncementVars = {
 const VehicleDetails = () => {
    const location = useLocation()
    const [data, setData] = useState<Announcement | null>(null)
+   const [currentPhotoNumber, setCurrentPhotoNumber] = useState(0)
+   const [alt, setAlt] = useState('')
 
    const { loading } = useQuery<GetAnnouncementData, GetAnnouncementVars>(
       GET_ANNOUNCEMENT,
       {
          variables: { id: location.pathname.split('/')[2] },
-         onCompleted: data => {
-            setData(data.getAnnouncement)
+         onCompleted: ({ getAnnouncement }) => {
+            setData(getAnnouncement)
+            setAlt(
+               `${getAnnouncement.mark} ${getAnnouncement.model}, ${getAnnouncement.year} production year, View - `
+            )
          },
          onError: error => {
             console.log(error)
@@ -50,7 +58,18 @@ const VehicleDetails = () => {
       }
    )
 
-   return <div>{data && <div>{data.mark}</div>}</div>
+
+
+   return (
+      <div>
+         <Grid templateColumns="45rem auto">
+            <GridItem h="1000px" bg="gold">
+               <Photos photos={data ? data.photos : null} alt={alt} />
+            </GridItem>
+            <GridItem h="100vh" bg="khaki" />
+         </Grid>
+      </div>
+   )
 }
 
 export default VehicleDetails
