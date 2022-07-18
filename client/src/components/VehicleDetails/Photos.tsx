@@ -4,6 +4,7 @@ import { Skeleton } from '@chakra-ui/react'
 import MainCarouselPhoto from './MainCarouselPhoto'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import { getImageBySize } from '../../shared/utils/utils'
+import { photosContainer } from './Photos.styles'
 
 type Props = {
    photos: string[] | null
@@ -37,9 +38,13 @@ const Photos = ({ photos, alt }: Props) => {
 
          <div>
             {photos && (
-               <div>
+               <div style={photosContainer}>
                   {photos.map((p, index) => (
                      <img
+                        key={`${index} photo`}
+                        onClick={() =>
+                           setCurrentImage({ src: p, number: index + 1 })
+                        }
                         src={getImageBySize(p, 144, 108)}
                         alt={`${alt}${index + 1}`}
                      />

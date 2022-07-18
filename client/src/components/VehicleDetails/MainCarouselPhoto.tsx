@@ -1,6 +1,8 @@
 import { Skeleton } from '@chakra-ui/react'
-import { getImageBySize } from '../../shared/utils/utils'
 import { useEffect, useState } from 'react'
+
+import { getImageBySize } from '../../shared/utils/utils'
+import { arrowBlock } from './MainCarouselPhoto.styles'
 
 type Props = {
    image: string | null
@@ -32,8 +34,29 @@ const MainCarouselPhoto = ({ image, alt, width, height }: Props) => {
          )}
          {smallImage && bigImage && (
             <div
-               style={{ width: ` ${width + 12}px`, height: ` ${height + 12}px` }}>
-               {/*This img is only for setSmallImageLoaded*/}
+               style={{
+                  width: ` ${width}px`,
+                  height: ` ${height}px`
+               }}>
+               <div
+                  style={{
+                     position: 'absolute',
+                     width: `${width}px`,
+                     height: `${height}px`,
+                     zIndex: 20,
+                     display: 'grid',
+                     gridTemplateColumns: '150px auto 150px'
+                  }}>
+                  <div
+                     onClick={() => console.log('Hello')}
+                     style={arrowBlock}
+                  />
+                  <div style={{ height: 'auto' }} />
+                  <div
+                     onClick={() => console.log('World')}
+                     style={arrowBlock}
+                  />
+               </div>
                <img
                   src={smallImage}
                   alt={alt}
@@ -51,7 +74,7 @@ const MainCarouselPhoto = ({ image, alt, width, height }: Props) => {
                   alt={alt}
                   onLoad={() => setSmallImageLoaded(true)}
                   style={{
-                     position: 'relative',
+                     position: 'absolute',
                      zIndex: 10,
                      width,
                      height,

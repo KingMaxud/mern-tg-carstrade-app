@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { useState } from 'react'
-import { Grid, GridItem } from '@chakra-ui/react'
 
 import { GET_ANNOUNCEMENT } from '../../shared/utils/graphql'
 import Photos from './Photos'
@@ -37,6 +36,9 @@ type GetAnnouncementVars = {
 }
 
 const VehicleDetails = () => {
+   // scroll to top on start
+   window.scrollTo(0, 0)
+
    const location = useLocation()
    const [data, setData] = useState<Announcement | null>(null)
    const [currentPhotoNumber, setCurrentPhotoNumber] = useState(0)
@@ -58,16 +60,16 @@ const VehicleDetails = () => {
       }
    )
 
-
-
    return (
       <div>
-         <Grid templateColumns="45rem auto">
-            <GridItem h="1000px" bg="gold">
+         <div style={{ display: 'grid', gridTemplateColumns: '45rem auto' }}>
+            <div style={{ height: '1000px', backgroundColor: 'gold' }}>
                <Photos photos={data ? data.photos : null} alt={alt} />
-            </GridItem>
-            <GridItem h="100vh" bg="khaki" />
-         </Grid>
+            </div>
+            <div style={{ backgroundColor: 'khaki' }}>
+
+            </div>
+         </div>
       </div>
    )
 }
