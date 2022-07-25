@@ -1,0 +1,53 @@
+.arrowsContainer {
+   position: absolute;
+   z-index: 20;
+   display: grid;
+   grid-template-columns: 6rem auto 6rem;
+}
+
+.arrowBlock {
+   height: auto;
+   display: flex;
+   justify-content: center;
+}
+
+.overlay {
+   position: absolute;
+   height: 100%;
+   width: 6rem;
+   background-color: black;
+   opacity: 0;
+   transition: opacity 0.6s;
+
+   &:hover {
+      opacity: 0.35;
+   }
+}
+
+.image {
+   margin: auto;
+   display: block;
+   width: 60%;
+   opacity: 0;
+   transition: opacity 0.4s;
+
+   &.hovered {
+      opacity: 1
+   }
+}
+
+.arrowsContainerCenter {
+   height: auto;
+}
+
+.smallImage {
+   position: absolute;
+   object-fit: cover;
+   filter: blur(6px);
+}
+
+.bigImage {
+   object-fit: contain;
+   position: absolute;
+   z-index: 10;
+}

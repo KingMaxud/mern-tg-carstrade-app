@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Skeleton } from '@chakra-ui/react'
 
 import MainCarouselPhoto from './MainCarouselPhoto'
-import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import { getImageBySize } from '../../shared/utils/utils'
-import { photosContainer } from './Photos.styles'
+import styles from './Photos.module.scss'
 
 type Props = {
    photos: string[] | null
@@ -19,8 +18,32 @@ type Image = {
 const Photos = ({ photos, alt }: Props) => {
    const [currentImage, setCurrentImage] = useState<null | Image>(null)
 
-   useDidMountEffect(() => {
-      setCurrentImage(photos ? { src: photos[0], number: 1 } : null)
+   const prevImage = (number: number) => {
+      // If the current image is the first - set the last
+      const prevImageNumber =
+         number === 0 ? (photos?.length || 0) - 1 : --number
+
+      photos?.map((p, i) => {
+         if (i === prevImageNumber) {
+            setCurrentImage({ src: p, number: prevImageNumber })
+         }
+      })
+   }
+
+   const nextImage = (number: number) => {
+      // If the current image is the last - set the first
+      const nextImageNumber =
+         number === (photos?.length || 0) - 1 ? 0 : ++number
+
+      photos?.map((p, i) => {
+         if (i === nextImageNumber) {
+            setCurrentImage({ src: p, number: nextImageNumber })
+         }
+      })
+   }
+
+   useEffect(() => {
+      setCurrentImage(photos ? { src: photos[0], number: 0 } : null)
    }, [photos])
 
    return (
@@ -30,7 +53,10 @@ const Photos = ({ photos, alt }: Props) => {
          ) : (
             <MainCarouselPhoto
                image={currentImage.src}
+               number={currentImage.number}
                alt={alt}
+               prevImage={prevImage}
+               nextImage={nextImage}
                width={720}
                height={540}
             />
@@ -38,7 +64,7 @@ const Photos = ({ photos, alt }: Props) => {
 
          <div>
             {photos && (
-               <div style={photosContainer}>
+               <div className={styles.photosContainer}>
                   {photos.map((p, index) => (
                      <img
                         key={`${index} photo`}

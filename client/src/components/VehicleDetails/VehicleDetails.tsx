@@ -66,9 +66,7 @@ const VehicleDetails = () => {
             <div style={{ height: '1000px', backgroundColor: 'gold' }}>
                <Photos photos={data ? data.photos : null} alt={alt} />
             </div>
-            <div style={{ backgroundColor: 'khaki' }}>
-
-            </div>
+            <div style={{ backgroundColor: 'khaki' }} />
          </div>
       </div>
    )
