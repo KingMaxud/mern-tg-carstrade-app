@@ -165,3 +165,54 @@ const powers = [100, 150, 200, 250, 300, 350, 400, 500, 600]
 export function getPowers(min: number, max: number) {
    return powers.filter(p => p >= min && p <= max)
 }
+
+export const sortMethods = [
+   {
+      shortCode: 'lo',
+      description: 'Latest offers first',
+      sort: {
+         key: 'createdAt',
+         direction: '-1'
+      }
+   },
+   {
+      shortCode: 'pa',
+      description: 'Price ascending',
+      sort: {
+         key: 'price',
+         direction: '1'
+      }
+   },
+   {
+      shortCode: 'pd',
+      description: 'Price descending',
+      sort: {
+         key: 'price',
+         direction: '-1'
+      }
+   },
+   {
+      shortCode: 'ma',
+      description: 'Mileage ascending',
+      sort: {
+         key: 'mileage',
+         direction: '1'
+      }
+   },
+   {
+      shortCode: 'yn',
+      description: 'By year: newest',
+      sort: {
+         key: 'year',
+         direction: '-1'
+      }
+   },
+   {
+      shortCode: 'yo',
+      description: 'By year: oldest',
+      sort: {
+         key: 'year',
+         direction: '1'
+      }
+   }
+]

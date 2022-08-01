@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import { createSearchParams, useSearchParams } from 'react-router-dom'
+import history from 'history/browser'
+import { Select } from '@chakra-ui/react'
 
 import {
    Announcement,
@@ -8,7 +10,9 @@ import {
    GetAnnouncementsVars,
    GetFilteredAnnouncementCountData,
    GetFilteredAnnouncementCountVars,
-   SearchParams
+   SearchParams,
+   SearchParamsExtended,
+   SortMethod
 } from '../../shared/types'
 import {
    GET_ANNOUNCEMENTS,
@@ -18,14 +22,15 @@ import AnnouncementsList from './AnnouncementsList/AnnouncementsList'
 import PagesBar from './PagesBar'
 import AdvancedFilter from './AdvancedFilter/AdvancedFilter'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
-import history from 'history/browser'
 import { getSessionStorageOrDefault } from '../../shared/utils/utils'
+import { sortMethods } from '../../shared/data'
 
 const Search = () => {
    const [, setSearch] = useSearchParams()
 
    const [count, setCount] = useState(0)
    const [params, setParams] = useState<SearchParams>({})
+   const [sortMethod, setSortMethod] = useState<null | SortMethod>(null)
    const [ifParamsParsed, setIfParamsParsed] = useState(false)
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
    const [firstLoaded, setFirstLoaded] = useState(false)
@@ -55,7 +60,7 @@ const Search = () => {
       onCompleted: data => setCount(data.getFilteredAnnouncementCount)
    })
 
-   // Load announcements when params or pages changes
+   // Load announcements when params, page or sort method change
    useEffect(() => {
       if (ifParamsParsed) {
          // clear empty arrays
@@ -74,7 +79,8 @@ const Search = () => {
                pagination: {
                   page: page.toString(),
                   limit: '20'
-               }
+               },
+               sort: sortMethod?.sort
             }
          })
          loadCount({
@@ -83,14 +89,20 @@ const Search = () => {
             }
          })
       }
-   }, [params, page, ifParamsParsed])
+   }, [params, page, ifParamsParsed, sortMethod])
 
-   // Set page and other params to search params
+   // Set params to search params when page or sort method changes
    useDidMountEffect(() => {
-      const temp = { ...params, page: page.toString() }
+      const temp: SearchParamsExtended = {
+         ...params,
+         page: page.toString()
+      }
+      if (sortMethod) {
+         temp.sort = sortMethod.shortCode
+      }
       history.push(`/search?${createSearchParams(params)}`)
       setSearch(temp, { replace: true })
-   }, [page])
+   }, [page, sortMethod])
 
    // Scroll on back
    useDidMountEffect(() => {
@@ -98,15 +110,37 @@ const Search = () => {
       sessionStorage.removeItem('yScrollPosition')
    }, [firstLoaded])
 
+   const handleSortMethodSelection = (
+      e: React.ChangeEvent<HTMLSelectElement>
+   ) => {
+      sortMethods.map(s => {
+         if (s.description === e.target.value) {
+            setSortMethod(s)
+         }
+      })
+   }
+
    return (
       <div>
          <AdvancedFilter
             params={params}
             setParams={setParams}
             setPage={setPage}
+            setSortMethod={setSortMethod}
             ifParamsParsed={ifParamsParsed}
             setIfParamsParsed={setIfParamsParsed}
          />
+         <Select
+            value={sortMethod ? sortMethod.description : 'Latest offers first'}
+            onChange={handleSortMethodSelection}>
+            {sortMethods.map(s => (
+               <option
+                  key={s.description}
+                  value={s.description}
+                  label={s.description}
+               />
+            ))}
+         </Select>
          <AnnouncementsList announcements={announcements} />
          <PagesBar
             count={count}

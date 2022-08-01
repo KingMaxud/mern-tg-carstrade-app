@@ -1,3 +1,8 @@
+.skeleton {
+   position: absolute;
+   z-index: 15;
+}
+
 .arrowsContainer {
    position: absolute;
    z-index: 20;
@@ -32,7 +37,7 @@
    transition: opacity 0.4s;
 
    &.hovered {
-      opacity: 1
+      opacity: 1;
    }
 }
 
@@ -50,4 +55,8 @@
    object-fit: contain;
    position: absolute;
    z-index: 10;
+
+   &.hidden {
+      visibility: hidden;
+   }
 }

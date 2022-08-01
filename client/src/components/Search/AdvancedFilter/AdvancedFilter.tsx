@@ -18,7 +18,8 @@ import {
    ModelsData,
    ModelsVars,
    SearchParams,
-   SelectKeys
+   SelectKeys,
+   SortMethod
 } from '../../../shared/types'
 import {
    arrayKeys,
@@ -31,6 +32,7 @@ import {
    getPowers,
    getPrices,
    getYears,
+   sortMethods,
    stringKeys,
    transmission
 } from '../../../shared/data'
@@ -46,6 +48,7 @@ type Props = {
    params: SearchParams
    setParams: Dispatch<SetStateAction<SearchParams>>
    setPage: Dispatch<SetStateAction<number>>
+   setSortMethod: Dispatch<SetStateAction<SortMethod | null>>
    ifParamsParsed: boolean
    setIfParamsParsed: Dispatch<SetStateAction<boolean>>
 }
@@ -54,6 +57,7 @@ const AdvancedFilter = ({
    params,
    setParams,
    setPage,
+   setSortMethod,
    ifParamsParsed,
    setIfParamsParsed
 }: Props) => {
@@ -127,8 +131,13 @@ const AdvancedFilter = ({
             })()
             setPage(page)
          }
+         else if (item === 'sort') {
+            setSortMethod(
+               sortMethods.find(s => s.shortCode === search[item][0]) || null
+            )
+         }
       }
-      
+
       setParams(params)
    }
 

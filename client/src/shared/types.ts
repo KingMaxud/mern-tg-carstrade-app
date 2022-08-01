@@ -100,7 +100,12 @@ export type SearchParams = {
    maxPower?: string
 }
 
-type Sort = {
+export type SearchParamsExtended = SearchParams & {
+   page?: string
+   sort?: string
+}
+
+export type Sort = {
    key: string
    direction: string
 }
@@ -122,6 +127,12 @@ export type Announcement = {
    model: string
    driveInit: string
    _id: string
+}
+
+export type SortMethod = {
+   shortCode: string
+   description: string
+   sort: Sort
 }
 
 export type GetAnnouncementsData = {

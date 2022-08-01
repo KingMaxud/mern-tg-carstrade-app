@@ -1,5 +1,5 @@
 import { Skeleton } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { getImageBySize } from '../../shared/utils/utils'
 import styles from './MainCarouselPhoto.module.scss'
@@ -9,6 +9,8 @@ import arrowRight from '../../images/arrow_right.svg'
 type Props = {
    image: string | null
    number: number
+   showSkeleton: boolean
+   setShowSkeleton: Dispatch<SetStateAction<boolean>>
    alt: string
    width: number
    height: number
@@ -19,23 +21,33 @@ type Props = {
 const MainCarouselPhoto = ({
    image,
    number,
+   showSkeleton,
+   setShowSkeleton,
    alt,
    width,
    height,
    nextImage,
    prevImage
 }: Props) => {
-   const [smallImage, setSmallImage] = useState<string | null>(null)
-   const [bigImage, setBigImage] = useState<string | null>(null)
-   const [smallImageLoaded, setSmallImageLoaded] = useState(false)
-   const [hovered, setHovered] = useState(false)
+   const [smallImage, setSmallImage] = useState<string>('')
+   const [bigImage, setBigImage] = useState<string>('')
+   const [bigImageLoaded, setBigImageLoaded] = useState(false)
+   const [hovered, setHovered] = useState(false) // To display arrow buttons on hover
 
+   // Set images by size whe it's available
    useEffect(() => {
       if (image) {
          setSmallImage(getImageBySize(image, 120, 90))
          setBigImage(getImageBySize(image, width, height))
       }
    }, [image])
+
+   // Hide Big Image when user changes main photo
+   useEffect(() => {
+      if (showSkeleton) {
+         setBigImageLoaded(false)
+      }
+   }, [showSkeleton])
 
    return (
       <div
@@ -45,71 +57,89 @@ const MainCarouselPhoto = ({
             width,
             height
          }}>
-         {!smallImageLoaded && (
-            <Skeleton width={`${width}px`} height={`${height}px`} />
+         {showSkeleton && (
+            <Skeleton
+               width={`${width}px`}
+               height={`${height}px`}
+               className={styles.skeleton}
+            />
          )}
-         {smallImage && bigImage && (
+         <div
+            className={styles.arrowsContainer}
+            style={{
+               width,
+               height
+            }}>
             <div
-               style={{
-                  width,
-                  height
-               }}>
-               <div
-                  className={styles.arrowsContainer}
-                  style={{
-                     width,
-                     height
-                  }}>
-                  <div
-                     onClick={() => prevImage(number)}
-                     className={styles.arrowBlock}>
-                     <div className={styles.overlay} />
-                     <img
-                        src={arrowLeft}
-                        alt="left arrow"
-                        className={`${styles.image} ${
-                           hovered && styles.hovered
-                        }`}
-                     />
-                  </div>
-                  <div className={styles.arrowsContainerCenter} />
-                  <div
-                     onClick={() => nextImage(number)}
-                     className={styles.arrowBlock}>
-                     <div className={styles.overlay} />
-                     <img
-                        src={arrowRight}
-                        alt="right arrow"
-                        className={`${styles.image} ${
-                           hovered && styles.hovered
-                        }`}
-                     />
-                  </div>
-               </div>
+               onClick={() => {
+                  prevImage(number)
+                  setShowSkeleton(true)
+               }}
+               className={styles.arrowBlock}>
+               <div className={styles.overlay} />
                <img
-                  src={smallImage}
-                  alt={alt}
-                  style={{
-                     width,
-                     height
-                  }}
-                  className={styles.smallImage}
-                  onLoad={() => setSmallImageLoaded(true)}
-               />
-               <img
-                  id={bigImage}
-                  src={bigImage}
-                  alt={alt}
-                  style={{
-                     width,
-                     height
-                  }}
-                  className={styles.bigImage}
+                  src={arrowLeft}
+                  alt="left arrow"
+                  className={`${styles.image} ${hovered && styles.hovered}`}
                />
             </div>
-         )}
+            <div className={styles.arrowsContainerCenter} />
+            <div
+               onClick={() => {
+                  nextImage(number)
+                  setShowSkeleton(true)
+               }}
+               className={styles.arrowBlock}>
+               <div className={styles.overlay} />
+               <img
+                  src={arrowRight}
+                  alt="right arrow"
+                  className={`${styles.image} ${hovered && styles.hovered}`}
+               />
+            </div>
+         </div>
+         <img
+            src={smallImage}
+            alt={alt}
+            style={{
+               width,
+               height
+            }}
+            className={`${styles.smallImage}`}
+            onLoad={() => setShowSkeleton(false)}
+         />
+         <img
+            src={bigImage || ''}
+            alt={alt}
+            style={{
+               width,
+               height
+            }}
+            onLoad={() => setBigImageLoaded(true)}
+            className={`${styles.bigImage} ${!bigImageLoaded && styles.hidden}`}
+         />
       </div>
    )
 }
 
 export default MainCarouselPhoto
+
+// <img
+// src={smallImage}
+// alt={alt}
+// style={{
+//    width,
+//       height
+// }}
+// className={`${styles.smallImage}`}
+// onLoad={() => setShowSkeleton(false)}
+// />
+// <img
+//    src={bigImage || ''}
+//    alt={alt}
+//    style={{
+//       width,
+//       height
+//    }}
+//    className={`${styles.bigImage}`}
+// />

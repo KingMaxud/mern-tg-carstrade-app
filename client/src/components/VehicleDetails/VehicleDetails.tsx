@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { GET_ANNOUNCEMENT } from '../../shared/utils/graphql'
 import Photos from './Photos'
+import styles from './VehicleDetails.module.scss'
 
 type Announcement = {
    _id: string
@@ -60,13 +61,45 @@ const VehicleDetails = () => {
       }
    )
 
+   console.log(data)
+
    return (
       <div>
          <div style={{ display: 'grid', gridTemplateColumns: '45rem auto' }}>
             <div style={{ height: '1000px', backgroundColor: 'gold' }}>
                <Photos photos={data ? data.photos : null} alt={alt} />
             </div>
-            <div style={{ backgroundColor: 'khaki' }} />
+            <div style={{ backgroundColor: 'khaki' }}>
+               <p className={styles.header}>
+                  {data?.mark} {data?.model}
+               </p>
+               <p className={styles.price}> Price: {data?.price}$</p>
+               <div className={styles.details}>
+                  <p>Year: {data?.year}</p>
+                  <p>Mileage: {data?.mileage}</p>
+                  <p>Body Style: {data?.bodyStyle}</p>
+                  <p>Color: {data?.color}</p>
+                  <p>Transmission: {data?.transmission}</p>
+                  <p>Fuel Type: {data?.fuelType}</p>
+                  <p>Drivetrain: {data?.driveInit}</p>
+                  <p>
+                     Engine Capacity:{' '}
+                     {Number.isInteger(data?.engineCapacity)
+                        ? `${data?.engineCapacity}.0`
+                        : data?.engineCapacity}
+                  </p>
+                  <p>Power: {data?.power}</p>
+                  <p>
+                     Description:{' '}
+                     {data?.description
+                        ? data?.description
+                        : 'There is no description.'}
+                  </p>
+               </div>
+               <div className={styles.contact}>
+                  Contact seller: +{data?.phoneNumber}
+               </div>
+            </div>
          </div>
       </div>
    )

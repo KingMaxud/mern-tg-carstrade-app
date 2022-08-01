@@ -210,8 +210,8 @@ export const GET_ANNOUNCEMENT = gql`
             driveInit
             engineCapacity
             power
-            phoneNumber
             description
+            phoneNumber
             createdAt
         }
     }

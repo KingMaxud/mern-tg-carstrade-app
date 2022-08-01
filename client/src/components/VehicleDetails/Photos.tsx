@@ -17,6 +17,7 @@ type Image = {
 
 const Photos = ({ photos, alt }: Props) => {
    const [currentImage, setCurrentImage] = useState<null | Image>(null)
+   const [showSkeleton, setShowSkeleton] = useState(true)
 
    const prevImage = (number: number) => {
       // If the current image is the first - set the last
@@ -54,6 +55,8 @@ const Photos = ({ photos, alt }: Props) => {
             <MainCarouselPhoto
                image={currentImage.src}
                number={currentImage.number}
+               showSkeleton={showSkeleton}
+               setShowSkeleton={setShowSkeleton}
                alt={alt}
                prevImage={prevImage}
                nextImage={nextImage}
@@ -68,9 +71,12 @@ const Photos = ({ photos, alt }: Props) => {
                   {photos.map((p, index) => (
                      <img
                         key={`${index} photo`}
-                        onClick={() =>
-                           setCurrentImage({ src: p, number: index + 1 })
-                        }
+                        onClick={() => {
+                           if (currentImage && index !== currentImage.number) {
+                              setShowSkeleton(true)
+                              setCurrentImage({ src: p, number: index })
+                           }
+                        }}
                         src={getImageBySize(p, 144, 108)}
                         alt={`${alt}${index + 1}`}
                      />

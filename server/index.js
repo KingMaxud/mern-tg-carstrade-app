@@ -39,6 +39,7 @@ const startServer = async () => {
    server.applyMiddleware({
       app,
       cors: {
+         methods: ['GET', 'PUT', 'POST'],
          credentials: true, // Allows setting credentials
          origin: function (origin, callback) {
             if (whitelist.indexOf(origin) !== -1) {
