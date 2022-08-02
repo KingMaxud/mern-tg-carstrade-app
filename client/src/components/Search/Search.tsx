@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
-import { createSearchParams, useSearchParams } from 'react-router-dom'
-import history from 'history/browser'
+import {
+   createSearchParams,
+   useNavigate,
+   useSearchParams
+} from 'react-router-dom'
 import { Select } from '@chakra-ui/react'
 
 import {
@@ -27,21 +30,17 @@ import { sortMethods } from '../../shared/data'
 
 const Search = () => {
    const [, setSearch] = useSearchParams()
+   const navigate = useNavigate()
 
    const [count, setCount] = useState(0)
    const [params, setParams] = useState<SearchParams>({})
-   const [sortMethod, setSortMethod] = useState<null | SortMethod>(null)
+   const [sortMethod, setSortMethod] = useState<null | SortMethod>(
+      sortMethods[0]
+   )
    const [ifParamsParsed, setIfParamsParsed] = useState(false)
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
    const [firstLoaded, setFirstLoaded] = useState(false)
    const [page, setPage] = useState(1)
-
-   const incrementPage = () => {
-      setPage(prevState => prevState + 1)
-   }
-   const decrementPage = () => {
-      setPage(prevState => prevState - 1)
-   }
 
    const [loadAnnouncements] = useLazyQuery<
       GetAnnouncementsData,
@@ -91,24 +90,26 @@ const Search = () => {
       }
    }, [params, page, ifParamsParsed, sortMethod])
 
-   // Set params to search params when page or sort method changes
-   useDidMountEffect(() => {
-      const temp: SearchParamsExtended = {
-         ...params,
-         page: page.toString()
-      }
-      if (sortMethod) {
-         temp.sort = sortMethod.shortCode
-      }
-      history.push(`/search?${createSearchParams(params)}`)
-      setSearch(temp, { replace: true })
-   }, [page, sortMethod])
-
    // Scroll on back
    useDidMountEffect(() => {
       window.scrollTo(0, getSessionStorageOrDefault('yScrollPosition', 0))
       sessionStorage.removeItem('yScrollPosition')
    }, [firstLoaded])
+
+   const updateSearchParamsOnPageChanges = (page: number) => {
+      const temp: SearchParamsExtended = {
+         ...params
+      }
+      if (sortMethod) {
+         temp.sort = sortMethod.shortCode
+      }
+
+      if (page !== 1) {
+         temp.page = page.toString()
+      }
+
+      navigate(`/search?${createSearchParams(temp)}`)
+   }
 
    const handleSortMethodSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
@@ -116,8 +117,17 @@ const Search = () => {
       sortMethods.map(s => {
          if (s.description === e.target.value) {
             setSortMethod(s)
+
+            // Record changes in history
+            const temp: SearchParamsExtended = {
+               ...params,
+               sort: s.shortCode
+            }
+
+            navigate(`/search?${createSearchParams(temp)}`)
          }
       })
+      setPage(1)
    }
 
    return (
@@ -145,9 +155,9 @@ const Search = () => {
          <PagesBar
             count={count}
             selectedPage={page}
+            page={page}
             setPage={setPage}
-            incrementPage={incrementPage}
-            decrementPage={decrementPage}
+            updateSearchParamsOnPageChanges={updateSearchParamsOnPageChanges}
          />
       </div>
    )

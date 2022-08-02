@@ -4,17 +4,17 @@ import { Dispatch, SetStateAction } from 'react'
 type Props = {
    count: number
    selectedPage: number
+   page: number
    setPage: Dispatch<SetStateAction<number>>
-   incrementPage: () => void
-   decrementPage: () => void
+   updateSearchParamsOnPageChanges: (page: number) => void
 }
 
 const PagesBar = ({
    count,
+   page,
    setPage,
    selectedPage,
-   incrementPage,
-   decrementPage
+   updateSearchParamsOnPageChanges
 }: Props) => {
    const pagesAmount = Math.ceil(count / 20)
    const renderedButtonsValuesList: number[] = []
@@ -44,15 +44,32 @@ const PagesBar = ({
          {count && (
             <div>
                {selectedPage > 1 && (
-                  <Button onClick={decrementPage}>Prev</Button>
+                  <Button
+                     onClick={() => {
+                        setPage(page - 1)
+                        updateSearchParamsOnPageChanges(page - 1)
+                     }}>
+                     Prev
+                  </Button>
                )}
                {renderedButtonsValuesList.map(v => (
-                  <Button onClick={() => setPage(v)} key={v}>
+                  <Button
+                     onClick={() => {
+                        setPage(v)
+                        updateSearchParamsOnPageChanges(v)
+                     }}
+                     key={v}>
                      {v}
                   </Button>
                ))}
                {selectedPage !== pagesAmount && (
-                  <Button onClick={incrementPage}>Next</Button>
+                  <Button
+                     onClick={() => {
+                        setPage(page + 1)
+                        updateSearchParamsOnPageChanges(page + 1)
+                     }}>
+                     Next
+                  </Button>
                )}
             </div>
          )}

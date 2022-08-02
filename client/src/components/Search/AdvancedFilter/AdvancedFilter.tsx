@@ -2,13 +2,11 @@ import React, {
    Dispatch,
    SetStateAction,
    useEffect,
-   useRef,
    useState
 } from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
-import { createSearchParams, useLocation } from 'react-router-dom'
-import history from 'history/browser'
+import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
 
 import {
    CheckboxKeys,
@@ -63,6 +61,7 @@ const AdvancedFilter = ({
 }: Props) => {
    const [search] = useCustomSearchParams()
    let location = useLocation()
+   const navigate = useNavigate()
 
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)
@@ -110,6 +109,8 @@ const AdvancedFilter = ({
 
    const parseSearch = () => {
       let params = {}
+      let sortMethod: null | SortMethod = sortMethods[0]
+      let page = 1
       for (const item in search) {
          // check if values must be an array or not, clean possible trash values
          if (arrayKeys.includes(item)) {
@@ -123,21 +124,20 @@ const AdvancedFilter = ({
                [item]: search[item][0]
             }
          } else if (item === 'page') {
-            let page: number = (function () {
+            page = (function () {
                if (Number(search[item]) > 0) {
                   return Number(search[item])
                }
                return 1
             })()
-            setPage(page)
-         }
-         else if (item === 'sort') {
-            setSortMethod(
+         } else if (item === 'sort') {
+            sortMethod =
                sortMethods.find(s => s.shortCode === search[item][0]) || null
-            )
          }
       }
 
+      setPage(page)
+      setSortMethod(sortMethod)
       setParams(params)
    }
 
@@ -223,7 +223,7 @@ const AdvancedFilter = ({
       }
 
       setParams(tempParams)
-      history.push(`/search?${createSearchParams(tempParams)}`)
+      navigate(`/search?${createSearchParams(tempParams)}`)
    }
 
    const handleSelection = (
@@ -255,7 +255,7 @@ const AdvancedFilter = ({
       }
 
       setParams(tempParams)
-      history.push(`/search?${createSearchParams(tempParams)}`)
+      navigate(`/search?${createSearchParams(tempParams)}`)
    }
 
    const handleCheckbox = (key: CheckboxKeys, value: string) => {
@@ -284,7 +284,7 @@ const AdvancedFilter = ({
       }
 
       setParams(tempParams)
-      history.push(`/search?${createSearchParams(tempParams)}`)
+      navigate(`/search?${createSearchParams(tempParams)}`)
    }
 
    const conditionDefaultValue = (function () {
