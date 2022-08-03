@@ -1,10 +1,18 @@
 import { useLocation } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
-import { useState } from 'react'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useEffect, useState } from 'react'
 
-import { GET_ANNOUNCEMENT } from '../../shared/utils/graphql'
+import {
+   DELETE_ANNOUNCEMENT,
+   GET_ANNOUNCEMENT
+} from '../../shared/utils/graphql'
 import Photos from './Photos'
 import styles from './VehicleDetails.module.scss'
+import { DeleteAnnouncementVars, MutationDetails } from '../../shared/types'
+import { Button, useDisclosure } from '@chakra-ui/react'
+import DeleteModal from '../DeleteModal'
+import useGetUser from '../../shared/hooks/useGetUser'
+import ChangePriceModal from './ChangePriceModal'
 
 type Announcement = {
    _id: string
@@ -41,27 +49,50 @@ const VehicleDetails = () => {
    window.scrollTo(0, 0)
 
    const location = useLocation()
+   const { isOpen, onOpen, onClose } = useDisclosure()
+   const { getIsAdmin, getUserId } = useGetUser()
+
    const [data, setData] = useState<Announcement | null>(null)
    const [currentPhotoNumber, setCurrentPhotoNumber] = useState(0)
+   const [id, setId] = useState(location.pathname.split('/')[2])
    const [alt, setAlt] = useState('')
+   const [isAdmin, setIsAdmin] = useState(false)
+   const [isOwner, setIsOwner] = useState(false)
 
    const { loading } = useQuery<GetAnnouncementData, GetAnnouncementVars>(
       GET_ANNOUNCEMENT,
       {
-         variables: { id: location.pathname.split('/')[2] },
+         variables: { id },
          onCompleted: ({ getAnnouncement }) => {
             setData(getAnnouncement)
             setAlt(
                `${getAnnouncement.mark} ${getAnnouncement.model}, ${getAnnouncement.year} production year, View - `
             )
-         },
-         onError: error => {
-            console.log(error)
          }
       }
    )
 
-   console.log(data)
+   const [deleteAnnouncement] =
+      useMutation<
+         { deleteAnnouncement: MutationDetails },
+         DeleteAnnouncementVars
+      >(DELETE_ANNOUNCEMENT)
+
+   useEffect(() => {
+      getIsAdmin().then(res => {
+         // If the user is admin
+         if (res[0]) {
+            setIsAdmin(true)
+         }
+      })
+
+      getUserId().then(res => {
+         // If the user is owner
+         if (res === data?.user) {
+            setIsOwner(true)
+         }
+      })
+   }, [data])
 
    return (
       <div>
@@ -74,6 +105,9 @@ const VehicleDetails = () => {
                   {data?.mark} {data?.model}
                </p>
                <p className={styles.price}> Price: {data?.price}$</p>
+               {data && (
+                  <ChangePriceModal currentPrice={data?.price || 0} id={id} />
+               )}
                <div className={styles.details}>
                   <p>Year: {data?.year}</p>
                   <p>Mileage: {data?.mileage}</p>
@@ -99,6 +133,27 @@ const VehicleDetails = () => {
                <div className={styles.contact}>
                   Contact seller: +{data?.phoneNumber}
                </div>
+               {(isOwner || isAdmin) && (
+                  <DeleteModal
+                     isOpen={isOpen}
+                     onOpen={onOpen}
+                     onClose={onClose}
+                     deleteObject="your announcement">
+                     <Button
+                        colorScheme="blue"
+                        mr={3}
+                        onClick={() => {
+                           deleteAnnouncement({
+                              variables: {
+                                 announcementId: id
+                              }
+                           })
+                           onClose()
+                        }}>
+                        Delete
+                     </Button>
+                  </DeleteModal>
+               )}
             </div>
          </div>
       </div>

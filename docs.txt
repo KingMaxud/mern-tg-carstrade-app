@@ -1,11 +1,3 @@
-TODO: Bugs with authentication
-      Set access on the client side
-      Set access on the server side
+TODO: Set access on the server side
+      Handle cache
       Design
-
-Latest offers first
-Price ascending
-Price descending
-Mileage ascending
-By year: newest
-By year: oldest

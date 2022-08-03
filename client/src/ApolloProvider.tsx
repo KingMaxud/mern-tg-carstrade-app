@@ -11,7 +11,6 @@ import { setContext } from '@apollo/client/link/context'
 import App from './App'
 import TokenService from './shared/utils/token.service'
 import jwtDecode from 'jwt-decode'
-import tokenService from './shared/utils/token.service'
 
 interface DecodedToken {
    exp: number
@@ -63,7 +62,7 @@ const authLink = setContext(async (_, { headers }) => {
          const data = await response.text()
          const newAccessToken = JSON.parse(data).data.getNewTokens.accessToken
          token = newAccessToken
-         tokenService.setLocalAccessToken(newAccessToken)
+         TokenService.setLocalAccessToken(newAccessToken)
       }
    }
 

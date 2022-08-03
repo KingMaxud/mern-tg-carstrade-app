@@ -8,7 +8,7 @@ type IsAdmin = [boolean, boolean]
 
 const AdminProtected = () => {
    const [isAdmin, setIsAdmin] = useState<IsAdmin>([false, false])
-   const {getIsAdmin} = useGetUser()
+   const { getIsAdmin } = useGetUser()
 
    useEffect(() => {
       getIsAdmin().then(data => setIsAdmin(data))

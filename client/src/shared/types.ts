@@ -173,3 +173,12 @@ export type CheckboxKeys =
    | 'transmission'
    | 'fuelType'
    | 'driveInit'
+
+export type DeleteAnnouncementVars = {
+   announcementId: string
+}
+
+export type ChangePriceVars = {
+   announcementId: string
+   price: string
+}

@@ -127,9 +127,7 @@ export default {
             }
 
             if (RefreshToken.verifyExpiration(refreshToken)) {
-               await RefreshToken.findByIdAndRemove(refreshToken._id, {
-                  useFindAndModify: false
-               }).exec()
+               await RefreshToken.findByIdAndRemove(refreshToken._id).exec()
 
                return {
                   status: 'Failed',
@@ -137,6 +135,16 @@ export default {
                      'Refresh token was expired. Please make a new login request.'
                }
             }
+
+            await RefreshToken.findByIdAndRemove(refreshToken._id).exec(
+               function (err, refreshToken) {
+                  if (err) {
+                     console.log(err)
+                  } else {
+                     console.log('Removed token: ' + refreshToken)
+                  }
+               }
+            )
 
             const newAccessToken = generateAccessToken(refreshToken.user._id)
             const newRefreshToken = await RefreshToken.createToken(

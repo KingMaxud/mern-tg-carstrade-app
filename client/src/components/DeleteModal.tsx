@@ -18,11 +18,11 @@ type Props = {
 }
 
 const DeleteModal = ({
-   deleteObject,
-   children,
    isOpen,
    onOpen,
-   onClose
+   onClose,
+   deleteObject,
+   children
 }: Props) => {
    return (
       <>

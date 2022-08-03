@@ -168,51 +168,73 @@ export const ADD_ANNOUNCEMENT = gql`
 `
 
 export const GET_ANNOUNCEMENTS = gql`
-    query GetGenerations($pagination: PaginationInput!, $sort: SortInput, $filter: FilterInput) {
-        getAnnouncements(pagination: $pagination, sort: $sort, filter: $filter) {
-            photos
-            condition
-            price
-            year
-            mileage
-            transmission
-            fuelType
-            mark
-            model
-            driveInit
-            _id
-        }
-    }
+   query GetGenerations(
+      $pagination: PaginationInput!
+      $sort: SortInput
+      $filter: FilterInput
+   ) {
+      getAnnouncements(pagination: $pagination, sort: $sort, filter: $filter) {
+         photos
+         condition
+         price
+         year
+         mileage
+         transmission
+         fuelType
+         mark
+         model
+         driveInit
+         _id
+      }
+   }
 `
 
 export const GET_FILTERED_ANNOUNCEMENTS_COUNT = gql`
-    query Query($filter: FilterInput) {
-        getFilteredAnnouncementCount(filter: $filter)
-    }
+   query Query($filter: FilterInput) {
+      getFilteredAnnouncementCount(filter: $filter)
+   }
 `
 
 export const GET_ANNOUNCEMENT = gql`
-    query Query($id: String!) {
-        getAnnouncement(id: $id) {
-            user
-            photos
-            mark
-            model
-            generation
-            condition
-            price
-            year
-            mileage
-            color
-            bodyStyle
-            transmission
-            fuelType
-            driveInit
-            engineCapacity
-            power
-            description
-            phoneNumber
-            createdAt
-        }
-    }
+   query Query($id: String!) {
+      getAnnouncement(id: $id) {
+         user
+         photos
+         mark
+         model
+         generation
+         condition
+         price
+         year
+         mileage
+         color
+         bodyStyle
+         transmission
+         fuelType
+         driveInit
+         engineCapacity
+         power
+         description
+         phoneNumber
+         createdAt
+      }
+   }
+`
+
+export const DELETE_ANNOUNCEMENT = gql`
+   mutation DeleteAnnouncement($announcementId: ID!) {
+      deleteAnnouncement(announcementId: $announcementId) {
+         success
+         message
+      }
+   }
+`
+
+export const CHANGE_PRICE = gql`
+   mutation changePrice($announcementId: ID!, $price: String) {
+      updateAnnouncement(announcementId: $announcementId, price: $price) {
+         success
+         message
+      }
+   }
 `

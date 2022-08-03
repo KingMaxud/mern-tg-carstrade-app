@@ -149,8 +149,6 @@ const AddAnnouncement = () => {
       }
    })
 
-   console.log(formik.errors)
-
    useEffect(() => {
       if (mark) {
          loadModels()
