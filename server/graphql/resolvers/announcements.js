@@ -1,6 +1,7 @@
 import { UserInputError } from 'apollo-server-errors'
 
 import Announcement from '../../models/announcement.model.js'
+import User from '../../models/user.model.js'
 
 const createFilterObject = filter => {
    const {
@@ -100,28 +101,36 @@ export default {
             phoneNumber
          }
       ) => {
-         const announcement = await Announcement.create({
-            user,
-            mark,
-            model,
-            generation,
-            condition,
-            price: Number(price),
-            year: Number(year),
-            mileage: Number(mileage),
-            color,
-            bodyStyle,
-            transmission,
-            fuelType,
-            driveInit,
-            engineCapacity: Number(engineCapacity),
-            power: Number(power),
-            description,
-            photos,
-            phoneNumber: Number(phoneNumber)
-         })
-
-         // TODO: add announcements to User's myAnnouncements (announcement._id)
+         await Announcement.create(
+            {
+               user,
+               mark,
+               model,
+               generation,
+               condition,
+               price: Number(price),
+               year: Number(year),
+               mileage: Number(mileage),
+               color,
+               bodyStyle,
+               transmission,
+               fuelType,
+               driveInit,
+               engineCapacity: Number(engineCapacity),
+               power: Number(power),
+               description,
+               photos,
+               phoneNumber: Number(phoneNumber)
+            },
+            async function (err, a) {
+               await User.updateOne(
+                  {
+                     _id: a.user
+                  },
+                  { $push: { myAnnouncements: a._id } }
+               )
+            }
+         )
 
          if (mark) {
             return {
@@ -133,9 +142,8 @@ export default {
          }
       },
       deleteAnnouncement: async (_, { announcementId }) => {
+         // TODO: Filter User.myAnnouncements
          await Announcement.deleteOne({ _id: announcementId })
-
-         // TODO: delete announcement from User's myAnnouncements (announcement._id)
 
          return {
             success: true,
@@ -143,6 +151,7 @@ export default {
          }
       },
       updateAnnouncement: async (_, body) => {
+         // TODO: Admin or owner access
          const valuesToChange = Object.assign({}, body)
          //    delete valuesToChange.announcementId
          await Announcement.updateOne(

@@ -21,9 +21,8 @@ export default {
                req.headers.authorization.split(' ')[1],
                process.env.JWT_SECRET
             )
-            const user = await User.findById(decoded.sub).select(
-               'name email isAdmin _id'
-            )
+            const user = await User.findById(decoded.sub)
+               .select('name email myAnnouncements isAdmin _id')
             return user
          } catch (e) {
             throw new AuthenticationError('Token is expired')
@@ -140,8 +139,6 @@ export default {
                function (err, refreshToken) {
                   if (err) {
                      console.log(err)
-                  } else {
-                     console.log('Removed token: ' + refreshToken)
                   }
                }
             )

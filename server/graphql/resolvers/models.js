@@ -34,6 +34,7 @@ export default {
    },
    Mutation: {
       addMark: async (_, { markName }) => {
+         // TODO: Admin access
          const mark = await Mark.create({ name: markName })
          if (mark) {
             return {
@@ -45,6 +46,7 @@ export default {
          }
       },
       deleteMark: async (_, { markName }) => {
+         // TODO: Admin access
          await Mark.deleteOne({ name: markName })
          await Model.deleteMany({ mark: markName })
 
@@ -54,6 +56,7 @@ export default {
          }
       },
       addModel: async (_, { markName, modelName }) => {
+         // TODO: Admin access
          const mark = await Mark.exists({ name: markName })
          if (!mark) {
             throw new UserInputError(`This mark doesn't exist`)
@@ -72,6 +75,7 @@ export default {
          }
       },
       deleteModel: async (_, { markName, modelName }) => {
+         // TODO: Admin access
          const mark = await Mark.exists({ name: markName })
          if (!mark) {
             throw new UserInputError(`This mark doesn't exist`)
@@ -87,6 +91,7 @@ export default {
          _,
          { markName, modelName, bodyStyles,generationName, startYear, endYear, photoUrl }
       ) => {
+         // TODO: Admin access
          const mark = await Mark.exists({ name: markName })
          if (!mark) {
             throw new UserInputError(`This mark doesn't exist`)
@@ -118,6 +123,7 @@ export default {
          }
       },
       deleteGeneration: async (_, { markName, modelName, generationName }) => {
+         // TODO: Admin access
          const mark = await Mark.exists({ name: markName })
          if (!mark) {
             throw new UserInputError(`This mark doesn't exist`)
