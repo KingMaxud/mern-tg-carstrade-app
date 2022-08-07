@@ -142,8 +142,25 @@ export default {
          }
       },
       deleteAnnouncement: async (_, { announcementId }) => {
-         // TODO: Filter User.myAnnouncements
-         await Announcement.deleteOne({ _id: announcementId })
+         // Filter User.myAnnouncements
+         await Announcement.findByIdAndDelete({ _id: announcementId }).then(  // Delete announcement and get user
+            async function (announcementData) {
+               await User.findById(                                              // Find user and filter user.myAnnouncements
+                  announcementData.user.toString(),
+                  async function (err, userData) {
+                     const newMyAnnouncements = userData.myAnnouncements.filter(
+                        a => announcementId !== a.toString()
+                     )
+                     await User.updateOne(                                       // Update user with new array
+                        { id: announcementData.user.toString() },
+                        {
+                           myAnnouncements: newMyAnnouncements
+                        }
+                     )
+                  }
+               )
+            }
+         )
 
          return {
             success: true,

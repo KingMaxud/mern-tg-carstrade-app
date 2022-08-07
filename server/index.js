@@ -29,7 +29,9 @@ const startServer = async () => {
    server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: ({ req, res }) => ({ req, res }),
+      context: ({ req, res }) => {
+         return ({ req, res })
+      },
       validationRules: [depthLimit(10)]
    })
    await server.start()

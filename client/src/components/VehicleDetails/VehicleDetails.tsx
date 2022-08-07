@@ -105,7 +105,7 @@ const VehicleDetails = () => {
                   {data?.mark} {data?.model}
                </p>
                <p className={styles.price}> Price: {data?.price}$</p>
-               {data && (
+               {data && isOwner && (
                   <ChangePriceModal currentPrice={data?.price || 0} id={id} />
                )}
                <div className={styles.details}>
