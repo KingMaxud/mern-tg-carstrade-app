@@ -4,9 +4,18 @@ import * as Yup from 'yup'
 import { useMutation } from '@apollo/client'
 import { Checkbox, Button } from '@chakra-ui/react'
 
-import { ADD_GENERATION } from '../../shared/utils/graphql'
+import {
+   ADD_GENERATION,
+   GET_GENERATIONS,
+   GET_MODELS
+} from '../../shared/utils/graphql'
 import useAddPhoto from '../../shared/hooks/useAddPhoto'
-import { AddGenerationVars, MutationDetails } from '../../shared/types'
+import {
+   AddGenerationVars,
+   GenerationsData,
+   GenerationsVars,
+   MutationDetailsWithId
+} from '../../shared/types'
 import { bodyStyles } from '../../shared/data'
 
 type Props = {
@@ -19,13 +28,15 @@ type FormikValues = {
    bodyStyles: string[]
    startYear: string
    endYear: string
+   photo: string
 }
 
 const AddGeneration = ({ mark, model }: Props): JSX.Element => {
+   const { addPhoto, addPhotoComponent } = useAddPhoto()
+
    const [error, setError] = useState('')
    const [loading, setLoading] = useState(false)
    const [photoUrlError, setPhotoUrlError] = useState('')
-   const { addPhoto, addPhotoComponent } = useAddPhoto()
 
    const AddGenerationSchema = Yup.object().shape({
       generationName: Yup.string().required('Required'),
@@ -39,13 +50,16 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
          generationName: '',
          bodyStyles: [],
          startYear: '',
-         endYear: ''
+         endYear: '',
+         photo: ''
       },
       validationSchema: AddGenerationSchema,
       onSubmit: async values => {
          setLoading(true)
          const photoUrl = await addPhoto()
+
          if (photoUrl) {
+            values.photo = photoUrl[0]
             addGeneration({
                variables: {
                   markName: mark,
@@ -54,7 +68,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
                   bodyStyles: values.bodyStyles,
                   startYear: values.startYear,
                   endYear: values.endYear,
-                  photoUrl: photoUrl[0]
+                  photoUrl: values.photo
                }
             })
          } else {
@@ -64,10 +78,51 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
    })
 
    const [addGeneration] = useMutation<
-      { addGeneration: MutationDetails },
+      { addGeneration: MutationDetailsWithId },
       AddGenerationVars
    >(ADD_GENERATION, {
-      update() {
+      update(cache, data) {
+         const cachedGenerations = cache.readQuery<
+            GenerationsData,
+            GenerationsVars
+         >({
+            query: GET_GENERATIONS,
+            variables: {
+               markName: mark,
+               modelName: model
+            }
+         })
+
+         const newData: any = {
+            getGenerations: []
+         }
+
+         if (cachedGenerations && cachedGenerations.getGenerations)
+            newData.getGenerations = cachedGenerations.getGenerations
+
+         if (formik.values.photo && data.data) {
+            newData.getGenerations = [
+               ...newData.getGenerations,
+               {
+                  name: formik.values.generationName,
+                  bodyStyles: formik.values.bodyStyles,
+                  startYear: Number(formik.values.startYear),
+                  endYear: Number(formik.values.endYear),
+                  photoUrl: formik.values.photo,
+                  _id: data.data?.addGeneration._id
+               }
+            ]
+         }
+
+         cache.writeQuery({
+            query: GET_GENERATIONS,
+            variables: {
+               markName: mark,
+               modelName: model
+            },
+            data: newData
+         })
+
          setLoading(false)
       },
       onError(error) {
@@ -117,7 +172,8 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
                <div>{formik.errors.endYear}</div>
             ) : null}
             {bodyStyles.map(b => (
-               <Checkbox key={b}
+               <Checkbox
+                  key={b}
                   onChange={() => {
                      if (formik.values.bodyStyles.includes(b)) {
                         formik.setFieldValue(

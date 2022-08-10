@@ -36,6 +36,7 @@ export const ADD_MARK = gql`
       addMark(markName: $markName) {
          success
          message
+         _id
       }
    }
 `
@@ -54,6 +55,7 @@ export const ADD_MODEL = gql`
       addModel(markName: $markName, modelName: $modelName) {
          success
          message
+         _id
       }
    }
 `
@@ -68,7 +70,7 @@ export const DELETE_MODEL = gql`
 `
 
 export const ADD_GENERATION = gql`
-   mutation Mutation(
+   mutation AddGeneration(
       $markName: String!
       $generationName: String!
       $startYear: String!
@@ -88,12 +90,13 @@ export const ADD_GENERATION = gql`
       ) {
          success
          message
+         _id
       }
    }
 `
 
 export const DELETE_GENERATION = gql`
-   mutation Mutation(
+   mutation DeleteGeneration(
       $markName: String!
       $modelName: String!
       $generationName: String!
@@ -110,7 +113,7 @@ export const DELETE_GENERATION = gql`
 `
 
 export const GET_USER = gql(`
-   query Query {
+   query GetUser {
       getUser {
          name
          email
@@ -121,7 +124,7 @@ export const GET_USER = gql(`
 `)
 
 export const ADD_ANNOUNCEMENT = gql`
-   mutation Mutation(
+   mutation AddAnnouncement(
       $user: String!
       $mark: String!
       $model: String!
@@ -190,13 +193,13 @@ export const GET_ANNOUNCEMENTS = gql`
 `
 
 export const GET_FILTERED_ANNOUNCEMENTS_COUNT = gql`
-   query Query($filter: FilterInput) {
+   query GetFilteredAnnouncementCount($filter: FilterInput) {
       getFilteredAnnouncementCount(filter: $filter)
    }
 `
 
 export const GET_ANNOUNCEMENT = gql`
-   query Query($id: String!) {
+   query GetAnnouncement($id: String!) {
       getAnnouncement(id: $id) {
          user
          photos
@@ -231,7 +234,7 @@ export const DELETE_ANNOUNCEMENT = gql`
 `
 
 export const CHANGE_PRICE = gql`
-   mutation changePrice($announcementId: ID!, $price: String) {
+   mutation ChangePrice($announcementId: ID!, $price: String) {
       updateAnnouncement(announcementId: $announcementId, price: $price) {
          success
          message

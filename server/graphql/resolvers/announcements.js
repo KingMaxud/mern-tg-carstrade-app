@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server-errors'
+import {ForbiddenError, UserInputError} from 'apollo-server-errors'
 
 import Announcement from '../../models/announcement.model.js'
 import User from '../../models/user.model.js'
@@ -143,15 +143,18 @@ export default {
       },
       deleteAnnouncement: async (_, { announcementId }) => {
          // Filter User.myAnnouncements
-         await Announcement.findByIdAndDelete({ _id: announcementId }).then(  // Delete announcement and get user
+         await Announcement.findByIdAndDelete({ _id: announcementId }).then(
+            // Delete announcement and get user
             async function (announcementData) {
-               await User.findById(                                              // Find user and filter user.myAnnouncements
+               await User.findById(
+                  // Find user and filter user.myAnnouncements
                   announcementData.user.toString(),
                   async function (err, userData) {
                      const newMyAnnouncements = userData.myAnnouncements.filter(
                         a => announcementId !== a.toString()
                      )
-                     await User.updateOne(                                       // Update user with new array
+                     await User.updateOne(
+                        // Update user with new array
                         { id: announcementData.user.toString() },
                         {
                            myAnnouncements: newMyAnnouncements
@@ -167,14 +170,25 @@ export default {
             message: `Announcement has been deleted`
          }
       },
-      updateAnnouncement: async (_, body) => {
-         // TODO: Admin or owner access
-         const valuesToChange = Object.assign({}, body)
-         //    delete valuesToChange.announcementId
-         await Announcement.updateOne(
-            { _id: body.announcementId },
-            valuesToChange
-         )
+      updateAnnouncement: async (_, body, { userInfo }) => {
+         // Owner or admin access
+         await Announcement.findById(body.announcementId).then(async function (
+            data
+         ) {
+            if (userInfo && (userInfo.isAdmin || data.user === userInfo._id)) {
+               const valuesToChange = Object.assign({}, body)
+               //    delete valuesToChange.announcementId
+               await Announcement.updateOne(
+                  { _id: body.announcementId },
+                  valuesToChange
+               )
+            } else {
+               throw new ForbiddenError(
+                  'You do not have access for this action'
+               )
+            }
+         })
+
          return {
             success: true,
             message: 'Your announcement has been changed!'

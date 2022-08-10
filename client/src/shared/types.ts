@@ -20,7 +20,7 @@ export type Generation = {
    bodyStyles: string[]
    startYear: number
    endYear: number
-   photo: number
+   photo: string
    _id: string
 }
 export type GenerationsData = {
@@ -33,6 +33,9 @@ export type GenerationsVars = {
 export type MutationDetails = {
    success: boolean
    message: string
+}
+export type MutationDetailsWithId = MutationDetails & {
+   _id: string
 }
 export type ModelHandleVars = {
    markName: string

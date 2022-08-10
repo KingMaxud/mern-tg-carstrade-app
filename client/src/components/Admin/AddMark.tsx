@@ -3,8 +3,13 @@ import { useMutation } from '@apollo/client'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 
-import { ADD_MARK } from '../../shared/utils/graphql'
-import { ModelsVars, MutationDetails } from '../../shared/types'
+import { ADD_MARK, GET_MARKS } from '../../shared/utils/graphql'
+import {
+   MarksData,
+   ModelsVars,
+   MutationDetails,
+   MutationDetailsWithId
+} from '../../shared/types'
 
 const AddMark = (): JSX.Element => {
    const [error, setError] = useState('')
@@ -25,18 +30,37 @@ const AddMark = (): JSX.Element => {
       }
    })
 
-   const [addMark] = useMutation<{ addMark: MutationDetails }, ModelsVars>(
-      ADD_MARK,
-      {
-         update() {
-            setLoading(false)
-         },
-         onError(error) {
-            setLoading(false)
-            setError(error.message)
+   const [addMark] = useMutation<
+      { addMark: MutationDetailsWithId },
+      ModelsVars
+   >(ADD_MARK, {
+      update(cache, data) {
+         const cachedMarks = cache.readQuery<MarksData>({
+            query: GET_MARKS
+         })
+
+         if (cachedMarks && data.data) {
+            cache.writeQuery({
+               query: GET_MARKS,
+               data: {
+                  getMarks: [
+                     ...cachedMarks.getMarks,
+                     {
+                        name: formik.values.markName,
+                        _id: data.data.addMark._id
+                     }
+                  ]
+               }
+            })
          }
+
+         setLoading(false)
+      },
+      onError(error) {
+         setLoading(false)
+         setError(error.message)
       }
-   )
+   })
 
    return (
       <>

@@ -3,8 +3,13 @@ import React, { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
-import { ADD_MODEL } from '../../shared/utils/graphql'
-import { ModelHandleVars, MutationDetails } from '../../shared/types'
+import { ADD_MODEL, GET_MODELS } from '../../shared/utils/graphql'
+import {
+   ModelHandleVars,
+   ModelsData,
+   ModelsVars,
+   MutationDetailsWithId
+} from '../../shared/types'
 
 type AddMarkProps = {
    mark: string
@@ -32,10 +37,35 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
    })
 
    const [addModel] = useMutation<
-      { addModel: MutationDetails },
+      { addModel: MutationDetailsWithId },
       ModelHandleVars
    >(ADD_MODEL, {
-      update() {
+      update(cache, data) {
+         const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
+            query: GET_MODELS,
+            variables: {
+               markName: mark
+            }
+         })
+
+         if (cachedModels && data.data) {
+            cache.writeQuery({
+               query: GET_MODELS,
+               variables: {
+                  markName: mark
+               },
+               data: {
+                  getModels: [
+                     ...cachedModels.getModels,
+                     {
+                        name: formik.values.modelName,
+                        _id: data.data.addModel._id
+                     }
+                  ]
+               }
+            })
+         }
+         formik.values.modelName = ''
          setLoading(false)
       },
       onError(error) {

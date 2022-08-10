@@ -4,11 +4,15 @@ import dotenv from 'dotenv'
 import depthLimit from 'graphql-depth-limit'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
+import { AuthenticationError } from 'apollo-server-errors'
+import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
 import resolvers from './graphql/resolvers/index.js'
 import typeDefs from './graphql/typeDefs.js'
+import User from './models/user.model.js'
+import { getUser } from './utils/getUser.js'
 
 const app = express()
 app.use(cookieParser())
@@ -29,8 +33,10 @@ const startServer = async () => {
    server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: ({ req, res }) => {
-         return ({ req, res })
+      context: async ({ req, res }) => {
+         const user = await getUser(req)
+         const userInfo = user.isAuthed ? user.info : null
+         return { req, res, userInfo }
       },
       validationRules: [depthLimit(10)]
    })

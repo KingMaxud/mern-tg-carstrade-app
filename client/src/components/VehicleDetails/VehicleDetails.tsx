@@ -1,5 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import {
+   useMutation,
+   useQuery
+} from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import {
@@ -36,7 +39,7 @@ type Announcement = {
    phoneNumber: number
 }
 
-type GetAnnouncementData = {
+export type GetAnnouncementData = {
    getAnnouncement: Announcement
 }
 
@@ -72,11 +75,10 @@ const VehicleDetails = () => {
       }
    )
 
-   const [deleteAnnouncement] =
-      useMutation<
-         { deleteAnnouncement: MutationDetails },
-         DeleteAnnouncementVars
-      >(DELETE_ANNOUNCEMENT)
+   const [deleteAnnouncement] = useMutation<
+      { deleteAnnouncement: MutationDetails },
+      DeleteAnnouncementVars
+   >(DELETE_ANNOUNCEMENT)
 
    useEffect(() => {
       getIsAdmin().then(res => {

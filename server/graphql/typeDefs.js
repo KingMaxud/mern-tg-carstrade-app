@@ -19,6 +19,12 @@ export default gql`
       message: String!
    }
 
+   type ReturnedTypeWithId {
+       success: Boolean!
+       message: String!
+       _id: ID!
+   }
+
    type Mark {
       name: String!
       _id: ID!
@@ -119,9 +125,9 @@ export default gql`
       getNewTokens: TokenData!
       logout: ReturnedType!
       #models
-      addMark(markName: String!): ReturnedType!
+      addMark(markName: String!): ReturnedTypeWithId!
       deleteMark(markName: String!): ReturnedType!
-      addModel(markName: String!, modelName: String!): ReturnedType!
+      addModel(markName: String!, modelName: String!): ReturnedTypeWithId!
       deleteModel(markName: String!, modelName: String!): ReturnedType!
       addGeneration(
          markName: String!
@@ -131,7 +137,7 @@ export default gql`
          startYear: String!
          endYear: String!
          photoUrl: String!
-      ): ReturnedType!
+      ): ReturnedTypeWithId!
       deleteGeneration(
          markName: String!
          modelName: String!

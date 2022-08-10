@@ -10,10 +10,11 @@ import {
    Button,
    useDisclosure
 } from '@chakra-ui/react'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 
-import { CHANGE_PRICE } from '../../shared/utils/graphql'
+import { CHANGE_PRICE, GET_ANNOUNCEMENT } from '../../shared/utils/graphql'
 import { ChangePriceVars, MutationDetails } from '../../shared/types'
+import { GetAnnouncementData } from './VehicleDetails'
 
 type Props = {
    currentPrice: number
@@ -22,28 +23,52 @@ type Props = {
 
 const ChangePriceModal = ({ currentPrice, id }: Props) => {
    const [newPrice, setNewPrice] = useState<string>(currentPrice.toString())
+   const [inputError, setInputError] = useState<string | null>(null)
 
    const { isOpen, onOpen, onClose } = useDisclosure()
 
-   const [changePrice] =
-      useMutation<{ updateAnnouncement: MutationDetails }, ChangePriceVars>(
-         CHANGE_PRICE
-      )
+   const [changePrice] = useMutation<
+      { updateAnnouncement: MutationDetails },
+      ChangePriceVars
+   >(CHANGE_PRICE, {
+      update: cache => {
+         const cachedAnnouncement: GetAnnouncementData | null = cache.readQuery(
+            {
+               query: GET_ANNOUNCEMENT,
+               variables: { id }
+            }
+         )
+         if (cachedAnnouncement) {
+            cache.writeQuery({
+               query: GET_ANNOUNCEMENT,
+               variables: { id },
+               data: {
+                  getAnnouncement: {
+                     ...cachedAnnouncement.getAnnouncement,
+                     price: newPrice
+                  }
+               }
+            })
+         }
+         onClose()
+      }
+   })
 
    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       setNewPrice(e.target.value)
    }
 
    const handleClick = () => {
-      changePrice({
-         variables: {
-            announcementId: id,
-            price: newPrice
-         }
-      })
-
-      // Refresh page after price changed
-      window.location.reload()
+      if (Number(newPrice)) {
+         changePrice({
+            variables: {
+               announcementId: id,
+               price: newPrice
+            }
+         })
+      } else {
+         setInputError('Value must be a number!')
+      }
    }
 
    return (
@@ -58,10 +83,11 @@ const ChangePriceModal = ({ currentPrice, id }: Props) => {
                <ModalBody>
                   New price:{' '}
                   <input type="text" value={newPrice} onChange={handleChange} />
+                  <div>{inputError}</div>
                </ModalBody>
                <ModalFooter>
                   <Button onClick={handleClick}>
-                     Change price to {newPrice}$
+                     Change price to {Number(newPrice) ? newPrice : ''}$
                   </Button>
                </ModalFooter>
             </ModalContent>

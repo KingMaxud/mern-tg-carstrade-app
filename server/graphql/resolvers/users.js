@@ -21,8 +21,9 @@ export default {
                req.headers.authorization.split(' ')[1],
                process.env.JWT_SECRET
             )
-            const user = await User.findById(decoded.sub)
-               .select('name email myAnnouncements isAdmin _id')
+            const user = await User.findById(decoded.sub).select(
+               'name email myAnnouncements isAdmin _id'
+            )
             return user
          } catch (e) {
             throw new AuthenticationError('Token is expired')
@@ -135,14 +136,6 @@ export default {
                }
             }
 
-            await RefreshToken.findByIdAndRemove(refreshToken._id).exec(
-               function (err, refreshToken) {
-                  if (err) {
-                     console.log(err)
-                  }
-               }
-            )
-
             const newAccessToken = generateAccessToken(refreshToken.user._id)
             const newRefreshToken = await RefreshToken.createToken(
                refreshToken.user
@@ -157,7 +150,7 @@ export default {
 
             return {
                status: 'OK',
-               message: 'New token were generated',
+               message: `New token were generated`,
                accessToken: newAccessToken
             }
          } catch (err) {

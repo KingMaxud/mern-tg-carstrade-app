@@ -68,17 +68,45 @@ const Admin = () => {
    const [deleteMark] = useMutation<
       { deleteMark: MutationDetails },
       ModelsVars
-   >(DELETE_MARK)
+   >(DELETE_MARK, {
+      update: (cache, data) => {
+         const cachedMarks = cache.readQuery<MarksData>({
+            query: GET_MARKS
+         })
+      }
+   })
 
    const [deleteModel] = useMutation<
       { deleteModel: MutationDetails },
       ModelHandleVars
-   >(DELETE_MODEL)
+   >(DELETE_MODEL, {
+      update: (cache, data) => {
+         const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
+            query: GET_MODELS,
+            variables: {
+               markName: selectedMark
+            }
+         })
+      }
+   })
 
    const [deleteGeneration] = useMutation<
       { deleteGeneration: MutationDetails },
       DeleteGenerationVars
-   >(DELETE_GENERATION)
+   >(DELETE_GENERATION, {
+      update: (cache, data) => {
+         const cachedGenerations = cache.readQuery<
+            GenerationsData,
+            GenerationsVars
+         >({
+            query: GET_GENERATIONS,
+            variables: {
+               markName: selectedMark,
+               modelName: selectedModel
+            }
+         })
+      }
+   })
 
    return (
       <>
