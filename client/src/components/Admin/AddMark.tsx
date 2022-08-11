@@ -39,21 +39,29 @@ const AddMark = (): JSX.Element => {
             query: GET_MARKS
          })
 
-         if (cachedMarks && data.data) {
-            cache.writeQuery({
-               query: GET_MARKS,
-               data: {
-                  getMarks: [
-                     ...cachedMarks.getMarks,
-                     {
-                        name: formik.values.markName,
-                        _id: data.data.addMark._id
-                     }
-                  ]
-               }
-            })
+         const newData: any = {
+            getMarks: []
          }
 
+         if (cachedMarks && cachedMarks.getMarks)
+            newData.getMarks = cachedMarks.getMarks
+
+         if (data.data) {
+            newData.getMarks = [
+               ...newData.getMarks,
+               {
+                  name: formik.values.markName,
+                  _id: data.data.addMark._id
+               }
+            ]
+         }
+
+         cache.writeQuery({
+            query: GET_MARKS,
+            data: newData
+         })
+
+         formik.values.markName = ''
          setLoading(false)
       },
       onError(error) {

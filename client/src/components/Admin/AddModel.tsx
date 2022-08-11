@@ -48,23 +48,31 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
             }
          })
 
-         if (cachedModels && data.data) {
-            cache.writeQuery({
-               query: GET_MODELS,
-               variables: {
-                  markName: mark
-               },
-               data: {
-                  getModels: [
-                     ...cachedModels.getModels,
-                     {
-                        name: formik.values.modelName,
-                        _id: data.data.addModel._id
-                     }
-                  ]
-               }
-            })
+         const newData: any = {
+            getModels: []
          }
+
+         if (cachedModels && cachedModels.getModels)
+            newData.getModels = cachedModels.getModels
+
+         if (data.data) {
+            newData.getModels = [
+               ...newData.getModels,
+               {
+                  name: formik.values.modelName,
+                  _id: data.data.addModel._id
+               }
+            ]
+         }
+
+         cache.writeQuery({
+            query: GET_MODELS,
+            variables: {
+               markName: mark
+            },
+            data: newData
+         })
+
          formik.values.modelName = ''
          setLoading(false)
       },

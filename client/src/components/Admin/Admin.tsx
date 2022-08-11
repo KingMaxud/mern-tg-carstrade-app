@@ -1,4 +1,9 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import {
+   ApolloCache,
+   useLazyQuery,
+   useMutation,
+   useQuery
+} from '@apollo/client'
 import { useState } from 'react'
 import { Box, Button, useDisclosure } from '@chakra-ui/react'
 
@@ -26,11 +31,14 @@ import AddModel from './AddModel'
 import AddMark from './AddMark'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import DeleteModal from '../DeleteModal'
+import Test from '../../Test'
 
 const Admin = () => {
    const [selectedMark, setSelectedMark] = useState('')
    const [selectedModel, setSelectedModel] = useState('')
    const [generationsData, setGenerationsData] = useState<Generation[]>([])
+
+   let deletedName = '' // To handle cache
    const { isOpen, onOpen, onClose } = useDisclosure()
 
    const {
@@ -69,9 +77,63 @@ const Admin = () => {
       { deleteMark: MutationDetails },
       ModelsVars
    >(DELETE_MARK, {
-      update: (cache, data) => {
+      update: cache => {
          const cachedMarks = cache.readQuery<MarksData>({
             query: GET_MARKS
+         })
+
+         const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
+            query: GET_MODELS,
+            variables: {
+               markName: deletedName
+            }
+         })
+
+         if (cachedModels) {
+            cachedModels.getModels.map(m => {
+               const cachedGenerations = cache.readQuery<
+                  GenerationsData,
+                  GenerationsVars
+               >({
+                  query: GET_GENERATIONS,
+                  variables: {
+                     markName: deletedName,
+                     modelName: m.name
+                  }
+               })
+
+               const deletedList: string[] = []
+
+               if (cachedGenerations) {
+                  cachedGenerations.getGenerations.map(g =>
+                     deletedList.push(g.name)
+                  )
+               }
+               deleteGenerationCache(cache, m.name, deletedList)
+            })
+
+            deleteModelCache(
+               cache,
+               deletedName,
+               cachedModels.getModels.map(m => m.name)
+            )
+         }
+
+         const newData: any = {
+            getMarks: []
+         }
+
+         if (cachedMarks) {
+            newData.getMarks = cachedMarks.getMarks.filter(
+               m => m.name !== deletedName
+            )
+         }
+
+         debugger
+
+         cache.writeQuery({
+            query: GET_MARKS,
+            data: newData
          })
       }
    })
@@ -80,21 +142,8 @@ const Admin = () => {
       { deleteModel: MutationDetails },
       ModelHandleVars
    >(DELETE_MODEL, {
-      update: (cache, data) => {
-         const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
-            query: GET_MODELS,
-            variables: {
-               markName: selectedMark
-            }
-         })
-      }
-   })
-
-   const [deleteGeneration] = useMutation<
-      { deleteGeneration: MutationDetails },
-      DeleteGenerationVars
-   >(DELETE_GENERATION, {
-      update: (cache, data) => {
+      update: cache => {
+         // At first, delete all generations, related to Model
          const cachedGenerations = cache.readQuery<
             GenerationsData,
             GenerationsVars
@@ -102,11 +151,99 @@ const Admin = () => {
             query: GET_GENERATIONS,
             variables: {
                markName: selectedMark,
-               modelName: selectedModel
+               modelName: deletedName
             }
          })
+
+         const deletedList: string[] = []
+
+         if (cachedGenerations) {
+            cachedGenerations.getGenerations.map(g => deletedList.push(g.name))
+         }
+         deleteGenerationCache(cache, deletedName, deletedList)
+
+         // Then, delete model
+         deleteModelCache(cache, selectedMark, [deletedName])
       }
    })
+
+   const [deleteGeneration] = useMutation<
+      { deleteGeneration: MutationDetails },
+      DeleteGenerationVars
+   >(DELETE_GENERATION, {
+      update: cache =>
+         deleteGenerationCache(cache, selectedModel, [deletedName])
+   })
+
+   function deleteModelCache(
+      cache: ApolloCache<any>,
+      markName: string,
+      deletedModels: string[]
+   ) {
+      const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
+         query: GET_MODELS,
+         variables: {
+            markName: markName
+         }
+      })
+
+      const newData: any = {
+         getModels: []
+      }
+
+      if (cachedModels) {
+         newData.getModels = cachedModels.getModels.filter(
+            m => !deletedModels.includes(m.name)
+         )
+      }
+
+      debugger
+
+      cache.writeQuery({
+         query: GET_MODELS,
+         variables: {
+            markName: markName
+         },
+         data: newData
+      })
+   }
+
+   function deleteGenerationCache(
+      cache: ApolloCache<any>,
+      modelName: string,
+      deletedGenerations: string[]
+   ) {
+      const cachedGenerations = cache.readQuery<
+         GenerationsData,
+         GenerationsVars
+      >({
+         query: GET_GENERATIONS,
+         variables: {
+            markName: selectedMark,
+            modelName: modelName
+         }
+      })
+
+      const newData: any = {
+         getGenerations: []
+      }
+
+      if (cachedGenerations)
+         newData.getGenerations = cachedGenerations.getGenerations.filter(
+            g => !deletedGenerations.includes(g.name)
+         )
+
+      debugger
+
+      cache.writeQuery({
+         query: GET_GENERATIONS,
+         variables: {
+            markName: selectedMark,
+            modelName: modelName
+         },
+         data: newData
+      })
+   }
 
    return (
       <>
@@ -127,25 +264,19 @@ const Admin = () => {
                      }}>
                      {mark.name}
                   </div>
-                  <DeleteModal
-                     isOpen={isOpen}
-                     onOpen={onOpen}
-                     onClose={onClose}
-                     deleteObject={mark.name}>
-                     <Button
-                        colorScheme="blue"
-                        mr={3}
-                        onClick={() => {
-                           deleteMark({
-                              variables: {
-                                 markName: mark.name
-                              }
-                           })
-                           onClose()
-                        }}>
-                        Delete
-                     </Button>
-                  </DeleteModal>
+                  <Button
+                     colorScheme="blue"
+                     mr={3}
+                     onClick={() => {
+                        deleteMark({
+                           variables: {
+                              markName: mark.name
+                           }
+                        })
+                        deletedName = mark.name
+                     }}>
+                     Delete
+                  </Button>
                </Box>
             ))}
          <div>
@@ -159,26 +290,20 @@ const Admin = () => {
                         }}>
                         {model.name}
                      </div>
-                     <DeleteModal
-                        isOpen={isOpen}
-                        onOpen={onOpen}
-                        onClose={onClose}
-                        deleteObject={model.name}>
-                        <Button
-                           colorScheme="blue"
-                           mr={3}
-                           onClick={() => {
-                              deleteModel({
-                                 variables: {
-                                    markName: selectedMark,
-                                    modelName: model.name
-                                 }
-                              })
-                              onClose()
-                           }}>
-                           Delete
-                        </Button>
-                     </DeleteModal>
+                     <Button
+                        colorScheme="blue"
+                        mr={3}
+                        onClick={() => {
+                           deleteModel({
+                              variables: {
+                                 markName: selectedMark,
+                                 modelName: model.name
+                              }
+                           })
+                           deletedName = model.name
+                        }}>
+                        Delete
+                     </Button>
                   </Box>
                ))}
          </div>
@@ -188,27 +313,21 @@ const Admin = () => {
                generationsData.map(generation => (
                   <Box key={generation._id}>
                      {generation.name}
-                     <DeleteModal
-                        isOpen={isOpen}
-                        onOpen={onOpen}
-                        onClose={onClose}
-                        deleteObject={generation.name}>
-                        <Button
-                           colorScheme="blue"
-                           mr={3}
-                           onClick={() => {
-                              deleteGeneration({
-                                 variables: {
-                                    markName: selectedMark,
-                                    modelName: selectedModel,
-                                    generationName: generation.name
-                                 }
-                              })
-                              onClose()
-                           }}>
-                           Delete
-                        </Button>
-                     </DeleteModal>
+                     <Button
+                        colorScheme="blue"
+                        mr={3}
+                        onClick={() => {
+                           deleteGeneration({
+                              variables: {
+                                 markName: selectedMark,
+                                 modelName: selectedModel,
+                                 generationName: generation.name
+                              }
+                           })
+                           deletedName = generation.name
+                        }}>
+                        Delete
+                     </Button>
                   </Box>
                ))}
          </div>
