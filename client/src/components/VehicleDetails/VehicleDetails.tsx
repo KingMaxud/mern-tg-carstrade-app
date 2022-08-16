@@ -1,8 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import {
-   useMutation,
-   useQuery
-} from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useEffect, useState } from 'react'
 
 import {
@@ -12,7 +9,7 @@ import {
 import Photos from './Photos'
 import styles from './VehicleDetails.module.scss'
 import { DeleteAnnouncementVars, MutationDetails } from '../../shared/types'
-import { Button, useDisclosure } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import DeleteModal from '../DeleteModal'
 import useGetUser from '../../shared/hooks/useGetUser'
 import ChangePriceModal from './ChangePriceModal'
@@ -52,7 +49,6 @@ const VehicleDetails = () => {
    window.scrollTo(0, 0)
 
    const location = useLocation()
-   const { isOpen, onOpen, onClose } = useDisclosure()
    const { getIsAdmin, getUserId } = useGetUser()
 
    const [data, setData] = useState<Announcement | null>(null)
@@ -61,6 +57,11 @@ const VehicleDetails = () => {
    const [alt, setAlt] = useState('')
    const [isAdmin, setIsAdmin] = useState(false)
    const [isOwner, setIsOwner] = useState(false)
+
+   // Modal
+   const [isOpen, setIsOpen] = useState(false)
+   const onOpen = () => setIsOpen(true)
+   const onClose = () => setIsOpen(false)
 
    const { loading } = useQuery<GetAnnouncementData, GetAnnouncementVars>(
       GET_ANNOUNCEMENT,

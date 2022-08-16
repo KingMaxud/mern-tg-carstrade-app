@@ -1,7 +1,6 @@
 import React, { useEffect, useReducer } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 
-import './App.css'
 import Home from './components/Home/Home'
 import Navbar from './components/Navbar'
 import SignUp from './components/SingUp/SignUp'

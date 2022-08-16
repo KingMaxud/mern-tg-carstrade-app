@@ -26,8 +26,6 @@ const DeleteModal = ({
 }: Props) => {
    return (
       <>
-         <Button onClick={onOpen}>Delete</Button>
-
          <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>

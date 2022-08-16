@@ -31,12 +31,12 @@ import AddModel from './AddModel'
 import AddMark from './AddMark'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import DeleteModal from '../DeleteModal'
-import Test from '../../Test'
 
 const Admin = () => {
    const [selectedMark, setSelectedMark] = useState('')
    const [selectedModel, setSelectedModel] = useState('')
    const [generationsData, setGenerationsData] = useState<Generation[]>([])
+   const [deleteObject, setDeleteObject] = useState('')
 
    let deletedName = '' // To handle cache
    const { isOpen, onOpen, onClose } = useDisclosure()
@@ -85,7 +85,7 @@ const Admin = () => {
          const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
             query: GET_MODELS,
             variables: {
-               markName: deletedName
+               markName: deleteObject
             }
          })
 
@@ -97,7 +97,7 @@ const Admin = () => {
                >({
                   query: GET_GENERATIONS,
                   variables: {
-                     markName: deletedName,
+                     markName: deleteObject,
                      modelName: m.name
                   }
                })
@@ -114,7 +114,7 @@ const Admin = () => {
 
             deleteModelCache(
                cache,
-               deletedName,
+               deleteObject,
                cachedModels.getModels.map(m => m.name)
             )
          }
@@ -125,11 +125,9 @@ const Admin = () => {
 
          if (cachedMarks) {
             newData.getMarks = cachedMarks.getMarks.filter(
-               m => m.name !== deletedName
+               m => m.name !== deleteObject
             )
          }
-
-         debugger
 
          cache.writeQuery({
             query: GET_MARKS,
@@ -151,7 +149,7 @@ const Admin = () => {
             query: GET_GENERATIONS,
             variables: {
                markName: selectedMark,
-               modelName: deletedName
+               modelName: deleteObject
             }
          })
 
@@ -160,10 +158,10 @@ const Admin = () => {
          if (cachedGenerations) {
             cachedGenerations.getGenerations.map(g => deletedList.push(g.name))
          }
-         deleteGenerationCache(cache, deletedName, deletedList)
+         deleteGenerationCache(cache, deleteObject, deletedList)
 
          // Then, delete model
-         deleteModelCache(cache, selectedMark, [deletedName])
+         deleteModelCache(cache, selectedMark, [deleteObject])
       }
    })
 
@@ -172,7 +170,7 @@ const Admin = () => {
       DeleteGenerationVars
    >(DELETE_GENERATION, {
       update: cache =>
-         deleteGenerationCache(cache, selectedModel, [deletedName])
+         deleteGenerationCache(cache, selectedModel, [deleteObject])
    })
 
    function deleteModelCache(
@@ -196,8 +194,6 @@ const Admin = () => {
             m => !deletedModels.includes(m.name)
          )
       }
-
-      debugger
 
       cache.writeQuery({
          query: GET_MODELS,
@@ -233,8 +229,6 @@ const Admin = () => {
             g => !deletedGenerations.includes(g.name)
          )
 
-      debugger
-
       cache.writeQuery({
          query: GET_GENERATIONS,
          variables: {
@@ -245,8 +239,28 @@ const Admin = () => {
       })
    }
 
+   type HandleDelete = () => void
+
+   // Delete function template
+   const [handleDelete, setHandleDelete] = useState<HandleDelete>(() => {})
+
    return (
       <>
+         <DeleteModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onOpen={onOpen}
+            deleteObject={deleteObject}>
+            <Button
+               colorScheme="blue"
+               mr={3}
+               onClick={() => {
+                  handleDelete()
+                  onClose()
+               }}>
+               Delete
+            </Button>
+         </DeleteModal>
          {selectedModel ? (
             <AddGeneration mark={selectedMark} model={selectedModel} />
          ) : selectedMark ? (
@@ -268,12 +282,16 @@ const Admin = () => {
                      colorScheme="blue"
                      mr={3}
                      onClick={() => {
-                        deleteMark({
-                           variables: {
-                              markName: mark.name
-                           }
-                        })
+                        setDeleteObject(mark.name)
                         deletedName = mark.name
+                        setHandleDelete(() => () => {
+                           deleteMark({
+                              variables: {
+                                 markName: deletedName
+                              }
+                           })
+                        })
+                        onOpen()
                      }}>
                      Delete
                   </Button>
@@ -294,13 +312,17 @@ const Admin = () => {
                         colorScheme="blue"
                         mr={3}
                         onClick={() => {
-                           deleteModel({
-                              variables: {
-                                 markName: selectedMark,
-                                 modelName: model.name
-                              }
-                           })
+                           setDeleteObject(model.name)
                            deletedName = model.name
+                           setHandleDelete(() => () => {
+                              deleteModel({
+                                 variables: {
+                                    markName: selectedMark,
+                                    modelName: deletedName
+                                 }
+                              })
+                           })
+                           onOpen()
                         }}>
                         Delete
                      </Button>
@@ -317,14 +339,18 @@ const Admin = () => {
                         colorScheme="blue"
                         mr={3}
                         onClick={() => {
-                           deleteGeneration({
-                              variables: {
-                                 markName: selectedMark,
-                                 modelName: selectedModel,
-                                 generationName: generation.name
-                              }
-                           })
+                           setDeleteObject(generation.name)
                            deletedName = generation.name
+                           setHandleDelete(() => () => {
+                              deleteGeneration({
+                                 variables: {
+                                    markName: selectedMark,
+                                    modelName: selectedModel,
+                                    generationName: deletedName
+                                 }
+                              })
+                           })
+                           onOpen()
                         }}>
                         Delete
                      </Button>
