@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
+import { useMutation } from '@apollo/client'
 
 import { useAuth } from '../context/context'
 import { signOut } from '../context/reducer'
 import tokenService from '../shared/utils/token.service'
-import { gql, useMutation } from '@apollo/client'
+import { LOGOUT } from '../shared/utils/graphql'
 
 const Navbar = () => {
    const { state, dispatch } = useAuth()
@@ -35,12 +36,3 @@ const Navbar = () => {
 }
 
 export default Navbar
-
-const LOGOUT = gql`
-   mutation Logout {
-      logout {
-         success
-         message
-      }
-   }
-`

@@ -241,3 +241,28 @@ export const CHANGE_PRICE = gql`
       }
    }
 `
+
+export const LOGIN_USER = gql`
+    mutation LoginUser($email: String!, $password: String!) {
+        loginUser(email: $email, password: $password) {
+            accessToken
+        }
+    }
+`
+
+export const REGISTER_USER = gql`
+    mutation Register($name: String!, $email: String!, $password: String!) {
+        registerUser(name: $name, email: $email, password: $password) {
+            accessToken
+        }
+    }
+`
+
+export const LOGOUT = gql`
+    mutation Logout {
+        logout {
+            success
+            message
+        }
+    }
+`

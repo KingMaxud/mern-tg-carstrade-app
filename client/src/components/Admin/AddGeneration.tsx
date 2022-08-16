@@ -6,8 +6,7 @@ import { Checkbox, Button } from '@chakra-ui/react'
 
 import {
    ADD_GENERATION,
-   GET_GENERATIONS,
-   GET_MODELS
+   GET_GENERATIONS
 } from '../../shared/utils/graphql'
 import useAddPhoto from '../../shared/hooks/useAddPhoto'
 import {
@@ -35,7 +34,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
    const { addPhoto, addPhotoComponent } = useAddPhoto()
 
    const [error, setError] = useState('')
-   const [loading, setLoading] = useState(false)
+   const [addGenerationLoading, setAddGenerationLoadingLoading] = useState(false)
    const [photoUrlError, setPhotoUrlError] = useState('')
 
    const AddGenerationSchema = Yup.object().shape({
@@ -55,7 +54,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
       },
       validationSchema: AddGenerationSchema,
       onSubmit: async values => {
-         setLoading(true)
+         setAddGenerationLoadingLoading(true)
          const photoUrl = await addPhoto()
 
          if (photoUrl) {
@@ -81,7 +80,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
       { addGeneration: MutationDetailsWithId },
       AddGenerationVars
    >(ADD_GENERATION, {
-      update(cache, data) {
+      update(cache, data) {      // Add a new generation to the cache
          const cachedGenerations = cache.readQuery<
             GenerationsData,
             GenerationsVars
@@ -122,11 +121,11 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
             },
             data: newData
          })
-
-         setLoading(false)
+         formik.values.generationName = ''
+         setAddGenerationLoadingLoading(false)
       },
       onError(error) {
-         setLoading(false)
+         setAddGenerationLoadingLoading(false)
          setError(error.message)
       }
    })
@@ -147,6 +146,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
             {formik.touched.generationName && formik.errors.generationName ? (
                <div>{formik.errors.generationName}</div>
             ) : null}
+
             <label htmlFor="modelName">Start Year: </label>
             <input
                id="startYear"
@@ -159,6 +159,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
             {formik.touched.startYear && formik.errors.startYear ? (
                <div>{formik.errors.startYear}</div>
             ) : null}
+
             <label htmlFor="modelName">End Year: </label>
             <input
                id="endYear"
@@ -171,6 +172,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
             {formik.touched.endYear && formik.errors.endYear ? (
                <div>{formik.errors.endYear}</div>
             ) : null}
+
             {bodyStyles.map(b => (
                <Checkbox
                   key={b}
@@ -190,6 +192,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
             {formik.touched.bodyStyles && formik.errors.bodyStyles ? (
                <div>{formik.errors.bodyStyles}</div>
             ) : null}
+
             {addPhotoComponent}
             {photoUrlError}
             {error && error}

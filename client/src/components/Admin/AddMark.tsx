@@ -7,13 +7,12 @@ import { ADD_MARK, GET_MARKS } from '../../shared/utils/graphql'
 import {
    MarksData,
    ModelsVars,
-   MutationDetails,
    MutationDetailsWithId
 } from '../../shared/types'
 
 const AddMark = (): JSX.Element => {
    const [error, setError] = useState('')
-   const [loading, setLoading] = useState(false)
+   const [addMarkLoading, setAddMarkLoading] = useState(false)
 
    const AddMarkSchema = Yup.object().shape({
       markName: Yup.string().required('Required')
@@ -25,7 +24,7 @@ const AddMark = (): JSX.Element => {
       },
       validationSchema: AddMarkSchema,
       onSubmit: values => {
-         setLoading(true)
+         setAddMarkLoading(true)
          addMark({ variables: { markName: values.markName } })
       }
    })
@@ -34,7 +33,7 @@ const AddMark = (): JSX.Element => {
       { addMark: MutationDetailsWithId },
       ModelsVars
    >(ADD_MARK, {
-      update(cache, data) {
+      update(cache, data) {         // Add a new model to the cache
          const cachedMarks = cache.readQuery<MarksData>({
             query: GET_MARKS
          })
@@ -62,10 +61,10 @@ const AddMark = (): JSX.Element => {
          })
 
          formik.values.markName = ''
-         setLoading(false)
+         setAddMarkLoading(false)
       },
       onError(error) {
-         setLoading(false)
+         setAddMarkLoading(false)
          setError(error.message)
       }
    })
@@ -86,6 +85,7 @@ const AddMark = (): JSX.Element => {
             {formik.touched.markName && formik.errors.markName ? (
                <div>{formik.errors.markName}</div>
             ) : null}
+
             <button type="submit">Add</button>
             {error && error}
          </form>

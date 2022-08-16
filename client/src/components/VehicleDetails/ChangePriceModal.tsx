@@ -25,13 +25,13 @@ const ChangePriceModal = ({ currentPrice, id }: Props) => {
    const [newPrice, setNewPrice] = useState<string>(currentPrice.toString())
    const [inputError, setInputError] = useState<string | null>(null)
 
-   const { isOpen, onOpen, onClose } = useDisclosure()
+   const { isOpen, onOpen, onClose } = useDisclosure()         // Handle modal behavior
 
    const [changePrice] = useMutation<
       { updateAnnouncement: MutationDetails },
       ChangePriceVars
    >(CHANGE_PRICE, {
-      update: cache => {
+      update: cache => {            // Change cached price
          const cachedAnnouncement: GetAnnouncementData | null = cache.readQuery(
             {
                query: GET_ANNOUNCEMENT,

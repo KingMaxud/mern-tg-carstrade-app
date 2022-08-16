@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
 import {
    createSearchParams,
-   useNavigate,
-   useSearchParams
+   useNavigate
 } from 'react-router-dom'
 import { Select } from '@chakra-ui/react'
 
@@ -29,7 +28,6 @@ import { getSessionStorageOrDefault } from '../../shared/utils/utils'
 import { sortMethods } from '../../shared/data'
 
 const Search = () => {
-   const [, setSearch] = useSearchParams()
    const navigate = useNavigate()
 
    const [count, setCount] = useState(0)

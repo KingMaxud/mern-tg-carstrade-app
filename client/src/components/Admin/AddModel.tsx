@@ -17,7 +17,7 @@ type AddMarkProps = {
 
 const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
    const [error, setError] = useState('')
-   const [loading, setLoading] = useState(false)
+   const [addModelLoading, setAddModelLoading] = useState(false)
 
    const AddModelSchema = Yup.object().shape({
       modelName: Yup.string().required('Required')
@@ -29,7 +29,7 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
       },
       validationSchema: AddModelSchema,
       onSubmit: values => {
-         setLoading(true)
+         setAddModelLoading(true)
          addModel({
             variables: { markName: mark, modelName: values.modelName }
          })
@@ -40,7 +40,7 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
       { addModel: MutationDetailsWithId },
       ModelHandleVars
    >(ADD_MODEL, {
-      update(cache, data) {
+      update(cache, data) {         // Add a new model to the cache
          const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
             query: GET_MODELS,
             variables: {
@@ -74,10 +74,10 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
          })
 
          formik.values.modelName = ''
-         setLoading(false)
+         setAddModelLoading(false)
       },
       onError(error) {
-         setLoading(false)
+         setAddModelLoading(false)
          setError(error.message)
       }
    })
@@ -98,6 +98,7 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
             {formik.touched.modelName && formik.errors.modelName ? (
                <div>{formik.errors.modelName}</div>
             ) : null}
+
             <button type="submit">Add</button>
             {error && error}
          </form>

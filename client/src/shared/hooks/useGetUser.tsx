@@ -25,7 +25,7 @@ const useGetUser = () => {
       }
 
       const data = await getUser()
-      return [data.data?.getUser.isAdmin || false, true]
+      return [data.data?.getUser.isAdmin || false, true] // [isAdmin, isLoaded]
    }
 
    const getUserId: () => Promise<string> = async () => {

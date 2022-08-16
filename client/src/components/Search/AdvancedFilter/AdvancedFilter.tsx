@@ -84,6 +84,7 @@ const AdvancedFilter = ({
    const [powersFrom, setPowersFrom] = useState(getPowers(0, 600))
    const [powersTo, setPowersTo] = useState(getPowers(0, 600))
 
+   // Load marks immediately
    useQuery<MarksData>(GET_MARKS, {
       onCompleted: data => {
          setMarksData(data)
@@ -108,7 +109,7 @@ const AdvancedFilter = ({
    )
 
    const parseSearch = () => {
-      let params = {}
+      let params = {}      // Declare params as an empty object
       let sortMethod: null | SortMethod = sortMethods[0]
       let page = 1
       for (const item in search) {
@@ -157,7 +158,7 @@ const AdvancedFilter = ({
       loadGenerations()
    }, [params.model])
 
-   // Effect to generations will not be deleted when they got from search params
+   // Effect for generations will are not deleted when they are retrieved from search params
    useDidMountEffect(() => {
       const temp = { ...params }
       setParams(temp)
@@ -243,7 +244,7 @@ const AdvancedFilter = ({
          }
       }
 
-      // If it is mark or model selection, delete waste keys
+      // Check if it is mark or model selection, delete extra keys
       switch (key) {
          case 'mark':
             delete tempParams['model']

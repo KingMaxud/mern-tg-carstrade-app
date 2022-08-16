@@ -123,23 +123,3 @@ const MainCarouselPhoto = ({
 }
 
 export default MainCarouselPhoto
-
-// <img
-// src={smallImage}
-// alt={alt}
-// style={{
-//    width,
-//       height
-// }}
-// className={`${styles.smallImage}`}
-// onLoad={() => setShowSkeleton(false)}
-// />
-// <img
-//    src={bigImage || ''}
-//    alt={alt}
-//    style={{
-//       width,
-//       height
-//    }}
-//    className={`${styles.bigImage}`}
-// />

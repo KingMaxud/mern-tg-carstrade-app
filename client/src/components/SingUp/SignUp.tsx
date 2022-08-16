@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { gql, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 import tokenService from '../../shared/utils/token.service'
 import { useAuth } from '../../context/context'
 import { signIn } from '../../context/reducer'
+import { REGISTER_USER } from '../../shared/utils/graphql'
 
 const SignUp = () => {
    const { dispatch } = useAuth()
@@ -119,13 +120,5 @@ const SignUp = () => {
       </>
    )
 }
-
-const REGISTER_USER = gql`
-   mutation Register($name: String!, $email: String!, $password: String!) {
-      registerUser(name: $name, email: $email, password: $password) {
-         accessToken
-      }
-   }
-`
 
 export default SignUp

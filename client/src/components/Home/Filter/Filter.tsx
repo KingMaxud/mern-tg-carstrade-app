@@ -31,6 +31,7 @@ const Filter = () => {
    const [yearsFrom, setYearsFrom] = useState(getYears(1940, 2022))
    const [yearsTo, setYearsTo] = useState(getYears(1940, 2022))
 
+   // Load marks immediately
    useQuery<MarksData>(GET_MARKS, {
       onCompleted: data => {
          setMarksData(data)
@@ -54,13 +55,16 @@ const Filter = () => {
       }
    })
 
+   // Update models, when marks changes
    useDidMountEffect(() => {
       loadModels()
+      // Delete irrelevant model from params
       const temp = { ...params }
       delete temp['model']
       setParams(temp)
    }, [params.mark])
 
+   // Update announcements count, when params changes
    useEffect(() => {
       loadCount()
    }, [params])
@@ -70,10 +74,12 @@ const Filter = () => {
       key: SelectKeys
    ) => {
       if (e.target.value === '') {
+         // Delete empty keys from params object
          const temp = { ...params }
          delete temp[key]
          setParams(temp)
       } else {
+         // If value is not empty, set it to params object
          setParams(prevState => ({
             ...prevState,
             [key]: e.target.value
@@ -81,7 +87,7 @@ const Filter = () => {
       }
    }
 
-   const goToSearch = () => {
+   const navigateToSearch = () => {
       navigate({
          pathname: '/search',
          search: `?${createSearchParams(params)}`
@@ -146,7 +152,7 @@ const Filter = () => {
                <option value={year} label={year.toString()} key={year} />
             ))}
          </Select>
-         <Button onClick={goToSearch}>{count} results</Button>
+         <Button onClick={navigateToSearch}>{count} results</Button>
       </Box>
    )
 }

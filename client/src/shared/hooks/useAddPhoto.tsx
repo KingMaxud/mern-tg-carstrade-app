@@ -20,7 +20,8 @@ type UploadPresetData = {
 }
 
 const compressImage = (image: any, uploadPreset: string) => {
-   return new Promise<string>(function (res, rej) {
+   // Compress image, then  upload it to cloudinary
+   return new Promise<string>(function (res, rej) {    // Return Promise, so I can await it
       new Compressor(image.file, {
          maxWidth: 1200,
          maxHeight: 900,
@@ -56,10 +57,11 @@ const useAddPhoto = () => {
          })
 
          const resolved = await Promise.all(unresolved)
-         return resolved
+         return resolved            // Return url's array
       }
    }
 
+   // Component to upload images
    const addPhotoComponent = (
       <div>
          <label htmlFor="modelName">Photo: </label>

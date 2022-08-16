@@ -57,6 +57,7 @@ const AddAnnouncement = () => {
    const { addPhoto, addPhotoComponent } = useAddPhoto()
    const { getUserId } = useGetUser()
 
+   // Load marks immediately
    useQuery<MarksData>(GET_MARKS, {
       onCompleted: data => {
          setMarksData(data)
@@ -80,7 +81,7 @@ const AddAnnouncement = () => {
    )
 
    useEffect(() => {
-      getUserId().then(data => setUserId(data))
+      getUserId().then(data => setUserId(data)) // Get user ID when page loads
    }, [])
 
    const AddGenerationSchema = Yup.object().shape({
@@ -149,12 +150,13 @@ const AddAnnouncement = () => {
       }
    })
 
+   // Load models, when mark changes
    useEffect(() => {
       if (mark) {
          loadModels()
       }
    }, [mark])
-
+   // Load generations, when model changes
    useEffect(() => {
       if (model) {
          loadGenerations()
@@ -184,6 +186,7 @@ const AddAnnouncement = () => {
       setGeneration(e.target.value)
       generationsData.getGenerations.map(g => {
          if (g.name === e.target.value) {
+            // Set available body styles and years
             setBodyStyles(g.bodyStyles)
             setYears(getYears(g.startYear, g.endYear))
          }

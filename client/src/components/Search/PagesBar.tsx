@@ -19,6 +19,7 @@ const PagesBar = ({
    const pagesAmount = Math.ceil(count / 20)
    const renderedButtonsValuesList: number[] = []
 
+   // Determine, which page buttons have to be rendered
    renderedButtonsValuesList.push(1)
    if (selectedPage - 2 > 1) {
       renderedButtonsValuesList.push(selectedPage - 2)

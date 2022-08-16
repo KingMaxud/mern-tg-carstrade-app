@@ -52,7 +52,6 @@ const VehicleDetails = () => {
    const { getIsAdmin, getUserId } = useGetUser()
 
    const [data, setData] = useState<Announcement | null>(null)
-   const [currentPhotoNumber, setCurrentPhotoNumber] = useState(0)
    const [id, setId] = useState(location.pathname.split('/')[2])
    const [alt, setAlt] = useState('')
    const [isAdmin, setIsAdmin] = useState(false)
@@ -63,7 +62,7 @@ const VehicleDetails = () => {
    const onOpen = () => setIsOpen(true)
    const onClose = () => setIsOpen(false)
 
-   const { loading } = useQuery<GetAnnouncementData, GetAnnouncementVars>(
+   useQuery<GetAnnouncementData, GetAnnouncementVars>(
       GET_ANNOUNCEMENT,
       {
          variables: { id },
