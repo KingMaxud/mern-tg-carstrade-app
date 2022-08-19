@@ -185,3 +185,28 @@ export type ChangePriceVars = {
    announcementId: string
    price: string
 }
+
+export type UsersAnnouncement = {
+   _id: string
+   mark: string
+   model: string
+   photos: string[]
+   price: number
+}
+
+export type GetUsersAnnouncementsData = {
+   getAnnouncements: UsersAnnouncement[]
+}
+
+export type GetUsersAnnouncementsVars = {
+   filter: {
+      user: string
+   }
+   pagination: Pagination
+}
+
+export type GetUsersAnnouncementCountVars = {
+   filter: {
+      user: string
+   }
+}

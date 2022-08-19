@@ -266,3 +266,15 @@ export const LOGOUT = gql`
         }
     }
 `
+
+export const GET_USERS_ANNOUNCEMENTS = gql`
+    query GetUsersAnnouncements($filter: FilterInput, $pagination: PaginationInput!) {
+        getAnnouncements(filter: $filter, pagination: $pagination) {
+            _id
+            mark
+            model
+            photos
+            price
+        }
+    }
+`

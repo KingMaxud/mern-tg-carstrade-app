@@ -20,9 +20,9 @@ export default gql`
    }
 
    type ReturnedTypeWithId {
-       success: Boolean!
-       message: String!
-       _id: ID!
+      success: Boolean!
+      message: String!
+      _id: ID!
    }
 
    type Mark {
@@ -68,6 +68,7 @@ export default gql`
    }
 
    input FilterInput {
+      user: String
       mark: String
       model: String
       generation: [String]

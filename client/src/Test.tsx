@@ -2,8 +2,13 @@ import React, { useState } from 'react'
 
 const Test = () => {
    return (
-      <div>
-         Test
+      <div className="container">
+         <div className="box"></div>
+         <div className="box absolute"></div>
+         <div className="box"></div>
+         <div className="box"></div>
+         <div className="box"></div>
+         <div className="box"></div>
       </div>
    )
 }

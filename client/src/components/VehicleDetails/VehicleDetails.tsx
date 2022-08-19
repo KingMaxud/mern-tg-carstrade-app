@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom'
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
+import { Button } from '@chakra-ui/react'
 
 import {
    DELETE_ANNOUNCEMENT,
@@ -9,7 +10,6 @@ import {
 import Photos from './Photos'
 import styles from './VehicleDetails.module.scss'
 import { DeleteAnnouncementVars, MutationDetails } from '../../shared/types'
-import { Button } from '@chakra-ui/react'
 import DeleteModal from '../DeleteModal'
 import useGetUser from '../../shared/hooks/useGetUser'
 import ChangePriceModal from './ChangePriceModal'
@@ -62,23 +62,29 @@ const VehicleDetails = () => {
    const onOpen = () => setIsOpen(true)
    const onClose = () => setIsOpen(false)
 
-   useQuery<GetAnnouncementData, GetAnnouncementVars>(
-      GET_ANNOUNCEMENT,
-      {
-         variables: { id },
-         onCompleted: ({ getAnnouncement }) => {
-            setData(getAnnouncement)
-            setAlt(
-               `${getAnnouncement.mark} ${getAnnouncement.model}, ${getAnnouncement.year} production year, View - `
-            )
-         }
+   const [getAnnouncement] = useLazyQuery<
+      GetAnnouncementData,
+      GetAnnouncementVars
+   >(GET_ANNOUNCEMENT, {
+      variables: { id },
+      onCompleted: ({ getAnnouncement }) => {
+         setData(getAnnouncement)
+         setAlt(
+            `${getAnnouncement.mark} ${getAnnouncement.model}, ${getAnnouncement.year} production year, View - `
+         )
       }
-   )
+   })
 
    const [deleteAnnouncement] = useMutation<
       { deleteAnnouncement: MutationDetails },
       DeleteAnnouncementVars
    >(DELETE_ANNOUNCEMENT)
+
+   // Refresh data when location changes
+   useEffect(() => {
+      setId(location.pathname.split('/')[2])
+      getAnnouncement()
+   }, [location])
 
    useEffect(() => {
       getIsAdmin().then(res => {
@@ -136,25 +142,28 @@ const VehicleDetails = () => {
                   Contact seller: +{data?.phoneNumber}
                </div>
                {(isOwner || isAdmin) && (
-                  <DeleteModal
-                     isOpen={isOpen}
-                     onOpen={onOpen}
-                     onClose={onClose}
-                     deleteObject="your announcement">
-                     <Button
-                        colorScheme="blue"
-                        mr={3}
-                        onClick={() => {
-                           deleteAnnouncement({
-                              variables: {
-                                 announcementId: id
-                              }
-                           })
-                           onClose()
-                        }}>
-                        Delete
-                     </Button>
-                  </DeleteModal>
+                  <>
+                     <Button onClick={onOpen}>Delete</Button>
+                     <DeleteModal
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                        deleteObject="your announcement">
+                        <Button
+                           colorScheme="blue"
+                           mr={3}
+                           onClick={() => {
+                              deleteAnnouncement({
+                                 variables: {
+                                    announcementId: id
+                                 }
+                              })
+                              onClose()
+                           }}>
+                           Delete
+                        </Button>
+                     </DeleteModal>
+                  </>
                )}
             </div>
          </div>

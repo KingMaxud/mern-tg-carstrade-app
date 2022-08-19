@@ -2,7 +2,7 @@ import React, { useEffect, useReducer } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 
 import Home from './components/Home/Home'
-import Navbar from './components/Navbar'
+import Navbar from './components/Navbar/Navbar'
 import SignUp from './components/SingUp/SignUp'
 import SignIn from './components/SignIn/SignIn'
 import { AuthContext } from './context/context'

@@ -1,0 +1,14 @@
+.nav {
+   background-color: #ffb319;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 0 100px;
+   height: 4.75rem;
+   color: #1b1a17;
+
+   &__right {
+      display: flex;
+      position: relative;
+   }
+}

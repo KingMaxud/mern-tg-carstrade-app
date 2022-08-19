@@ -1,0 +1,35 @@
+.container {
+   position: absolute;
+   width: 28rem;
+   height: auto;
+   background-color: #cecccc;
+   left: -14rem;
+   top: 2rem;
+   z-index: 4;
+   border-radius: 1rem;
+}
+
+.link {
+   &:first-child {
+      .announcement {
+         .image {
+            border-radius: 0.75rem 0 0 0;
+         }
+      }
+   }
+
+   &:last-child {
+      .announcement {
+         margin-bottom: 0;
+      }
+   }
+}
+
+.announcement {
+   cursor: pointer;
+   margin-bottom: 0.75rem;
+}
+
+.image {
+   width: 13rem;
+}

@@ -22,7 +22,6 @@ import {
 import {
    AddAnnouncementData,
    AddAnnouncementVars,
-   Generation,
    GenerationsData,
    GenerationsVars,
    MarksData,
@@ -172,15 +171,15 @@ const AddAnnouncement = () => {
       }
    })
 
-   const handleMarksSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+   const handleMarkSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setMark(e.target.value)
       setModel('')
       setGeneration('')
    }
-   const handleModelsSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+   const handleModelSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setModel(e.target.value)
    }
-   const handleGenerationsSelection = (
+   const handleGenerationSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
       setGeneration(e.target.value)
@@ -201,7 +200,7 @@ const AddAnnouncement = () => {
          <form onSubmit={formik.handleSubmit}>
             <VStack>
                <FormLabel htmlFor="mark">Select Mark:</FormLabel>
-               <Select value={mark} id="mark" onChange={handleMarksSelection}>
+               <Select value={mark} id="mark" onChange={handleMarkSelection}>
                   <option value="" label="-- Mark --" />
                   {marksData.getMarks.map(mark => (
                      <option
@@ -213,7 +212,7 @@ const AddAnnouncement = () => {
                </Select>
 
                <FormLabel htmlFor="mark">Select Model:</FormLabel>
-               <Select value={model} id="mark" onChange={handleModelsSelection}>
+               <Select value={model} id="mark" onChange={handleModelSelection}>
                   <option value="" label="-- Model --" />
                   {modelsData.getModels.map(model => (
                      <option
@@ -228,7 +227,7 @@ const AddAnnouncement = () => {
                <Select
                   value={generation}
                   id="generation"
-                  onChange={handleGenerationsSelection}>
+                  onChange={handleGenerationSelection}>
                   <option value="" label="-- Generation --" />
                   {generationsData.getGenerations.map(generation => {
                      return (
