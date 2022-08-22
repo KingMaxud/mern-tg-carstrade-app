@@ -5,6 +5,7 @@ import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
 
 import {
    CheckboxKeys,
+   Generation,
    GenerationsData,
    GenerationsVars,
    MarksData,
@@ -44,8 +45,8 @@ type Props = {
    setSortMethod: Dispatch<SetStateAction<SortMethod | null>>
    ifParamsParsed: boolean
    setIfParamsParsed: Dispatch<SetStateAction<boolean>>
-   trigger: boolean
-   setTrigger: Dispatch<SetStateAction<boolean>>
+   loadAnnouncementTrigger: boolean
+   setLoadAnnouncementTrigger: Dispatch<SetStateAction<boolean>>
 }
 
 const AdvancedFilter = ({
@@ -55,19 +56,24 @@ const AdvancedFilter = ({
    setSortMethod,
    ifParamsParsed,
    setIfParamsParsed,
-   setTrigger,
-   trigger
+   setLoadAnnouncementTrigger,
+   loadAnnouncementTrigger
 }: Props) => {
    const [search] = useCustomSearchParams()
    let location = useLocation()
    const navigate = useNavigate()
 
+   type GenerationsFilterArray = {
+      generation: Generation
+      isChecked: boolean
+   }
+
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
-   const [generationsData, setGenerationsData] = useState<GenerationsData>({
-      getGenerations: []
-   })
+   const [generationsData, setGenerationsData] = useState<
+      GenerationsFilterArray[]
+   >([])
    const [yearsFrom, setYearsFrom] = useState(getYears(1940, 2022))
    const [yearsTo, setYearsTo] = useState(getYears(1940, 2022))
    const [pricesFrom, setPricesFrom] = useState(getPrices(0, 100000))
@@ -103,13 +109,23 @@ const AdvancedFilter = ({
             markName: params.mark || '',
             modelName: params.model || ''
          },
-         onCompleted: data => setGenerationsData(data)
+         onCompleted: data => {
+            const newArr = data.getGenerations.map(g => {
+               return {
+                  generation: g,
+                  isChecked: params.generation?.includes(g.name) || false
+               }
+            })
+
+            setGenerationsData(newArr)
+         }
       }
    )
 
    const parseSearch = () => {
-      setTrigger(!trigger)
-      let params = {} // Declare params as an empty object
+      // Trigger useEffect to load reload announcement
+      setLoadAnnouncementTrigger(!loadAnnouncementTrigger)
+      let params: any = {} // Declare params as an empty object
       let sortMethod: null | SortMethod = sortMethods[0]
       let page = 1
       for (const item in search) {
@@ -140,6 +156,14 @@ const AdvancedFilter = ({
       setPage(page)
       setSortMethod(sortMethod)
       setParams(params)
+      // Change generations' isChecked
+      const newArr = generationsData.map(g => {
+         return {
+            generation: g.generation,
+            isChecked: params.generation?.includes(g.generation.name) || false
+         }
+      })
+      setGenerationsData(newArr)
    }
 
    // Parse search params when location changes
@@ -149,16 +173,25 @@ const AdvancedFilter = ({
 
    // Load models when mark changes
    useDidMountEffect(() => {
-      loadModels()
-      setGenerationsData({ getGenerations: [] })
+      if (params.mark) {
+         loadModels()
+      } else {
+         setModelsData({ getModels: [] })
+      }
+
+      setGenerationsData([])
    }, [params.mark])
 
    // Load generations when model changes
    useDidMountEffect(() => {
-      loadGenerations()
+      if (params.model) {
+         loadGenerations()
+      } else {
+         setGenerationsData([])
+      }
    }, [params.model])
 
-   // Effect for generations will are not deleted when they are retrieved from search params
+   // Effect for generations will be not deleted when they are retrieved from search params
    useDidMountEffect(() => {
       const temp = { ...params }
       setParams(temp)
@@ -303,7 +336,7 @@ const AdvancedFilter = ({
    return (
       <div>
          {ifParamsParsed && (
-            <div>
+            <div onMouseEnter={() => console.log(generationsData)}>
                <Select
                   value={conditionDefaultValue}
                   id="condition"
@@ -350,15 +383,14 @@ const AdvancedFilter = ({
                )}
 
                {generationsData &&
-                  generationsData.getGenerations.map(g => (
+                  generationsData.map(g => (
                      <Checkbox
-                        onMouseEnter={() =>
-                           console.log(params.generation)
+                        isChecked={g.isChecked}
+                        onChange={() =>
+                           handleCheckbox('generation', g.generation.name)
                         }
-                        isChecked={params.generation?.includes(g.name)}
-                        onChange={() => handleCheckbox('generation', g.name)}
-                        key={g._id}>
-                        {g.name}
+                        key={g.generation._id}>
+                        {g.generation.name}
                      </Checkbox>
                   ))}
 

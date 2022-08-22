@@ -145,8 +145,8 @@ const Search = () => {
             setSortMethod={setSortMethod}
             ifParamsParsed={ifParamsParsed}
             setIfParamsParsed={setIfParamsParsed}
-            trigger={loadAnnouncementTrigger}
-            setTrigger={setLoadAnnouncementTrigger}
+            loadAnnouncementTrigger={loadAnnouncementTrigger}
+            setLoadAnnouncementTrigger={setLoadAnnouncementTrigger}
          />
          <Select
             value={sortMethod ? sortMethod.description : 'Latest offers first'}
