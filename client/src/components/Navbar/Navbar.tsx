@@ -31,7 +31,7 @@ const Navbar = () => {
 
    return (
       <nav className={styles.nav}>
-         <NavLink to={'/'}>Home</NavLink>
+         <NavLink className={styles.navHeader} to={'/'}>CarTrader</NavLink>
          {state.isAuthed ? (
             <div className={styles.nav__right}>
                <div>

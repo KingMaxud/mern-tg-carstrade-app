@@ -79,6 +79,11 @@ const AddAnnouncement = () => {
       }
    )
 
+   // Change Title
+   useEffect(() => {
+      document.title = 'Add your announcement to CarTrader'
+   }, [])
+
    useEffect(() => {
       getUserId().then(data => setUserId(data)) // Get user ID when page loads
    }, [])

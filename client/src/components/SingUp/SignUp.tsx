@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import { useMutation } from '@apollo/client'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -10,6 +10,11 @@ import { REGISTER_USER } from '../../shared/utils/graphql'
 
 const SignUp = () => {
    const { dispatch } = useAuth()
+
+   // Change title
+   useEffect(() => {
+      document.title = 'Sign Up'
+   }, [])
 
    const [error, setError] = useState('')
    const [loading, setLoading] = useState(false)

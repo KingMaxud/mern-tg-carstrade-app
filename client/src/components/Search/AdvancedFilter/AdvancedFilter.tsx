@@ -1,9 +1,4 @@
-import React, {
-   Dispatch,
-   SetStateAction,
-   useEffect,
-   useState
-} from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
@@ -49,6 +44,8 @@ type Props = {
    setSortMethod: Dispatch<SetStateAction<SortMethod | null>>
    ifParamsParsed: boolean
    setIfParamsParsed: Dispatch<SetStateAction<boolean>>
+   trigger: boolean
+   setTrigger: Dispatch<SetStateAction<boolean>>
 }
 
 const AdvancedFilter = ({
@@ -57,7 +54,9 @@ const AdvancedFilter = ({
    setPage,
    setSortMethod,
    ifParamsParsed,
-   setIfParamsParsed
+   setIfParamsParsed,
+   setTrigger,
+   trigger
 }: Props) => {
    const [search] = useCustomSearchParams()
    let location = useLocation()
@@ -109,7 +108,8 @@ const AdvancedFilter = ({
    )
 
    const parseSearch = () => {
-      let params = {}      // Declare params as an empty object
+      setTrigger(!trigger)
+      let params = {} // Declare params as an empty object
       let sortMethod: null | SortMethod = sortMethods[0]
       let page = 1
       for (const item in search) {
@@ -352,6 +352,9 @@ const AdvancedFilter = ({
                {generationsData &&
                   generationsData.getGenerations.map(g => (
                      <Checkbox
+                        onMouseEnter={() =>
+                           console.log(params.generation)
+                        }
                         isChecked={params.generation?.includes(g.name)}
                         onChange={() => handleCheckbox('generation', g.name)}
                         key={g._id}>

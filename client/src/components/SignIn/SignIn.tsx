@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import { useMutation } from '@apollo/client'
 import * as Yup from 'yup'
 
@@ -13,6 +13,11 @@ const SignIn = () => {
 
    const [error, setError] = useState('')
    const [loading, setLoading] = useState(false)
+
+   // Change title
+   useEffect(() => {
+      document.title = 'Sign In'
+   }, [])
 
    const SignInSchema = Yup.object().shape({
       email: Yup.string().email('Invalid email').required('Required'),

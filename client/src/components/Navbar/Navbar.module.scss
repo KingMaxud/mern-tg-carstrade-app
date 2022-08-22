@@ -5,10 +5,15 @@
    align-items: center;
    padding: 0 100px;
    height: 4.75rem;
-   color: #1b1a17;
+   color: #212121;
 
    &__right {
       display: flex;
       position: relative;
    }
+}
+
+.navHeader {
+   font-size: 2.5rem;
+   font-family: 'Ubuntu', sans-serif;
 }

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
-import {
-   createSearchParams,
-   useNavigate
-} from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 import { Select } from '@chakra-ui/react'
 
 import {
@@ -39,6 +36,7 @@ const Search = () => {
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
    const [firstLoaded, setFirstLoaded] = useState(false)
    const [page, setPage] = useState(1)
+   const [loadAnnouncementTrigger, setLoadAnnouncementTrigger] = useState(false)
 
    const [loadAnnouncements] = useLazyQuery<
       GetAnnouncementsData,
@@ -54,7 +52,17 @@ const Search = () => {
       GetFilteredAnnouncementCountData,
       GetFilteredAnnouncementCountVars
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
-      onCompleted: data => setCount(data.getFilteredAnnouncementCount)
+      onCompleted: data => {
+         setCount(data.getFilteredAnnouncementCount)
+
+         // Change title
+         const title = data.getFilteredAnnouncementCount
+            ? `${params.mark ? params.mark : 'Cars'} ${
+                 params.model ? params.model : ''
+              } for sale: ${data.getFilteredAnnouncementCount} announcements`
+            : 'There are no announcements for you'
+         document.title = title
+      }
    })
 
    // Load announcements when params, page or sort method change
@@ -86,7 +94,7 @@ const Search = () => {
             }
          })
       }
-   }, [params, page, ifParamsParsed, sortMethod])
+   }, [loadAnnouncementTrigger])
 
    // Scroll on back
    useDidMountEffect(() => {
@@ -137,6 +145,8 @@ const Search = () => {
             setSortMethod={setSortMethod}
             ifParamsParsed={ifParamsParsed}
             setIfParamsParsed={setIfParamsParsed}
+            trigger={loadAnnouncementTrigger}
+            setTrigger={setLoadAnnouncementTrigger}
          />
          <Select
             value={sortMethod ? sortMethod.description : 'Latest offers first'}
