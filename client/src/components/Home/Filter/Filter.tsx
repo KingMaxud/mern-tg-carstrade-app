@@ -20,6 +20,7 @@ import {
 } from '../../../shared/utils/graphql'
 import { getYears, prices } from '../../../shared/data'
 import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
+import styles from './Filter.module.scss'
 
 const Filter = () => {
    const navigate = useNavigate()
@@ -94,66 +95,75 @@ const Filter = () => {
       })
    }
 
+   // TODO: make select border brighter, change bg when selected, style button
+
    return (
-      <Box>
-         <Select
-            placeholder="All"
-            id="mark"
-            onChange={e => {
-               setModelsData({ getModels: [] })
-               handleSelection(e, 'mark')
-            }}>
-            {marksData.getMarks.map(m => (
-               <option value={m.name} label={m.name} key={m._id} />
-            ))}
-         </Select>
-
-         <Select
-            placeholder="All"
-            id="model"
-            onChange={e => handleSelection(e, 'model')}>
-            {modelsData &&
-               modelsData.getModels.map(mark => (
-                  <option value={mark.name} label={mark.name} key={mark._id} />
+      <div className={styles.container}>
+         <div className={styles.filterModule}>
+            <Select
+               placeholder="Select Mark"
+               id="mark"
+               onChange={e => {
+                  setModelsData({ getModels: [] })
+                  handleSelection(e, 'mark')
+               }}>
+               {marksData.getMarks.map(m => (
+                  <option value={m.name} label={m.name} key={m._id} />
                ))}
-         </Select>
+            </Select>
 
-         <Select
-            placeholder="Maximum price"
-            id="price"
-            onChange={e => handleSelection(e, 'maxPrice')}>
-            {prices.map(price => (
-               <option
-                  value={price.toString()}
-                  label={price.toString()}
-                  key={price.toString()}
-               />
-            ))}
-         </Select>
+            <Select
+               placeholder="Select model"
+               disabled={!modelsData.getModels.length}
+               id="model"
+               onChange={e => handleSelection(e, 'model')}>
+               {modelsData &&
+                  modelsData.getModels.map(mark => (
+                     <option
+                        value={mark.name}
+                        label={mark.name}
+                        key={mark._id}
+                     />
+                  ))}
+            </Select>
 
-         <Select
-            onChange={e => {
-               handleSelection(e, 'minYear')
-               setYearsTo(getYears(Number(e.target.value), 2022))
-            }}>
-            <option value={1940} label={'Year from'} />
-            {yearsFrom.map(year => (
-               <option value={year} label={year.toString()} key={year} />
-            ))}
-         </Select>
+            <Select
+               placeholder="Maximum price"
+               id="price"
+               onChange={e => handleSelection(e, 'maxPrice')}>
+               {prices.map(price => (
+                  <option
+                     value={price.toString()}
+                     label={price.toString()}
+                     key={price.toString()}
+                  />
+               ))}
+            </Select>
 
-         <Select
-            onChange={e => {
-               handleSelection(e, 'maxYear')
-               setYearsFrom(getYears(1940, Number(e.target.value)))
-            }}>
-            <option value={2022} label={'To'} />
-            {yearsTo.map(year => (
-               <option value={year} label={year.toString()} key={year} />
-            ))}
-         </Select>
-         <Button onClick={navigateToSearch}>{count} results</Button>
-      </Box>
+            <Select
+               onChange={e => {
+                  handleSelection(e, 'minYear')
+                  setYearsTo(getYears(Number(e.target.value), 2022))
+               }}>
+               <option value={1940} label={'Year from'} />
+               {yearsFrom.map(year => (
+                  <option value={year} label={year.toString()} key={year} />
+               ))}
+            </Select>
+
+            <Select
+               onChange={e => {
+                  handleSelection(e, 'maxYear')
+                  setYearsFrom(getYears(1940, Number(e.target.value)))
+               }}>
+               <option value={2022} label={'To'} />
+               {yearsTo.map(year => (
+                  <option value={year} label={year.toString()} key={year} />
+               ))}
+            </Select>
+            <Button onClick={navigateToSearch}>{count} results</Button>
+         </div>
+      </div>
    )
 }
 

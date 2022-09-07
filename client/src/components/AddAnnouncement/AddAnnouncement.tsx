@@ -204,8 +204,7 @@ const AddAnnouncement = () => {
       <>
          <form onSubmit={formik.handleSubmit}>
             <VStack>
-               <FormLabel htmlFor="mark">Select Mark:</FormLabel>
-               <Select value={mark} id="mark" onChange={handleMarkSelection}>
+               <Select maxW='480px' value={mark} id="mark" onChange={handleMarkSelection}>
                   <option value="" label="-- Mark --" />
                   {marksData.getMarks.map(mark => (
                      <option
@@ -216,7 +215,6 @@ const AddAnnouncement = () => {
                   ))}
                </Select>
 
-               <FormLabel htmlFor="mark">Select Model:</FormLabel>
                <Select value={model} id="mark" onChange={handleModelSelection}>
                   <option value="" label="-- Model --" />
                   {modelsData.getModels.map(model => (
@@ -228,7 +226,6 @@ const AddAnnouncement = () => {
                   ))}
                </Select>
 
-               <FormLabel htmlFor="generation">Select Generation:</FormLabel>
                <Select
                   value={generation}
                   id="generation"
@@ -278,11 +275,11 @@ const AddAnnouncement = () => {
                   <Radio value="New">New</Radio>
                </RadioGroup>
 
-               <FormLabel htmlFor="mileage">Mileage</FormLabel>
                <Input
                   id="mileage"
                   name="mileage"
                   type="text"
+                  placeholder='Enter Mileage'
                   onChange={formik.handleChange}
                   value={formik.values.mileage}
                />
@@ -353,29 +350,29 @@ const AddAnnouncement = () => {
                   ))}
                </Select>
 
-               <FormLabel htmlFor="power">Power</FormLabel>
                <Input
                   id="power"
                   name="power"
                   type="text"
+                  placeholder='Enter power'
                   onChange={formik.handleChange}
                   value={formik.values.power}
                />
 
-               <FormLabel htmlFor="phoneNumber">Price</FormLabel>
                <Input
                   id="price"
                   name="price"
                   type="text"
+                  placeholder='Enter price'
                   onChange={formik.handleChange}
                   value={formik.values.price}
                />
 
-               <FormLabel htmlFor="power">Description</FormLabel>
                <Input
                   id="description"
                   name="description"
                   type="text"
+                  placeholder='Enter description'
                   onChange={formik.handleChange}
                   value={formik.values.description}
                />
@@ -383,12 +380,12 @@ const AddAnnouncement = () => {
                   <div>{formik.errors.description}</div>
                ) : null}
 
-               <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
                <Input
                   isDisabled={true}
                   id="power"
                   name="power"
                   type="text"
+                  placeholder='Enter phone number'
                   onChange={formik.handleChange}
                   value={formik.values.phoneNumber}
                />

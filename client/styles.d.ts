@@ -13,5 +13,11 @@ declare module '*.module.scss' {
 // For SVG
 declare module '*.svg' {
    const content: any
-   export default content
+   export = content
+}
+
+// For JPG
+declare module '*.jpg' {
+   const value: any
+   export = value
 }

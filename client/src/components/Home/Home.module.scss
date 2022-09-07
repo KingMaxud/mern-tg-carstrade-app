@@ -1,0 +1,24 @@
+.container {
+   position: relative;
+}
+
+.background {
+   background-image: url('https://res.cloudinary.com/dxl170evw/image/upload/v1662481116/images/bg_fqouky.jpg');
+   background-repeat: no-repeat;
+   background-size: cover;
+   background-position: center center;
+   height: 27vw;
+   position: relative;
+
+   div {
+      position: relative;
+      top: 1.5vw;
+      left: 6vw;
+      color: #f9f9f9;
+      font-size: 3vw;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      font-style: italic;
+      max-width: 28vw;
+   }
+}

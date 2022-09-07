@@ -9,6 +9,7 @@ import { AuthContext } from './context/context'
 import authReducer from './context/reducer'
 import { initialAuthState } from './context/state'
 import NotAuthedProtected from './components/NotAuthedProtected'
+import AuthedProtected from './components/AuthedProtected'
 import AdminProtected from './components/Admin/AdminProtected'
 import VehicleDetails from './components/VehicleDetails/VehicleDetails'
 import AddAnnouncement from './components/AddAnnouncement/AddAnnouncement'
@@ -22,7 +23,10 @@ const App = () => {
 
    // Remove yScrollPosition when it's not needed
    useEffect(() => {
-      if (!location.pathname.includes('search') && !location.pathname.includes('vehicledetails')) {
+      if (
+         !location.pathname.includes('search') &&
+         !location.pathname.includes('vehicledetails')
+      ) {
          sessionStorage.removeItem('yScrollPosition')
       }
    }, [location])
@@ -37,7 +41,14 @@ const App = () => {
                element={<VehicleDetails />}
             />
             <Route path="test" element={<Test />} />
-            <Route path="addannouncement" element={<AddAnnouncement />} />
+            <Route
+               path="addannouncement"
+               element={
+                  <AuthedProtected isAuthed={state.isAuthed}>
+                     <AddAnnouncement />
+                  </AuthedProtected>
+               }
+            />
             <Route path="search" element={<Search />} />
             <Route
                path="signup"

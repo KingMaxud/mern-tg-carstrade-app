@@ -336,7 +336,7 @@ const AdvancedFilter = ({
    return (
       <div>
          {ifParamsParsed && (
-            <div onMouseEnter={() => console.log(generationsData)}>
+            <div>
                <Select
                   value={conditionDefaultValue}
                   id="condition"
