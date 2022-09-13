@@ -49,12 +49,52 @@
          box-shadow: rgba(0, 0, 0, 0.35) 0 15px 10px -15px;
       }
 
+      @media (min-width: 768px) {
+         justify-content: space-between;
+         margin-right: 3rem;
+         width: 25rem;
+      }
+
+      @media (min-width: 1200px) {
+         font-size: 1.15rem;
+         width: 35rem;
+      }
+
       &__element {
+         cursor: pointer;
+
+         // Limit width to prevent overlying
+         @media (min-width: 768px) and (max-width: 1200px) {
+            max-width: 9.75rem;
+         }
+
          @media (max-width: 768px) {
             font-size: 1.25rem;
             width: 15rem;
             margin: 1rem auto;
             text-align: center;
+         }
+
+         @media (min-width: 768px) {
+            // Underline on hover
+            text-decoration: none;
+            position: relative;
+
+            &:after {
+               position: absolute;
+               content: '';
+               height: 2px;
+               bottom: -2px;
+               margin: 0 auto;
+               left: 0;
+               right: 0;
+               width: 0;
+               background: #111;
+               transition: 0.25s;
+            }
+            &:hover:after {
+               width: 100%;
+            }
          }
       }
 
@@ -83,4 +123,13 @@
 .closeIcon {
    position: absolute;
    width: 1rem;
+}
+
+.overlay {
+   height: 100vh;
+   width: 100vw;
+   position: absolute;
+   top: 0;
+   right: -3rem;
+   z-index: 4;
 }

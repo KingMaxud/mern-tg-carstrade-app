@@ -9,7 +9,7 @@ type Props = {
 }
 
 const PagesBar = ({ count, page, setPage }: Props) => {
-   const pagesAmount = Math.ceil(count / 5)
+   const pagesAmount = Math.ceil(count / 4)
    const availableBefore = page !== 1
    const availableNext = page !== pagesAmount
    const handleDecrease = () => setPage(page - 1)

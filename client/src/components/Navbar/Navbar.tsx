@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 
 import { useAuth } from '../../context/context'
@@ -45,12 +45,10 @@ const Navbar = () => {
    }, [width])
 
    // Animations
-   const variants = {
+   const menuVariants = {
       open: { x: '-100%' },
       closed: { x: 0 }
    }
-
-   // TODO: animate menu elements hover
 
    return (
       <nav className={styles.nav}>
@@ -71,7 +69,7 @@ const Navbar = () => {
          {state.isAuthed ? (
             <motion.div
                animate={isMobileMenuOpen ? 'open' : 'closed'}
-               variants={variants}
+               variants={menuVariants}
                transition={{
                   ease: 'easeOut',
                   duration: 0.25
@@ -89,13 +87,15 @@ const Navbar = () => {
                      }>
                      My Announcements
                   </h1>
-                  {isMyAnnouncementsShown && <MyAnnouncements />}
                </div>
                <button
                   className={styles.nav__menu__element}
                   onClick={handleLogOut}>
                   Log Out
                </button>
+               {isMyAnnouncementsShown && <MyAnnouncements />}
+               {/*Overlay, when MyAnnouncements is shown*/}
+               {isMyAnnouncementsShown && <div className={styles.overlay} onClick={() => setIsMyAnnouncementsShown(false)} />}
                {isMobile && (
                   <i onClick={() => setIsMobileMenuOpen(false)}>
                      <svg
@@ -110,7 +110,7 @@ const Navbar = () => {
          ) : (
             <motion.div
                animate={isMobileMenuOpen ? 'open' : 'closed'}
-               variants={variants}
+               variants={menuVariants}
                transition={{
                   ease: 'easeOut',
                   duration: 0.25

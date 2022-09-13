@@ -1,6 +1,5 @@
-import { Box, Button } from '@chakra-ui/react'
 import { createSearchParams, useNavigate } from 'react-router-dom'
-import { Select } from '@chakra-ui/react'
+import Select from '../../shared/Select'
 
 import {
    GetFilteredAnnouncementCountData,
@@ -21,11 +20,13 @@ import {
 import { getYears, prices } from '../../../shared/data'
 import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
 import styles from './Filter.module.scss'
+import loader from '../../../images/fading-circles.png'
 
 const Filter = () => {
    const navigate = useNavigate()
 
    const [count, setCount] = useState(0)
+   const [countLoading, setCountLoading] = useState(false)
    const [params, setParams] = useState<SearchParams>({})
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
@@ -50,6 +51,7 @@ const Filter = () => {
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
       onCompleted: data => {
          setCount(data.getFilteredAnnouncementCount)
+         setCountLoading(false)
       },
       variables: {
          filter: params
@@ -67,6 +69,7 @@ const Filter = () => {
 
    // Update announcements count, when params changes
    useEffect(() => {
+      setCountLoading(true)
       loadCount()
    }, [params])
 
@@ -95,28 +98,28 @@ const Filter = () => {
       })
    }
 
-   // TODO: make select border brighter, change bg when selected, style button
-
    return (
       <div className={styles.container}>
          <div className={styles.filterModule}>
             <Select
-               placeholder="Select Mark"
                id="mark"
+               isSelected={!!params.mark}
                onChange={e => {
                   setModelsData({ getModels: [] })
                   handleSelection(e, 'mark')
                }}>
+               <option label="Select Mark" />
                {marksData.getMarks.map(m => (
                   <option value={m.name} label={m.name} key={m._id} />
                ))}
             </Select>
 
             <Select
-               placeholder="Select model"
                disabled={!modelsData.getModels.length}
+               isSelected={!!params.model}
                id="model"
                onChange={e => handleSelection(e, 'model')}>
+               <option label="Select Model" />
                {modelsData &&
                   modelsData.getModels.map(mark => (
                      <option
@@ -128,9 +131,10 @@ const Filter = () => {
             </Select>
 
             <Select
-               placeholder="Maximum price"
+               isSelected={!!params.maxPrice}
                id="price"
                onChange={e => handleSelection(e, 'maxPrice')}>
+               <option label="Maximum price"></option>
                {prices.map(price => (
                   <option
                      value={price.toString()}
@@ -141,27 +145,38 @@ const Filter = () => {
             </Select>
 
             <Select
+               isSelected={!!params.minYear}
                onChange={e => {
                   handleSelection(e, 'minYear')
-                  setYearsTo(getYears(Number(e.target.value), 2022))
+                  setYearsTo(getYears(Number(e.target.value || 1940), 2022))
                }}>
-               <option value={1940} label={'Year from'} />
+               <option label={'Year from'} />
                {yearsFrom.map(year => (
                   <option value={year} label={year.toString()} key={year} />
                ))}
             </Select>
 
             <Select
+               isSelected={!!params.maxYear}
                onChange={e => {
                   handleSelection(e, 'maxYear')
-                  setYearsFrom(getYears(1940, Number(e.target.value)))
+                  setYearsFrom(getYears(1940, Number(e.target.value || 2022)))
                }}>
-               <option value={2022} label={'To'} />
+               <option label={'To'} />
                {yearsTo.map(year => (
                   <option value={year} label={year.toString()} key={year} />
                ))}
             </Select>
-            <Button onClick={navigateToSearch}>{count} results</Button>
+            <button className={styles.button} onClick={navigateToSearch}>
+               {countLoading ? (
+                  <img
+                     alt="loader"
+                     className={styles.loading}
+                     src={loader} />
+               ) : (
+                  <span>{count} results</span>
+               )}
+            </button>
          </div>
       </div>
    )

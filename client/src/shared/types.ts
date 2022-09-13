@@ -190,6 +190,7 @@ export type UsersAnnouncement = {
    _id: string
    mark: string
    model: string
+   year: string
    photos: string[]
    price: number
 }

@@ -5,22 +5,25 @@
    background-color: #cecccc;
    left: -14rem;
    top: 2rem;
-   z-index: 4;
+   z-index: 5;
    border-radius: 1rem;
 }
 
 .link {
    &:first-child {
       .announcement {
+         border-top: 0;
          .image {
             border-radius: 0.75rem 0 0 0;
          }
       }
    }
 
+   // TODO: last child doesn't work
    &:last-child {
       .announcement {
          margin-bottom: 0;
+         border-bottom: 0;
       }
    }
 }
@@ -28,8 +31,24 @@
 .announcement {
    cursor: pointer;
    margin-bottom: 0.75rem;
+   display: flex;
+   border-top: 1px solid black;
+   border-bottom: 1px solid black;
+}
+
+.info {
+   margin: 0 auto;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-around;
+   align-items: center;
 }
 
 .image {
    width: 13rem;
+}
+
+.loading {
+   width: 28rem;
+   height: 46rem;
 }

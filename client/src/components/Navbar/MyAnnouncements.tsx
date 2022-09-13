@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useQuery } from '@apollo/client'
+import React, { useEffect, useState } from 'react'
+import { useLazyQuery } from '@apollo/client'
 import { Link } from 'react-router-dom'
 
 import {
@@ -16,6 +16,9 @@ import {
 import styles from './MyAnnouncements.module.scss'
 import { getImageBySize } from '../../shared/utils/utils'
 import PagesBar from './PagesBar'
+import loader from '../../images/fading-balls.png'
+import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
+import useGetUser from "../../shared/hooks/useGetUser";
 
 const MyAnnouncements = () => {
    const [loading, setLoading] = useState(true)
@@ -23,46 +26,77 @@ const MyAnnouncements = () => {
    const [count, setCount] = useState(0)
    const [data, setData] = useState<UsersAnnouncement[]>([])
    const [page, setPage] = useState(1)
+   const [userId, setUserId] = useState('')
 
-   useQuery<GetFilteredAnnouncementCountData, GetUsersAnnouncementCountVars>(
-      GET_FILTERED_ANNOUNCEMENTS_COUNT,
-      {
-         variables: {
-            filter: {
-               user: '626a610d564752202c984e47'
-            }
-         },
-         onCompleted: data => setCount(data.getFilteredAnnouncementCount)
+   const { getUserId } = useGetUser()
+
+   const [getCount] = useLazyQuery<
+      GetFilteredAnnouncementCountData,
+      GetUsersAnnouncementCountVars
+   >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
+      onCompleted: data => setCount(data.getFilteredAnnouncementCount)
+   })
+
+   const [getUsersAnnouncementsData] = useLazyQuery<
+      GetUsersAnnouncementsData,
+      GetUsersAnnouncementsVars
+   >(GET_USERS_ANNOUNCEMENTS, {
+      onCompleted: data => {
+         setData(data.getAnnouncements)
+         setLoading(false)
+      },
+      onError: error => {
+         setError(true)
+         setLoading(false)
       }
-   )
+   })
 
-   useQuery<GetUsersAnnouncementsData, GetUsersAnnouncementsVars>(
-      GET_USERS_ANNOUNCEMENTS,
-      {
+   useEffect(() => {
+      getUserId().then(data => {
+         setUserId(data)
+
+         getCount({
+            variables: {
+               filter: {
+                  user: data
+               }
+            }
+         })
+         getUsersAnnouncementsData({
+            variables: {
+               filter: {
+                  user: data
+               },
+               pagination: {
+                  page: '1',
+                  limit: '4'
+               }
+            }
+         })
+      })
+   }, [])
+
+   useDidMountEffect(() => {
+      setLoading(true)
+      getUsersAnnouncementsData({
          variables: {
             filter: {
-               user: '626a610d564752202c984e47'
+               user: userId
             },
             pagination: {
                page: page.toString(),
-               limit: '5'
+               limit: '4'
             }
-         },
-         onCompleted: data => {
-            setData(data.getAnnouncements)
-            setLoading(false)
-         },
-         onError: error => {
-            setError(true)
-            setLoading(false)
          }
-      }
-   )
+      })
+   }, [page])
 
    return (
       <div className={styles.container}>
          {loading ? (
-            <p>Loading</p>
+            <div className={styles.loading}>
+               <img alt="loader" className={styles.loading} src={loader} />
+            </div>
          ) : error || !data ? (
             <p>You haven't published an announcements yet!</p>
          ) : (
@@ -78,6 +112,12 @@ const MyAnnouncements = () => {
                            src={getImageBySize(a.photos[0], 224, 168)}
                            alt={`${a.mark} ${a.model}`}
                         />
+                        <div className={styles.info}>
+                           <p className={styles.mark}>{a.mark}</p>
+                           <p className={styles.model}>{a.model}</p>
+                           <p className={styles.year}>{a.year}</p>
+                           <p className={styles.price}>{a.price}$</p>
+                        </div>
                      </div>
                   </Link>
                ))}

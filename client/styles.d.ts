@@ -21,3 +21,9 @@ declare module '*.jpg' {
    const value: any
    export = value
 }
+
+// For JPG
+declare module '*.png' {
+   const value: any
+   export = value
+}

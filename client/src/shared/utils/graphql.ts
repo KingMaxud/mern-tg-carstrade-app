@@ -273,6 +273,7 @@ export const GET_USERS_ANNOUNCEMENTS = gql`
             _id
             mark
             model
+            year
             photos
             price
         }
