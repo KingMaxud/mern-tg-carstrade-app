@@ -21,6 +21,7 @@ import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import useGetUser from "../../shared/hooks/useGetUser";
 
 const MyAnnouncements = () => {
+   const [firstTimeLoaded, setFirstTimeLoaded] = useState(false)
    const [loading, setLoading] = useState(true)
    const [error, setError] = useState(false)
    const [count, setCount] = useState(0)
@@ -43,6 +44,7 @@ const MyAnnouncements = () => {
    >(GET_USERS_ANNOUNCEMENTS, {
       onCompleted: data => {
          setData(data.getAnnouncements)
+         setFirstTimeLoaded(true)
          setLoading(false)
       },
       onError: error => {
@@ -93,14 +95,15 @@ const MyAnnouncements = () => {
 
    return (
       <div className={styles.container}>
-         {loading ? (
-            <div className={styles.loading}>
+         {!firstTimeLoaded ? (
+            <div className={styles.firstLoader}>
                <img alt="loader" className={styles.loading} src={loader} />
             </div>
          ) : error || !data ? (
             <p>You haven't published an announcements yet!</p>
          ) : (
-            <div>
+            <div className={styles.container__loading}>
+               <div className={`${styles.overlay} ${loading && styles.displayed}`}></div>
                {data.map(a => (
                   <Link
                      to={`/vehicledetails/${a._id}`}

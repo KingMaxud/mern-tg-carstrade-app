@@ -12,13 +12,24 @@
 
    div {
       position: relative;
-      top: 1.5vw;
+      top: 3vw;
       left: 6vw;
       color: #f9f9f9;
-      font-size: 3vw;
+      font-size: 4vw;
       font-family: 'Poppins', sans-serif;
       font-weight: 500;
       font-style: italic;
-      max-width: 28vw;
+
+      @media (min-width: 1200px) {
+         font-size: 3vw;
+         max-width: 28vw;
+         top: 1.5vw;
+         left: 6vw;
+      }
+
+      @media (max-width: 600px) {
+         font-size: 1.5rem;
+         max-width: 80vw;
+      }
    }
 }
