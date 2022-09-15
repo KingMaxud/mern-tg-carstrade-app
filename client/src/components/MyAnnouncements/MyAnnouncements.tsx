@@ -15,7 +15,7 @@ import {
 } from '../../shared/types'
 import styles from './MyAnnouncements.module.scss'
 import { getImageBySize } from '../../shared/utils/utils'
-import PagesBar from './PagesBar'
+import PagesBar from '../Navbar/PagesBar'
 import loader from '../../images/fading-balls.png'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import useGetUser from "../../shared/hooks/useGetUser";

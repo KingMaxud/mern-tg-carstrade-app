@@ -8,9 +8,9 @@ import { signOut } from '../../context/reducer'
 import tokenService from '../../shared/utils/token.service'
 import { LOGOUT } from '../../shared/utils/graphql'
 import styles from './Navbar.module.scss'
-import MyAnnouncements from './MyAnnouncements'
+import MyAnnouncements from '../MyAnnouncements/MyAnnouncements'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
-import useWindowSize from '../../shared/useWindowDimensions'
+import useWindowSize from '../../shared/hooks/useWindowDimensions'
 
 const Navbar = () => {
    const { state, dispatch } = useAuth()
@@ -43,6 +43,12 @@ const Navbar = () => {
    useDidMountEffect(() => {
       setIsMobile((width || 0) <= 768)
    }, [width])
+   // Close unwanted menus, when isMobile changes
+   useDidMountEffect(() => {
+      setIsMessageShown(false)
+      setIsMobileMenuOpen(false)
+      setIsMyAnnouncementsShown(false)
+   }, [isMobile])
 
    // Animations
    const menuVariants = {
@@ -80,22 +86,28 @@ const Navbar = () => {
                   to={'/addannouncement'}>
                   Add Announcement
                </NavLink>
-               <div className={styles.nav__menu__element}>
-                  <h1
-                     onClick={() =>
-                        setIsMyAnnouncementsShown(!isMyAnnouncementsShown)
-                     }>
-                     My Announcements
-                  </h1>
-               </div>
+               {!isMobile && (
+                  <div className={styles.nav__menu__element}>
+                     <h1
+                        onClick={() =>
+                           setIsMyAnnouncementsShown(!isMyAnnouncementsShown)
+                        }>
+                        My Announcements
+                     </h1>
+                  </div>
+               )}
                <button
                   className={styles.nav__menu__element}
                   onClick={handleLogOut}>
                   Log Out
                </button>
                {isMyAnnouncementsShown && <MyAnnouncements />}
-               {/*Overlay, when MyAnnouncements is shown*/}
-               {isMyAnnouncementsShown && <div className={styles.overlay} onClick={() => setIsMyAnnouncementsShown(false)} />}
+               {isMyAnnouncementsShown && (
+                  <div
+                     className={styles.overlay}
+                     onClick={() => setIsMyAnnouncementsShown(false)}
+                  />
+               )}
                {isMobile && (
                   <i onClick={() => setIsMobileMenuOpen(false)}>
                      <svg
@@ -123,6 +135,7 @@ const Navbar = () => {
                </button>
                {isMessageShown && (
                   <div className={styles.message}>
+                     <p>Please sign in first!</p>
                      <i onClick={() => setIsMessageShown(false)}>
                         <svg
                            className={styles.closeIcon}
@@ -131,7 +144,6 @@ const Navbar = () => {
                            <path d="M55.931,47.463L94.306,9.09c0.826-0.827,0.826-2.167,0-2.994L88.833,0.62C88.436,0.224,87.896,0,87.335,0   c-0.562,0-1.101,0.224-1.498,0.62L47.463,38.994L9.089,0.62c-0.795-0.795-2.202-0.794-2.995,0L0.622,6.096   c-0.827,0.827-0.827,2.167,0,2.994l38.374,38.373L0.622,85.836c-0.827,0.827-0.827,2.167,0,2.994l5.473,5.476   c0.397,0.396,0.936,0.62,1.498,0.62s1.1-0.224,1.497-0.62l38.374-38.374l38.374,38.374c0.397,0.396,0.937,0.62,1.498,0.62   s1.101-0.224,1.498-0.62l5.473-5.476c0.826-0.827,0.826-2.167,0-2.994L55.931,47.463z" />
                         </svg>
                      </i>
-                     <p>Please log in first!</p>
                   </div>
                )}
                <NavLink className={styles.nav__menu__element} to={'/signin'}>

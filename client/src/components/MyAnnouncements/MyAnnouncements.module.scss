@@ -2,11 +2,15 @@
    position: absolute;
    width: 28rem;
    height: auto;
-   background-color: #cecccc;
+   z-index: 5;
    left: -14rem;
    top: 2rem;
-   z-index: 5;
    border-radius: 1rem;
+   background-color: #cecccc;
+
+   @media (max-width: 768px) {
+      display: none;
+   }
 }
 
 .link {
