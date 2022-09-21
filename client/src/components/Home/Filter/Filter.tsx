@@ -103,7 +103,7 @@ const Filter = () => {
          <div className={styles.filterModule}>
             <Select
                id="mark"
-               isSelected={!!params.mark}
+               status={params.mark ? 'selected' : 'default'}
                onChange={e => {
                   setModelsData({ getModels: [] })
                   handleSelection(e, 'mark')
@@ -116,7 +116,7 @@ const Filter = () => {
 
             <Select
                disabled={!modelsData.getModels.length}
-               isSelected={!!params.model}
+               status={params.model ? 'selected' : 'default'}
                id="model"
                onChange={e => handleSelection(e, 'model')}>
                <option label="Select Model" />
@@ -131,7 +131,7 @@ const Filter = () => {
             </Select>
 
             <Select
-               isSelected={!!params.maxPrice}
+               status={params.maxPrice ? 'selected' : 'default'}
                id="price"
                onChange={e => handleSelection(e, 'maxPrice')}>
                <option label="Maximum price"></option>
@@ -145,7 +145,7 @@ const Filter = () => {
             </Select>
 
             <Select
-               isSelected={!!params.minYear}
+               status={params.minYear ? 'selected' : 'default'}
                onChange={e => {
                   handleSelection(e, 'minYear')
                   setYearsTo(getYears(Number(e.target.value || 1940), 2022))
@@ -157,7 +157,7 @@ const Filter = () => {
             </Select>
 
             <Select
-               isSelected={!!params.maxYear}
+               status={params.maxYear ? 'selected' : 'default'}
                onChange={e => {
                   handleSelection(e, 'maxYear')
                   setYearsFrom(getYears(1940, Number(e.target.value || 2022)))
@@ -169,10 +169,7 @@ const Filter = () => {
             </Select>
             <button className={styles.button} onClick={navigateToSearch}>
                {countLoading ? (
-                  <img
-                     alt="loader"
-                     className={styles.loading}
-                     src={loader} />
+                  <img alt="loader" className={styles.loading} src={loader} />
                ) : (
                   <span>{count} results</span>
                )}

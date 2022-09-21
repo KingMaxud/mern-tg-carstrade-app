@@ -2,17 +2,29 @@ import React from 'react'
 
 import styles from './Select.module.scss'
 
+type Status = 'default' | 'selected' | 'error'
+
 type Props = {
-   isSelected: boolean
+   status: Status
    children: any
+   value?: string
    id?: string
    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
    disabled?: boolean
 }
 
-const Select = ({ id, isSelected, children, onChange, disabled }: Props) => {
+const Select = ({ id, status, value, children, onChange, disabled }: Props) => {
+   const className = (() => {
+      if (status === 'selected') {
+         return styles.selected
+      } else if (status === 'error') {
+         return styles.error
+      } else {
+         return ''
+      }
+   })()
    return (
-      <select disabled={disabled} id={id} className={`${isSelected && styles.selected}`} onChange={onChange}>
+      <select value={value} disabled={disabled} id={id} className={`${className}`} onChange={onChange}>
          {children}
       </select>
    )

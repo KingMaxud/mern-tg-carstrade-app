@@ -2,15 +2,7 @@ import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
-import {
-   VStack,
-   Button,
-   Select,
-   RadioGroup,
-   Radio,
-   FormLabel,
-   Input
-} from '@chakra-ui/react'
+import { Button, Input, Textarea } from '@chakra-ui/react'
 
 import useAddPhoto from '../../shared/hooks/useAddPhoto'
 import {
@@ -37,21 +29,26 @@ import {
    getYears,
    transmission
 } from '../../shared/data'
+import Select from '../shared/Select'
+import styles from './AddAnnouncement.module.scss'
+import useWindowSize from '../../shared/hooks/useWindowDimensions'
+import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 
 const AddAnnouncement = () => {
+   const width = useWindowSize().width
+
    const [announcementLoading, setAnnouncementLoading] = useState(true)
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
-   const [marksLoading, setMarksLoading] = useState(true)
-   const [mark, setMark] = useState('')
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
-   const [model, setModel] = useState('')
    const [generationsData, setGenerationsData] = useState<GenerationsData>({
       getGenerations: []
    })
-   const [generation, setGeneration] = useState('')
    const [userId, setUserId] = useState('')
    const [years, setYears] = useState(getYears(1940, 2022))
    const [bodyStyles, setBodyStyles] = useState<string[]>([])
+   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
+      (width || 1000) <= 600
+   )
 
    const { addPhoto, addPhotoComponent } = useAddPhoto()
    const { getUserId } = useGetUser()
@@ -60,35 +57,13 @@ const AddAnnouncement = () => {
    useQuery<MarksData>(GET_MARKS, {
       onCompleted: data => {
          setMarksData(data)
-         setMarksLoading(false)
       }
    })
-
-   const [loadModels] = useLazyQuery<ModelsData, ModelsVars>(GET_MODELS, {
-      variables: { markName: mark },
-      onCompleted: data => setModelsData(data)
-   })
-
-   const [loadGenerations] = useLazyQuery<GenerationsData, GenerationsVars>(
-      GET_GENERATIONS,
-      {
-         variables: { markName: mark, modelName: model },
-         onCompleted: data => {
-            setGenerationsData(data)
-         }
-      }
-   )
-
-   // Change Title
-   useEffect(() => {
-      document.title = 'Add your announcement to CarTrader'
-   }, [])
-
-   useEffect(() => {
-      getUserId().then(data => setUserId(data)) // Get user ID when page loads
-   }, [])
 
    const AddGenerationSchema = Yup.object().shape({
+      mark: Yup.string().required('Required'),
+      model: Yup.string().required('Required'),
+      generation: Yup.string().required('Required'),
       condition: Yup.string().required('Required'),
       price: Yup.string().required('Required'),
       year: Yup.string().required('Required'),
@@ -111,6 +86,9 @@ const AddAnnouncement = () => {
 
    const formik = useFormik({
       initialValues: {
+         mark: '',
+         model: '',
+         generation: '',
          condition: 'Used',
          price: '',
          year: '',
@@ -131,9 +109,9 @@ const AddAnnouncement = () => {
          addAnnouncement({
             variables: {
                user: userId,
-               mark,
-               model,
-               generation,
+               mark: values.mark,
+               model: values.model,
+               generation: values.generation,
                condition: values.condition,
                price: values.price,
                year: values.year,
@@ -154,18 +132,49 @@ const AddAnnouncement = () => {
       }
    })
 
+   const [loadModels] = useLazyQuery<ModelsData, ModelsVars>(GET_MODELS, {
+      variables: { markName: formik.values.mark },
+      onCompleted: data => setModelsData(data)
+   })
+
+   const [loadGenerations] = useLazyQuery<GenerationsData, GenerationsVars>(
+      GET_GENERATIONS,
+      {
+         variables: {
+            markName: formik.values.mark,
+            modelName: formik.values.model
+         },
+         onCompleted: data => {
+            setGenerationsData(data)
+         }
+      }
+   )
+
+   // Change Title
+   useEffect(() => {
+      document.title = 'Add your announcement to CarTrader'
+   }, [])
+   // Get user ID when page loads
+   useEffect(() => {
+      getUserId().then(data => setUserId(data))
+   }, [])
+   // Change isMobile, when width changes
+   useDidMountEffect(() => {
+      setIsSmallDevice((width || 0) <= 600)
+   }, [width])
+
    // Load models, when mark changes
    useEffect(() => {
-      if (mark) {
+      if (formik.values.mark) {
          loadModels()
       }
-   }, [mark])
+   }, [formik.values.mark])
    // Load generations, when model changes
    useEffect(() => {
-      if (model) {
+      if (formik.values.model) {
          loadGenerations()
       }
-   }, [model])
+   }, [formik.values.model])
 
    const [addAnnouncement] = useMutation<
       AddAnnouncementData,
@@ -177,17 +186,24 @@ const AddAnnouncement = () => {
    })
 
    const handleMarkSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setMark(e.target.value)
-      setModel('')
-      setGeneration('')
+      formik.setFieldValue('mark', e.target.value)
+      formik.setFieldValue('model', '')
+      setModelsData({
+         getModels: []
+      })
+      formik.setFieldValue('generation', '')
+      setGenerationsData({
+         getGenerations: []
+      })
    }
    const handleModelSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setModel(e.target.value)
+      formik.setFieldValue('model', e.target.value)
+      formik.setFieldValue('generation', '')
    }
    const handleGenerationSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
-      setGeneration(e.target.value)
+      formik.setFieldValue('generation', e.target.value)
       generationsData.getGenerations.map(g => {
          if (g.name === e.target.value) {
             // Set available body styles and years
@@ -200,201 +216,248 @@ const AddAnnouncement = () => {
       formik.setFieldValue('condition', nextValue)
    }
 
+   const colorSelector = (key: keyof typeof formik.values) => {
+      if (!!(formik.touched[key] && formik.errors[key])) {
+         return '#CC0000A5'
+      } else if (formik.values[key]) {
+         return '#FFB319A5'
+      }
+      return '#FFFFFF'
+   }
+   const isSelected = (key: keyof typeof formik.values) => {
+      if (!!(formik.touched[key] && formik.errors[key])) {
+         return 'error'
+      } else if (formik.values[key]) {
+         return 'selected'
+      }
+      return 'default'
+   }
+
    return (
-      <>
+      <div className={styles.container}>
          <form onSubmit={formik.handleSubmit}>
-            <VStack>
-               <Select maxW='480px' value={mark} id="mark" onChange={handleMarkSelection}>
-                  <option value="" label="-- Mark --" />
-                  {marksData.getMarks.map(mark => (
+
+            {/*TODO: first three selects status*/}
+            <Select
+               value={formik.values.mark}
+               status={isSelected('mark')}
+               id="mark"
+               onChange={handleMarkSelection}>
+               <option value="" label="Select Mark" />
+               {marksData.getMarks.map(mark => (
+                  <option value={mark.name} label={mark.name} key={mark._id} />
+               ))}
+            </Select>
+
+            <Select
+               value={formik.values.model}
+               status={isSelected('model')}
+               id="model"
+               onChange={handleModelSelection}>
+               <option value="" label="Select Model" />
+               {modelsData.getModels.map(model => (
+                  <option
+                     value={model.name}
+                     label={model.name}
+                     key={model._id}
+                  />
+               ))}
+            </Select>
+
+            <Select
+               value={formik.values.generation}
+               status={isSelected('generation')}
+               id="generation"
+               onChange={handleGenerationSelection}>
+               <option value="" label="Select Generation" />
+               {generationsData.getGenerations.map(generation => {
+                  return (
                      <option
-                        value={mark.name}
-                        label={mark.name}
-                        key={mark._id}
+                        value={generation.name}
+                        label={generation.name}
+                        key={generation._id}
                      />
-                  ))}
-               </Select>
+                  )
+               })}
+            </Select>
 
-               <Select value={model} id="mark" onChange={handleModelSelection}>
-                  <option value="" label="-- Model --" />
-                  {modelsData.getModels.map(model => (
-                     <option
-                        value={model.name}
-                        label={model.name}
-                        key={model._id}
-                     />
-                  ))}
-               </Select>
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('year')}
+               id="year">
+               <option value="" label="Select Year" />
+               {years.map(year => (
+                  <option value={year} label={year.toString()} key={year} />
+               ))}
+            </Select>
 
-               <Select
-                  value={generation}
-                  id="generation"
-                  onChange={handleGenerationSelection}>
-                  <option value="" label="-- Generation --" />
-                  {generationsData.getGenerations.map(generation => {
-                     return (
-                        <option
-                           value={generation.name}
-                           label={generation.name}
-                           key={generation._id}
-                        />
-                     )
-                  })}
-               </Select>
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('bodyStyle')}
+               id="bodyStyle">
+               <option value="" label="Select Body Style" />
+               {bodyStyles.map(bodyStyle => (
+                  <option value={bodyStyle} label={bodyStyle} key={bodyStyle} />
+               ))}
+            </Select>
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Year"
-                  id="year"
-                  name="year">
-                  {years.map(year => (
-                     <option value={year} label={year.toString()} key={year} />
-                  ))}
-               </Select>
+            <div className={styles.condition__container}>
+               <div
+                  onClick={() => handleConditionSelection('Used')}
+                  className={`${styles.condition__item} ${
+                     formik.values.condition === 'Used' && styles.selected
+                  }`}>
+                  Used
+               </div>
+               <div
+                  onClick={() => handleConditionSelection('New')}
+                  className={`${styles.condition__item} ${
+                     formik.values.condition === 'New' && styles.selected
+                  }`}>
+                  New
+               </div>
+            </div>
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Body Style"
-                  id="bodyStyle"
-                  name="bodyStyle">
-                  {bodyStyles.map(bodyStyle => (
-                     <option
-                        value={bodyStyle}
-                        label={bodyStyle}
-                        key={bodyStyle}
-                     />
-                  ))}
-               </Select>
+            <Input
+               background={colorSelector('mileage')}
+               mt="0.25rem"
+               mb="0.25rem"
+               width={isSmallDevice ? '90vw' : '32rem'}
+               outline="1px solid rgba(0, 0, 0, 0.7)"
+               id="mileage"
+               name="mileage"
+               type="text"
+               placeholder="Enter Mileage"
+               onChange={formik.handleChange}
+               value={formik.values.mileage}
+            />
 
-               <RadioGroup
-                  onChange={handleConditionSelection}
-                  value={formik.values.condition}
-                  name="condition"
-                  id="condition">
-                  <Radio value="Used">Used</Radio>
-                  <Radio value="New">New</Radio>
-               </RadioGroup>
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('color')}
+               id="color">
+               <option value="" label="Select Color" />
+               {colors.map(color => (
+                  <option
+                     value={color.color}
+                     label={color.color}
+                     key={color.hex}
+                  />
+               ))}
+            </Select>
 
-               <Input
-                  id="mileage"
-                  name="mileage"
-                  type="text"
-                  placeholder='Enter Mileage'
-                  onChange={formik.handleChange}
-                  value={formik.values.mileage}
-               />
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('transmission')}
+               id="transmission">
+               <option value="" label="Select Transmission" />
+               {transmission.map(transmission => (
+                  <option
+                     value={transmission}
+                     label={transmission}
+                     key={transmission}
+                  />
+               ))}
+            </Select>
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Color"
-                  id="color"
-                  name="color">
-                  {colors.map(color => (
-                     <option
-                        value={color.color}
-                        label={color.color}
-                        key={color.hex}
-                     />
-                  ))}
-               </Select>
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('fuelType')}
+               id="fuelType">
+               <option value="" label="Select Fuel Type" />
+               {fuelTypes.map(fuelType => (
+                  <option value={fuelType} label={fuelType} key={fuelType} />
+               ))}
+            </Select>
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Transmission"
-                  id="transmission"
-                  name="transmission">
-                  {transmission.map(transmission => (
-                     <option
-                        value={transmission}
-                        label={transmission}
-                        key={transmission}
-                     />
-                  ))}
-               </Select>
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('driveInit')}
+               id="driveInit">
+               <option value="" label="Select Drive Init" />
+               {driveInits.map(driveInit => (
+                  <option value={driveInit} label={driveInit} key={driveInit} />
+               ))}
+            </Select>
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Fuel Type"
-                  id="fuelType"
-                  name="fuelType">
-                  {fuelTypes.map(fuelType => (
-                     <option value={fuelType} label={fuelType} key={fuelType} />
-                  ))}
-               </Select>
+            <Select
+               onChange={formik.handleChange}
+               status={isSelected('engineCapacity')}
+               id="engineCapacity">
+               <option value="" label="Select Engine Capacity" />
+               {engineCapacity.map(e => (
+                  <option value={e.toString()} label={e.toString()} key={e} />
+               ))}
+            </Select>
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Drive Init"
-                  id="driveInit"
-                  name="driveInit">
-                  {driveInits.map(driveInit => (
-                     <option
-                        value={driveInit}
-                        label={driveInit}
-                        key={driveInit}
-                     />
-                  ))}
-               </Select>
+            <Input
+               background={colorSelector('power')}
+               mt="0.25rem"
+               mb="0.25rem"
+               width={isSmallDevice ? '90vw' : '32rem'}
+               color="black"
+               id="power"
+               name="power"
+               type="text"
+               outline="1px solid rgba(0, 0, 0, 0.7)"
+               placeholder="Enter power"
+               onChange={formik.handleChange}
+               value={formik.values.power}
+            />
 
-               <Select
-                  onChange={formik.handleChange}
-                  placeholder="Select Engine Capacity"
-                  id="engineCapacity"
-                  name="engineCapacity">
-                  {engineCapacity.map(e => (
-                     <option
-                        value={e.toString()}
-                        label={e.toString()}
-                        key={e}
-                     />
-                  ))}
-               </Select>
+            <Input
+               background={colorSelector('price')}
+               mt="0.25rem"
+               mb="0.25rem"
+               width={isSmallDevice ? '90vw' : '32rem'}
+               id="price"
+               name="price"
+               type="text"
+               outline="1px solid rgba(0, 0, 0, 0.7)"
+               placeholder="Enter price"
+               onChange={formik.handleChange}
+               value={formik.values.price}
+            />
 
-               <Input
-                  id="power"
-                  name="power"
-                  type="text"
-                  placeholder='Enter power'
-                  onChange={formik.handleChange}
-                  value={formik.values.power}
-               />
+            <Textarea
+               background={colorSelector('description')}
+               mt="0.25rem"
+               mb="0.25rem"
+               width={isSmallDevice ? '90vw' : '32rem'}
+               outline="1px solid rgba(0, 0, 0, 0.7)"
+               id="description"
+               name="description"
+               placeholder="Enter description"
+               onChange={formik.handleChange}
+               value={formik.values.description}
+            />
 
-               <Input
-                  id="price"
-                  name="price"
-                  type="text"
-                  placeholder='Enter price'
-                  onChange={formik.handleChange}
-                  value={formik.values.price}
-               />
+            <Input
+               background={colorSelector('phoneNumber')}
+               mt="0.25rem"
+               mb="0.25rem"
+               width={isSmallDevice ? '90vw' : '32rem'}
+               isDisabled={true}
+               id="phoneNumber"
+               name="phoneNumber"
+               type="text"
+               placeholder="Enter phone number"
+               onChange={formik.handleChange}
+               value={formik.values.phoneNumber}
+            />
 
-               <Input
-                  id="description"
-                  name="description"
-                  type="text"
-                  placeholder='Enter description'
-                  onChange={formik.handleChange}
-                  value={formik.values.description}
-               />
-               {formik.touched.description && formik.errors.description ? (
-                  <div>{formik.errors.description}</div>
-               ) : null}
-
-               <Input
-                  isDisabled={true}
-                  id="power"
-                  name="power"
-                  type="text"
-                  placeholder='Enter phone number'
-                  onChange={formik.handleChange}
-                  value={formik.values.phoneNumber}
-               />
-
-               {addPhotoComponent}
-               <Button type="submit">Publish Announcement</Button>
-            </VStack>
+            <label htmlFor="modelName" className={styles.photoLabel}>
+               Photo:{' '}
+            </label>
+            {addPhotoComponent}
+            <Button
+               bg="#ffb319"
+               width={isSmallDevice ? '90vw' : '32rem'}
+               type="submit">
+               Publish Announcement
+            </Button>
          </form>
-      </>
+      </div>
    )
 }
 

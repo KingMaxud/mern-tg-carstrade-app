@@ -8,6 +8,8 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 
+import 'filepond/dist/filepond.min.css'
+
 registerPlugin(
    FilePondPluginImagePreview,
    FilePondPluginImageValidateSize,
@@ -21,7 +23,8 @@ type UploadPresetData = {
 
 const compressImage = (image: any, uploadPreset: string) => {
    // Compress image, then  upload it to cloudinary
-   return new Promise<string>(function (res, rej) {    // Return Promise, so I can await it
+   return new Promise<string>(function (res, rej) {
+      // Return Promise, so I can await it
       new Compressor(image.file, {
          maxWidth: 1200,
          maxHeight: 900,
@@ -57,28 +60,30 @@ const useAddPhoto = () => {
          })
 
          const resolved = await Promise.all(unresolved)
-         return resolved            // Return url's array
+         return resolved // Return url's array
       }
    }
 
    // Component to upload images
    const addPhotoComponent = (
-      <div>
-         <label htmlFor="modelName">Photo: </label>
-         <FilePond
-            // @ts-ignore
-            files={images}
-            // @ts-ignore
-            onupdatefiles={setImages}
-            allowMultiple={true}
-            maxFiles={9}
-            name="files"
-            acceptedFileTypes={['image/png', 'image/jpeg', 'image/jpg', 'image/webp']}
-            imageValidateSizeMinWidth={320}
-            imageValidateSizeMinHeight={240}
-            labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-         />
-      </div>
+      <FilePond
+         // @ts-ignore
+         files={images}
+         // @ts-ignore
+         onupdatefiles={setImages}
+         allowMultiple={true}
+         maxFiles={9}
+         name="files"
+         acceptedFileTypes={[
+            'image/png',
+            'image/jpeg',
+            'image/jpg',
+            'image/webp'
+         ]}
+         imageValidateSizeMinWidth={320}
+         imageValidateSizeMinHeight={240}
+         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
+      />
    )
 
    return { addPhoto, addPhotoComponent }

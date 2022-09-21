@@ -5,20 +5,20 @@ import { Link } from 'react-router-dom'
 import {
    GET_FILTERED_ANNOUNCEMENTS_COUNT,
    GET_USERS_ANNOUNCEMENTS
-} from '../../shared/utils/graphql'
+} from '../../../shared/utils/graphql'
 import {
    GetFilteredAnnouncementCountData,
    GetUsersAnnouncementCountVars,
    GetUsersAnnouncementsData,
    GetUsersAnnouncementsVars,
    UsersAnnouncement
-} from '../../shared/types'
+} from '../../../shared/types'
 import styles from './MyAnnouncements.module.scss'
-import { getImageBySize } from '../../shared/utils/utils'
-import PagesBar from '../Navbar/PagesBar'
-import loader from '../../images/fading-balls.png'
-import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
-import useGetUser from "../../shared/hooks/useGetUser";
+import { getImageBySize } from '../../../shared/utils/utils'
+import PagesBar from '../PagesBar'
+import loader from '../../../images/fading-balls.png'
+import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
+import useGetUser from "../../../shared/hooks/useGetUser";
 
 const MyAnnouncements = () => {
    const [firstTimeLoaded, setFirstTimeLoaded] = useState(false)

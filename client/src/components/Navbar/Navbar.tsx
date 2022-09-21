@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 import { useAuth } from '../../context/context'
@@ -8,7 +8,7 @@ import { signOut } from '../../context/reducer'
 import tokenService from '../../shared/utils/token.service'
 import { LOGOUT } from '../../shared/utils/graphql'
 import styles from './Navbar.module.scss'
-import MyAnnouncements from '../MyAnnouncements/MyAnnouncements'
+import MyAnnouncements from './MyAnnouncements/MyAnnouncements'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import useWindowSize from '../../shared/hooks/useWindowDimensions'
 
@@ -20,7 +20,7 @@ const Navbar = () => {
    const [isMyAnnouncementsShown, setIsMyAnnouncementsShown] = useState(false)
    const [isMessageShown, setIsMessageShown] = useState(false)
    const [isMobile, setIsMobile] = useState<boolean>(
-      (useWindowSize().width || 1000) <= 768
+      (width || 1000) <= 768
    )
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -40,7 +40,7 @@ const Navbar = () => {
       setIsMobileMenuOpen(false)
    }, [location])
    // Change isMobile, when width changes
-   useDidMountEffect(() => {
+   useEffect(() => {
       setIsMobile((width || 0) <= 768)
    }, [width])
    // Close unwanted menus, when isMobile changes
