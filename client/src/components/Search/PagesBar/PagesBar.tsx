@@ -1,5 +1,7 @@
-import { Button, HStack } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import { Dispatch, SetStateAction } from 'react'
+
+import styles from './PagesBar.module.scss'
 
 type Props = {
    count: number
@@ -41,7 +43,7 @@ const PagesBar = ({
    }
 
    return (
-      <HStack>
+      <div className={styles.container}>
          {count && (
             <div>
                {selectedPage > 1 && (
@@ -74,7 +76,7 @@ const PagesBar = ({
                )}
             </div>
          )}
-      </HStack>
+      </div>
    )
 }
 

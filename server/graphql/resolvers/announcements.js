@@ -125,7 +125,7 @@ export default {
             async function (err, a) {
                await User.updateOne(
                   {
-                     _id: a.user
+                     _id: a.user // TODO: bug
                   },
                   { $push: { myAnnouncements: a._id } }
                )

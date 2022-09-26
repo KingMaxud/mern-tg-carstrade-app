@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { Button, Input, Textarea } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom'
 
 import useAddPhoto from '../../shared/hooks/useAddPhoto'
 import {
@@ -37,7 +38,7 @@ import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 const AddAnnouncement = () => {
    const width = useWindowSize().width
 
-   const [announcementLoading, setAnnouncementLoading] = useState(true)
+   const [announcementLoading, setAnnouncementLoading] = useState(false)
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
    const [generationsData, setGenerationsData] = useState<GenerationsData>({
@@ -52,6 +53,7 @@ const AddAnnouncement = () => {
 
    const { addPhoto, addPhotoComponent } = useAddPhoto()
    const { getUserId } = useGetUser()
+   const navigate = useNavigate()
 
    // Load marks immediately
    useQuery<MarksData>(GET_MARKS, {
@@ -105,6 +107,7 @@ const AddAnnouncement = () => {
       },
       validationSchema: AddGenerationSchema,
       onSubmit: async values => {
+         setAnnouncementLoading(true)
          const photoUrl = await addPhoto()
          addAnnouncement({
             variables: {
@@ -128,7 +131,6 @@ const AddAnnouncement = () => {
                phoneNumber: '123456789'
             }
          })
-         setAnnouncementLoading(true)
       }
    })
 
@@ -182,6 +184,7 @@ const AddAnnouncement = () => {
    >(ADD_ANNOUNCEMENT, {
       update() {
          setAnnouncementLoading(false)
+         navigate('/search')
       }
    })
 
@@ -233,11 +236,17 @@ const AddAnnouncement = () => {
       return 'default'
    }
 
+   // TODO: select mark, model, generation errors issue
+
    return (
       <div className={styles.container}>
+         <div
+            className={`${styles.loadingLayout} ${
+               announcementLoading && styles.displayed
+            }`}>
+            <p>Your announcement is publishing, wait...</p>
+         </div>
          <form onSubmit={formik.handleSubmit}>
-
-            {/*TODO: first three selects status*/}
             <Select
                value={formik.values.mark}
                status={isSelected('mark')}
@@ -447,7 +456,7 @@ const AddAnnouncement = () => {
             />
 
             <label htmlFor="modelName" className={styles.photoLabel}>
-               Photo:{' '}
+               Photo:
             </label>
             {addPhotoComponent}
             <Button

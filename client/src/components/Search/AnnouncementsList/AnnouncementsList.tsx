@@ -1,5 +1,4 @@
-import { Box } from '@chakra-ui/react'
-
+import styles from './AnnouncementList.module.scss'
 import { Announcement } from '../../../shared/types'
 import AnnouncementCard from './AnnouncementCard'
 
@@ -9,11 +8,11 @@ type Props = {
 
 const AnnouncementsList = ({ announcements }: Props) => {
    return (
-      <Box>
+      <div className={styles.container}>
          {announcements.map(a => (
             <AnnouncementCard key={a._id} a={a} />
          ))}
-      </Box>
+      </div>
    )
 }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useLazyQuery } from '@apollo/client'
+import Select from '../shared/Select'
 import { createSearchParams, useNavigate } from 'react-router-dom'
-import { Select } from '@chakra-ui/react'
 
 import {
    Announcement,
@@ -18,11 +18,12 @@ import {
    GET_FILTERED_ANNOUNCEMENTS_COUNT
 } from '../../shared/utils/graphql'
 import AnnouncementsList from './AnnouncementsList/AnnouncementsList'
-import PagesBar from './PagesBar'
+import PagesBar from './PagesBar/PagesBar'
 import AdvancedFilter from './AdvancedFilter/AdvancedFilter'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import { getSessionStorageOrDefault } from '../../shared/utils/utils'
 import { sortMethods } from '../../shared/data'
+import styles from './Search.module.scss'
 
 const Search = () => {
    const navigate = useNavigate()
@@ -137,7 +138,7 @@ const Search = () => {
    }
 
    return (
-      <div>
+      <div className={styles.container}>
          <AdvancedFilter
             params={params}
             setParams={setParams}
@@ -148,17 +149,23 @@ const Search = () => {
             loadAnnouncementTrigger={loadAnnouncementTrigger}
             setLoadAnnouncementTrigger={setLoadAnnouncementTrigger}
          />
-         <Select
-            value={sortMethod ? sortMethod.description : 'Latest offers first'}
-            onChange={handleSortMethodSelection}>
-            {sortMethods.map(s => (
-               <option
-                  key={s.description}
-                  value={s.description}
-                  label={s.description}
-               />
-            ))}
-         </Select>
+         <div className={styles.sortSelector}>
+            <p>There are {count} offers for your search</p>
+            <Select
+               status="default"
+               value={
+                  sortMethod ? sortMethod.description : 'Latest offers first'
+               }
+               onChange={handleSortMethodSelection}>
+               {sortMethods.map(s => (
+                  <option
+                     key={s.description}
+                     value={s.description}
+                     label={s.description}
+                  />
+               ))}
+            </Select>
+         </div>
          <AnnouncementsList announcements={announcements} />
          <PagesBar
             count={count}

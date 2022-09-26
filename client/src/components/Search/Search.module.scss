@@ -1,0 +1,34 @@
+.container {
+   display: grid;
+   grid-template-areas:
+      'filter sort'
+      'filter list'
+      'filter bar';
+   gap: 0 2rem;
+   grid-template-columns: min-content min-content;
+   grid-template-rows: min-content min-content min-content;
+   justify-content: center;
+   background: #f4f4f4;
+   font-family: 'Poppins', sans-serif;
+}
+
+.sortSelector {
+   margin-top: 2rem;
+   padding: 0.5rem 0.5rem;
+   grid-area: sort;
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+   background: #ffffff;
+   height: 4.75rem;
+
+   p {
+      padding: 0.75rem;
+      font-size: 1.5rem;
+   }
+
+   select {
+      margin-right: 1rem;
+   }
+}

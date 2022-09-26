@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Checkbox, FormLabel, Select, Box } from '@chakra-ui/react'
+import { Checkbox, FormLabel, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
 
@@ -37,6 +37,9 @@ import {
 } from '../../../shared/utils/graphql'
 import useCustomSearchParams from '../../../shared/hooks/useCustomSearchParams'
 import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
+import styles from './AdvancedFilter.module.scss'
+import Select from '../../shared/Select'
+import CheckboxSelect from '../../shared/CheckboxSelect'
 
 type Props = {
    params: SearchParams
@@ -333,11 +336,21 @@ const AdvancedFilter = ({
       return value
    })()
 
+   // selected, default
+   const isSelected = (key: keyof typeof params) => {
+      if (params[key]) {
+         return 'selected'
+      } else {
+         return 'default'
+      }
+   }
    return (
-      <div>
+      <div className={styles.container}>
          {ifParamsParsed && (
-            <div>
+            <div className={styles.wrapper}>
+               <label htmlFor="condition">Condition</label>
                <Select
+                  status={isSelected('condition')}
                   value={conditionDefaultValue}
                   id="condition"
                   onChange={handleConditionSelection}>
@@ -346,9 +359,11 @@ const AdvancedFilter = ({
                   <option value="New" label="New" />
                </Select>
 
+               <label htmlFor="mark">Mark</label>
                {marksData.getMarks.length > 0 ? (
                   <Select
                      value={params.mark || ''}
+                     status={isSelected('mark')}
                      id="mark"
                      onChange={e => {
                         handleSelection(e, 'mark')
@@ -359,15 +374,17 @@ const AdvancedFilter = ({
                      ))}
                   </Select>
                ) : (
-                  <Select id="mark">
+                  <Select id="mark" onChange={e => {}} status="default">
                      <option value="" label={'All marks'} />
                   </Select>
                )}
 
+               <label htmlFor="model">Model</label>
                {modelsData && modelsData.getModels.length > 0 ? (
                   <Select
                      value={params.model || ''}
                      id="model"
+                     status={isSelected('model')}
                      onChange={e => {
                         handleSelection(e, 'model')
                      }}>
@@ -377,7 +394,7 @@ const AdvancedFilter = ({
                      ))}
                   </Select>
                ) : (
-                  <Select id="model">
+                  <Select onChange={e => {}} status="default" id="model">
                      <option value="" label={'All models'} />
                   </Select>
                )}
@@ -394,162 +411,174 @@ const AdvancedFilter = ({
                      </Checkbox>
                   ))}
 
-               <FormLabel htmlFor="bodyStyle">Select Body Style:</FormLabel>
-               <Box key={`${params.bodyStyle?.length} bodyStyle`}>
-                  {bodyStyles.map(b => (
-                     <Checkbox
-                        isChecked={params.bodyStyle?.includes(b)}
-                        onChange={() => handleCheckbox('bodyStyle', b)}
-                        key={b}>
-                        {b}
-                     </Checkbox>
-                  ))}
-               </Box>
+               <label htmlFor="bodyStyle">Body Style</label>
+               <CheckboxSelect
+                  values={bodyStyles}
+                  handleCheckbox={handleCheckbox}
+                  params={params}
+               />
 
-               <Select
-                  value={params.minYear || ''}
-                  onChange={e => handleSelection(e, 'minYear')}>
-                  <option value="" label={'Year from'} />
-                  {yearsFrom.map(year => (
-                     <option value={year} label={year.toString()} key={year} />
-                  ))}
-               </Select>
-               <Select
-                  value={params.maxYear || ''}
-                  onChange={e => handleSelection(e, 'maxYear')}>
-                  <option value="" label={'To'} />
-                  {yearsTo.map(year => (
-                     <option value={year} label={year.toString()} key={year} />
-                  ))}
-               </Select>
+               <label htmlFor="minYear">Year</label>
+               <div className={styles.selectWrapper}>
+                  <Select
+                     value={params.minYear || ''}
+                     status={isSelected('minYear')}
+                     onChange={e => handleSelection(e, 'minYear')}>
+                     <option value="" label={'From'} />
+                     {yearsFrom.map(year => (
+                        <option
+                           value={year}
+                           label={year.toString()}
+                           key={year}
+                        />
+                     ))}
+                  </Select>
+                  <Select
+                     value={params.maxYear || ''}
+                     status={isSelected('maxYear')}
+                     onChange={e => handleSelection(e, 'maxYear')}>
+                     <option value="" label={'To'} />
+                     {yearsTo.map(year => (
+                        <option
+                           value={year}
+                           label={year.toString()}
+                           key={year}
+                        />
+                     ))}
+                  </Select>
+               </div>
 
-               <Select
-                  value={params.minPrice || ''}
-                  onChange={e => handleSelection(e, 'minPrice')}>
-                  <option value="" label={'Price from'} />
-                  {pricesFrom.map(price => (
-                     <option
-                        value={price}
-                        label={price.toString()}
-                        key={price}
-                     />
-                  ))}
-               </Select>
-               <Select
-                  value={params.maxPrice || ''}
-                  onChange={e => handleSelection(e, 'maxPrice')}>
-                  <option value="" label={'To'} />
-                  {pricesTo.map(price => (
-                     <option
-                        value={price}
-                        label={price.toString()}
-                        key={price}
-                     />
-                  ))}
-               </Select>
+               <label>Price</label>
+               <div className={styles.selectWrapper}>
+                  <Select
+                     value={params.minPrice || ''}
+                     status={isSelected('minPrice')}
+                     onChange={e => handleSelection(e, 'minPrice')}>
+                     <option value="" label={'From'} />
+                     {pricesFrom.map(price => (
+                        <option
+                           value={price}
+                           label={price.toString()}
+                           key={price}
+                        />
+                     ))}
+                  </Select>
+                  <Select
+                     value={params.maxPrice || ''}
+                     status={isSelected('maxPrice')}
+                     onChange={e => handleSelection(e, 'maxPrice')}>
+                     <option value="" label={'To'} />
+                     {pricesTo.map(price => (
+                        <option
+                           value={price}
+                           label={price.toString()}
+                           key={price}
+                        />
+                     ))}
+                  </Select>
+               </div>
 
-               <Select
-                  value={params.minMileage || ''}
-                  onChange={e => handleSelection(e, 'minMileage')}>
-                  <option value="" label={'Mileage from'} />
-                  {mileagesFrom.map(mileage => (
-                     <option
-                        value={mileage}
-                        label={mileage.toString()}
-                        key={mileage}
-                     />
-                  ))}
-               </Select>
-               <Select
-                  value={params.maxMileage || ''}
-                  onChange={e => handleSelection(e, 'maxMileage')}>
-                  <option value="" label={'To'} />
-                  {mileagesTo.map(mileage => (
-                     <option
-                        value={mileage}
-                        label={mileage.toString()}
-                        key={mileage}
-                     />
-                  ))}
-               </Select>
+               <label>Mileage</label>
+               <div className={styles.selectWrapper}>
+                  <Select
+                     value={params.minMileage || ''}
+                     status={isSelected('minMileage')}
+                     onChange={e => handleSelection(e, 'minMileage')}>
+                     <option value="" label={'From'} />
+                     {mileagesFrom.map(mileage => (
+                        <option
+                           value={mileage}
+                           label={mileage.toString()}
+                           key={mileage}
+                        />
+                     ))}
+                  </Select>
+                  <Select
+                     value={params.maxMileage || ''}
+                     status={isSelected('maxMileage')}
+                     onChange={e => handleSelection(e, 'maxMileage')}>
+                     <option value="" label={'To'} />
+                     {mileagesTo.map(mileage => (
+                        <option
+                           value={mileage}
+                           label={mileage.toString()}
+                           key={mileage}
+                        />
+                     ))}
+                  </Select>
+               </div>
 
-               <Box key={`${params.color?.length} color`}>
-                  {colors.map(b => (
-                     <Checkbox
-                        key={b.hex}
-                        isChecked={params.color?.includes(b.color)}
-                        onChange={() => handleCheckbox('color', b.color)}>
-                        {b.color}
-                     </Checkbox>
-                  ))}
-               </Box>
+               <label htmlFor="color">Color</label>
+               <CheckboxSelect
+                  values={colors.map(c => c.color)}
+                  handleCheckbox={handleCheckbox}
+                  params={params}
+               />
 
-               <Box key={`${params.transmission?.length} transmission`}>
-                  {transmission.map(t => (
-                     <Checkbox
-                        key={t}
-                        isChecked={params.transmission?.includes(t)}
-                        onChange={() => handleCheckbox('transmission', t)}>
-                        {t}
-                     </Checkbox>
-                  ))}
-               </Box>
+               <label htmlFor="transmission">Transmission</label>
+               <CheckboxSelect
+                  values={transmission}
+                  handleCheckbox={handleCheckbox}
+                  params={params}
+               />
 
-               <Box key={`${params.fuelType?.length} fuelType`}>
-                  {fuelTypes.map(t => (
-                     <Checkbox
-                        key={t}
-                        isChecked={params.fuelType?.includes(t)}
-                        onChange={() => handleCheckbox('fuelType', t)}>
-                        {t}
-                     </Checkbox>
-                  ))}
-               </Box>
+               <label htmlFor="fuelType">Fuel Type</label>
+               <CheckboxSelect
+                  values={fuelTypes}
+                  handleCheckbox={handleCheckbox}
+                  params={params}
+               />
 
-               <Box key={`${params.driveInit?.length} driveInit`}>
-                  {driveInits.map(d => (
-                     <Checkbox
-                        key={d}
-                        isChecked={params.driveInit?.includes(d)}
-                        onChange={() => handleCheckbox('driveInit', d)}>
-                        {d}
-                     </Checkbox>
-                  ))}
-               </Box>
+               <label htmlFor="driveInit">Drive Init</label>
+               <CheckboxSelect
+                  values={driveInits}
+                  handleCheckbox={handleCheckbox}
+                  params={params}
+               />
 
-               <Select
-                  value={params.minEngineCapacity || ''}
-                  onChange={e => handleSelection(e, 'minEngineCapacity')}>
-                  <option value="" label={'Engine Capacity from'} />
-                  {engineCapacitiesFrom.map(e => (
-                     <option value={e} label={e.toString()} key={e} />
-                  ))}
-               </Select>
-               <Select
-                  value={params.maxEngineCapacity || ''}
-                  onChange={e => handleSelection(e, 'maxEngineCapacity')}>
-                  <option value="" label={'To'} />
-                  {engineCapacitiesTo.map(e => (
-                     <option value={e} label={e.toString()} key={e} />
-                  ))}
-               </Select>
+               <label>Engine Capacity</label>
+               <div className={styles.selectWrapper}>
+                  <Select
+                     value={params.minEngineCapacity || ''}
+                     status={isSelected('minEngineCapacity')}
+                     onChange={e => handleSelection(e, 'minEngineCapacity')}>
+                     <option value="" label={'From'} />
+                     {engineCapacitiesFrom.map(e => (
+                        <option value={e} label={e.toString()} key={e} />
+                     ))}
+                  </Select>
+                  <Select
+                     value={params.maxEngineCapacity || ''}
+                     status={isSelected('maxEngineCapacity')}
+                     onChange={e => handleSelection(e, 'maxEngineCapacity')}>
+                     <option value="" label={'To'} />
+                     {engineCapacitiesTo.map(e => (
+                        <option value={e} label={e.toString()} key={e} />
+                     ))}
+                  </Select>
+               </div>
 
-               <Select
-                  value={params.minPower || ''}
-                  onChange={e => handleSelection(e, 'minPower')}>
-                  <option value="" label={'Power from'} />
-                  {powersFrom.map(p => (
-                     <option value={p} label={p.toString()} key={p} />
-                  ))}
-               </Select>
-               <Select
-                  value={params.maxPower || ''}
-                  onChange={e => handleSelection(e, 'maxPower')}>
-                  <option value="" label={'To'} />
-                  {powersTo.map(p => (
-                     <option value={p} label={p.toString()} key={p} />
-                  ))}
-               </Select>
+               <label>Power</label>
+               <div className={styles.selectWrapper}>
+                  <Select
+                     value={params.minPower || ''}
+                     status={isSelected('minPower')}
+                     onChange={e => handleSelection(e, 'minPower')}>
+                     <option value="" label={'From'} />
+                     {powersFrom.map(p => (
+                        <option value={p} label={p.toString()} key={p} />
+                     ))}
+                  </Select>
+                  <Select
+                     value={params.maxPower || ''}
+                     status={isSelected('maxPower')}
+                     onChange={e => handleSelection(e, 'maxPower')}>
+                     <option value="" label={'To'} />
+                     {powersTo.map(p => (
+                        <option value={p} label={p.toString()} key={p} />
+                     ))}
+                  </Select>
+               </div>
             </div>
          )}
       </div>

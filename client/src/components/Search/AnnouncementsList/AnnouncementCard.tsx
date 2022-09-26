@@ -4,6 +4,7 @@ import { Skeleton } from '@chakra-ui/react'
 
 import { Announcement } from '../../../shared/types'
 import { getImageBySize } from '../../../shared/utils/utils'
+import styles from './AnnouncementCard.module.scss'
 
 const AnnouncementCard = ({ a }: { a: Announcement }) => {
    const img = a.photos[0]
@@ -12,6 +13,7 @@ const AnnouncementCard = ({ a }: { a: Announcement }) => {
 
    return (
       <Link
+         className={styles.container}
          to={`/vehicledetails/${a._id}`}
          key={a._id}
          onClick={() =>
@@ -20,13 +22,15 @@ const AnnouncementCard = ({ a }: { a: Announcement }) => {
                JSON.stringify(Math.round(window.scrollY))
             )
          }>
-         {showImageSkeleton && <Skeleton height="180px" width="240px" />}
-         <img
-            src={imageUrl}
-            alt={`${a.mark} ${a.model}`}
-            onLoad={() => setShowImageSkeleton(false)}
-            style={{ display: showImageSkeleton ? 'none' : 'block' }}
-         />
+         <div className={styles.wrapper}>
+            {showImageSkeleton && <Skeleton height="180px" width="240px" />}
+            <img
+               src={imageUrl}
+               alt={`${a.mark} ${a.model}`}
+               onLoad={() => setShowImageSkeleton(false)}
+               style={{ display: showImageSkeleton ? 'none' : 'block' }}
+            />
+         </div>
       </Link>
    )
 }
