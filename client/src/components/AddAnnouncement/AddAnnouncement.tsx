@@ -188,6 +188,13 @@ const AddAnnouncement = () => {
       }
    })
 
+   const resetValues = () => {
+      setYears([])
+      setBodyStyles([])
+      formik.setFieldValue('year', '')
+      formik.setFieldValue('bodyStyle', '')
+   }
+
    const handleMarkSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       formik.setFieldValue('mark', e.target.value)
       formik.setFieldValue('model', '')
@@ -195,6 +202,7 @@ const AddAnnouncement = () => {
          getModels: []
       })
       formik.setFieldValue('generation', '')
+      resetValues()
       setGenerationsData({
          getGenerations: []
       })
@@ -202,11 +210,13 @@ const AddAnnouncement = () => {
    const handleModelSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
       formik.setFieldValue('model', e.target.value)
       formik.setFieldValue('generation', '')
+      resetValues()
    }
    const handleGenerationSelection = (
       e: React.ChangeEvent<HTMLSelectElement>
    ) => {
       formik.setFieldValue('generation', e.target.value)
+      resetValues()
       generationsData.getGenerations.map(g => {
          if (g.name === e.target.value) {
             // Set available body styles and years
@@ -236,6 +246,8 @@ const AddAnnouncement = () => {
       return 'default'
    }
 
+   console.log(formik.values)
+
    // TODO: select mark, model, generation errors issue
 
    return (
@@ -259,6 +271,7 @@ const AddAnnouncement = () => {
             </Select>
 
             <Select
+               disabled={!modelsData.getModels.length}
                value={formik.values.model}
                status={isSelected('model')}
                id="model"
@@ -275,6 +288,7 @@ const AddAnnouncement = () => {
 
             <Select
                value={formik.values.generation}
+               disabled={!generationsData.getGenerations.length}
                status={isSelected('generation')}
                id="generation"
                onChange={handleGenerationSelection}>
@@ -291,6 +305,7 @@ const AddAnnouncement = () => {
             </Select>
 
             <Select
+               disabled={!formik.values.generation}
                onChange={formik.handleChange}
                status={isSelected('year')}
                id="year">
@@ -301,6 +316,7 @@ const AddAnnouncement = () => {
             </Select>
 
             <Select
+               disabled={!formik.values.generation}
                onChange={formik.handleChange}
                status={isSelected('bodyStyle')}
                id="bodyStyle">

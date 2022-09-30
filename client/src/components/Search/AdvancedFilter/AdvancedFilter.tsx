@@ -7,6 +7,7 @@ import {
    CheckboxKeys,
    Generation,
    GenerationsData,
+   GenerationsFilterArray,
    GenerationsVars,
    MarksData,
    ModelsData,
@@ -40,6 +41,7 @@ import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
 import styles from './AdvancedFilter.module.scss'
 import Select from '../../shared/Select'
 import CheckboxSelect from '../../shared/CheckboxSelect'
+import CheckboxSelectGeneration from './CheckboxSelectGeneration/CheckboxSelectGeneration'
 
 type Props = {
    params: SearchParams
@@ -65,11 +67,6 @@ const AdvancedFilter = ({
    const [search] = useCustomSearchParams()
    let location = useLocation()
    const navigate = useNavigate()
-
-   type GenerationsFilterArray = {
-      generation: Generation
-      isChecked: boolean
-   }
 
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [marksLoading, setMarksLoading] = useState(false)
@@ -344,6 +341,7 @@ const AdvancedFilter = ({
          return 'default'
       }
    }
+
    return (
       <div className={styles.container}>
          {ifParamsParsed && (
@@ -359,63 +357,55 @@ const AdvancedFilter = ({
                   <option value="New" label="New" />
                </Select>
 
-               <label htmlFor="mark">Mark</label>
-               {marksData.getMarks.length > 0 ? (
-                  <Select
-                     value={params.mark || ''}
-                     status={isSelected('mark')}
-                     id="mark"
-                     onChange={e => {
-                        handleSelection(e, 'mark')
-                     }}>
-                     <option value="" label={'All marks'} />
-                     {marksData.getMarks.map(m => (
-                        <option value={m.name} label={m.name} key={m._id} />
-                     ))}
-                  </Select>
-               ) : (
-                  <Select id="mark" onChange={e => {}} status="default">
-                     <option value="" label={'All marks'} />
-                  </Select>
-               )}
+               <label htmlFor="model">Mark</label>
+               <Select
+                  disabled={!marksData.getMarks.length}
+                  value={params.mark || ''}
+                  status={isSelected('mark')}
+                  id="mark"
+                  onChange={e => {
+                     handleSelection(e, 'mark')
+                  }}>
+                  <option value="" label={'All marks'} />
+                  {marksData.getMarks.map(m => (
+                     <option value={m.name} label={m.name} key={m._id} />
+                  ))}
+               </Select>
 
                <label htmlFor="model">Model</label>
-               {modelsData && modelsData.getModels.length > 0 ? (
-                  <Select
-                     value={params.model || ''}
-                     id="model"
-                     status={isSelected('model')}
-                     onChange={e => {
-                        handleSelection(e, 'model')
-                     }}>
-                     <option value="" label={'All models'} />
-                     {modelsData.getModels.map(m => (
-                        <option value={m.name} label={m.name} key={m._id} />
-                     ))}
-                  </Select>
-               ) : (
-                  <Select onChange={e => {}} status="default" id="model">
-                     <option value="" label={'All models'} />
-                  </Select>
-               )}
-
-               {generationsData &&
-                  generationsData.map(g => (
-                     <Checkbox
-                        isChecked={g.isChecked}
-                        onChange={() =>
-                           handleCheckbox('generation', g.generation.name)
-                        }
-                        key={g.generation._id}>
-                        {g.generation.name}
-                     </Checkbox>
+               <Select
+                  disabled={!modelsData.getModels.length}
+                  value={params.model || ''}
+                  id="model"
+                  status={isSelected('model')}
+                  onChange={e => {
+                     handleSelection(e, 'model')
+                  }}>
+                  <option value="" label={'All models'} />
+                  {modelsData.getModels.map(m => (
+                     <option value={m.name} label={m.name} key={m._id} />
                   ))}
+               </Select>
+
+               <label htmlFor="generation">Generation</label>
+               <CheckboxSelectGeneration
+                  text={
+                     !params.generation || params.generation.length === 0
+                        ? 'All'
+                        : params.generation.join(', ')
+                  }
+                  generationsData={generationsData}
+                  disabled={generationsData.length === 0}
+                  handleCheckbox={handleCheckbox}
+               />
 
                <label htmlFor="bodyStyle">Body Style</label>
                <CheckboxSelect
+                  keyName="bodyStyle"
                   values={bodyStyles}
                   handleCheckbox={handleCheckbox}
                   params={params}
+                  text={params.bodyStyle ? params.bodyStyle.join(', ') : 'All'}
                />
 
                <label htmlFor="minYear">Year</label>
@@ -510,30 +500,42 @@ const AdvancedFilter = ({
 
                <label htmlFor="color">Color</label>
                <CheckboxSelect
+                  keyName="color"
                   values={colors.map(c => c.color)}
                   handleCheckbox={handleCheckbox}
                   params={params}
+                  text={params.color ? params.color.join(', ') : 'All'}
                />
 
                <label htmlFor="transmission">Transmission</label>
                <CheckboxSelect
+                  keyName="transmission"
                   values={transmission}
                   handleCheckbox={handleCheckbox}
                   params={params}
+                  text={
+                     params.transmission
+                        ? params.transmission.join(', ')
+                        : 'All'
+                  }
                />
 
                <label htmlFor="fuelType">Fuel Type</label>
                <CheckboxSelect
+                  keyName="fuelType"
                   values={fuelTypes}
                   handleCheckbox={handleCheckbox}
                   params={params}
+                  text={params.fuelType ? params.fuelType.join(', ') : 'All'}
                />
 
                <label htmlFor="driveInit">Drive Init</label>
                <CheckboxSelect
+                  keyName="driveInit"
                   values={driveInits}
                   handleCheckbox={handleCheckbox}
                   params={params}
+                  text={params.driveInit ? params.driveInit.join(', ') : 'All'}
                />
 
                <label>Engine Capacity</label>

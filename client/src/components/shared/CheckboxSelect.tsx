@@ -5,12 +5,20 @@ import styles from './CheckboxSelect.module.scss'
 import { CheckboxKeys, SearchParams } from '../../shared/types'
 
 type Props = {
+   keyName: CheckboxKeys
    values: string[]
    params: SearchParams
    handleCheckbox: (key: CheckboxKeys, value: string) => void
+   text: string
 }
 
-const CheckboxSelect = ({ values, params, handleCheckbox }: Props) => {
+const CheckboxSelect = ({
+   keyName,
+   values,
+   params,
+   handleCheckbox,
+   text
+}: Props) => {
    const [isOpen, setIsOpen] = useState(false)
 
    const ref = useRef<HTMLDivElement>(null)
@@ -27,16 +35,14 @@ const CheckboxSelect = ({ values, params, handleCheckbox }: Props) => {
       }
    })
 
-   // TODO: Fix bug with search params and checkbox interaction
-   // TODO: Change selector text when something is selected
    return (
       <div className={styles.container}>
          <div
-            className={`${styles.selector} ${isOpen && styles.open}`}
+            className={`${styles.selector} ${isOpen && styles.openSelector}`}
             onClick={() => {
                setIsOpen(true)
             }}>
-            <p>All</p>
+            <p>{text}</p>
             <i>
                <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -58,8 +64,8 @@ const CheckboxSelect = ({ values, params, handleCheckbox }: Props) => {
                {values.map(v => (
                   <Checkbox
                      className={styles.checkbox}
-                     isChecked={params.bodyStyle?.includes(v)}
-                     onChange={() => handleCheckbox('bodyStyle', v)}
+                     isChecked={!!params[keyName]?.includes(v)}
+                     onChange={() => handleCheckbox(keyName, v)}
                      key={v}>
                      {v}
                   </Checkbox>

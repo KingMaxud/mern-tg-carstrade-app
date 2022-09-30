@@ -20,7 +20,7 @@ export type Generation = {
    bodyStyles: string[]
    startYear: number
    endYear: number
-   photo: string
+   photoUrl: string
    _id: string
 }
 export type GenerationsData = {
@@ -210,4 +210,9 @@ export type GetUsersAnnouncementCountVars = {
    filter: {
       user: string
    }
+}
+
+export type GenerationsFilterArray = {
+   generation: Generation
+   isChecked: boolean
 }
