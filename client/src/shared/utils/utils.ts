@@ -12,3 +12,19 @@ export function getImageBySize(img: string, width: number, height: number) {
 
    return stringStart.concat(widthAndHeight, stringEnd)
 }
+
+export function reverseString(str: string): string {
+   return str.split('').reverse().join('') || ''
+}
+
+export function divideByThreeChars(str: string) {
+   const arr = reverseString(str).match(/.{1,3}/g)
+   const temp = (() => {
+      if (arr) {
+         return arr.join(' ')
+      } else {
+         return ''
+      }
+   })()
+   return reverseString(temp)
+}

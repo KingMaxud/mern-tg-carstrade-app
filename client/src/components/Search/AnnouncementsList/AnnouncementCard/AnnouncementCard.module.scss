@@ -1,0 +1,113 @@
+.container {
+   background: #ffffff;
+   margin-bottom: 1rem;
+   display: grid;
+   grid-template-areas:
+      'name name name price'
+      'imageBlock condition transmission fuelType'
+      'imageBlock mileage year engineCapacity';
+
+   p {
+      font-size: 1.125rem;
+      justify-self: center;
+      align-self: center;
+   }
+
+   .imageBlock {
+      justify-self: center;
+      align-self: center;
+      padding-left: 0.875rem;
+      grid-area: imageBlock;
+      width: 240px;
+      height: 180px;
+      border-radius: 0.375rem;
+
+      img {
+         border-radius: 0.375rem;
+      }
+   }
+
+   .name {
+      grid-area: name;
+      font-size: 1.375rem;
+      margin: 0.25rem 0;
+   }
+
+   .price {
+      grid-area: price;
+      font-size: 1.375rem;
+   }
+
+   .condition {
+      grid-area: condition;
+   }
+
+   .transmission {
+      grid-area: transmission;
+   }
+
+   .fuelType {
+      grid-area: fuelType;
+   }
+
+   .mileage {
+      grid-area: mileage;
+      white-space: nowrap;
+   }
+
+   .year {
+      grid-area: year;
+   }
+
+   .engineCapacity {
+      grid-area: engineCapacity;
+   }
+}
+
+@media (min-width: 480px) and (max-width: 600px) {
+   .container {
+      grid-template-areas:
+         'name name price'
+         'imageBlock mileage fuelType'
+         'imageBlock year transmission';
+
+      p {
+         font-size: 1rem;
+      }
+
+      .name {
+         font-size: 1.125rem;
+      }
+
+      .price {
+         font-size: 1.125rem;
+      }
+
+      .condition {
+         display: none;
+      }
+
+      .engineCapacity {
+         display: none;
+      }
+   }
+}
+
+@media (max-width: 480px) {
+   .container {
+      grid-template-areas:
+         'name name'
+         'price price'
+         'imageBlock imageBlock'
+         'mileage fuelType'
+         'year transmission';
+
+      .condition {
+         display: none;
+      }
+
+      .engineCapacity {
+         display: none;
+      }
+   }
+}

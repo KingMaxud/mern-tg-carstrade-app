@@ -246,10 +246,6 @@ const AddAnnouncement = () => {
       return 'default'
    }
 
-   console.log(formik.values)
-
-   // TODO: select mark, model, generation errors issue
-
    return (
       <div className={styles.container}>
          <div

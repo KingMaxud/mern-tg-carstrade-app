@@ -44,10 +44,12 @@ const PagesBar = ({
 
    return (
       <div className={styles.container}>
-         {count && (
+         {!!count && (
             <div>
                {selectedPage > 1 && (
                   <Button
+                     border="1px"
+                     borderColor="gray.500"
                      onClick={() => {
                         setPage(page - 1)
                         updateSearchParamsOnPageChanges(page - 1)
@@ -57,6 +59,13 @@ const PagesBar = ({
                )}
                {renderedButtonsValuesList.map(v => (
                   <Button
+                     border="1px"
+                     borderColor="gray.500"
+                     background={
+                        v === selectedPage
+                           ? 'rgba(255, 179, 25, 0.65)'
+                           : '#ffffff'
+                     }
                      onClick={() => {
                         setPage(v)
                         updateSearchParamsOnPageChanges(v)
@@ -67,6 +76,8 @@ const PagesBar = ({
                ))}
                {selectedPage !== pagesAmount && (
                   <Button
+                     border="1px"
+                     borderColor="gray.500"
                      onClick={() => {
                         setPage(page + 1)
                         updateSearchParamsOnPageChanges(page + 1)

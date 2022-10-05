@@ -1,10 +1,13 @@
 .container {
    grid-area: filter;
-   width: 24rem;
    margin-top: 2rem;
 }
 
 .wrapper {
+   width: 24rem;
+}
+
+.filterWrapper {
    background: #ffffff;
    padding: 1rem;
    display: flex;
@@ -23,4 +26,67 @@
    display: grid;
    grid-template-columns: 1fr 1fr;
    gap: 0 1rem;
+}
+
+.mobileHeader {
+   display: none;
+   p {
+      font-size: 1.5rem;
+   }
+
+   i {
+      cursor: pointer;
+      position: relative;
+      width: 1.125rem;
+   }
+}
+
+.overlay {
+   display: none;
+}
+
+@media (max-width: 1200px) {
+   .container {
+      display: none;
+      position: fixed;
+      z-index: 4;
+      top: 0;
+      margin-top: 0;
+   }
+
+   .wrapper {
+      height: calc(100vh);
+      overflow-y: scroll;
+   }
+
+   .open {
+      display: block;
+   }
+
+   .mobileHeader {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+   }
+}
+
+@media (min-width: 600px) and (max-width: 1200px) {
+   .overlay {
+      display: block;
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 100%;
+      background: #f4f4f4;
+      opacity: 0.7;
+      z-index: 1000;
+   }
+}
+
+@media (max-width: 600px) {
+   .wrapper {
+      width: 100vw;
+   }
 }

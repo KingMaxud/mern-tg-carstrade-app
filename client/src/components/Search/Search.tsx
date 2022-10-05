@@ -35,9 +35,11 @@ const Search = () => {
    )
    const [ifParamsParsed, setIfParamsParsed] = useState(false)
    const [announcements, setAnnouncements] = useState<Announcement[]>([])
+   const [announcementsLoading, setAnnouncementsLoading] = useState(true)
    const [firstLoaded, setFirstLoaded] = useState(false)
    const [page, setPage] = useState(1)
    const [loadAnnouncementTrigger, setLoadAnnouncementTrigger] = useState(false)
+   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
    const [loadAnnouncements] = useLazyQuery<
       GetAnnouncementsData,
@@ -45,6 +47,7 @@ const Search = () => {
    >(GET_ANNOUNCEMENTS, {
       onCompleted: data => {
          setAnnouncements(data.getAnnouncements)
+         setAnnouncementsLoading(false)
          setFirstLoaded(true)
       }
    })
@@ -79,6 +82,7 @@ const Search = () => {
             }
          }
 
+         setAnnouncementsLoading(true)
          loadAnnouncements({
             variables: {
                filter,
@@ -102,6 +106,11 @@ const Search = () => {
       window.scrollTo(0, getSessionStorageOrDefault('yScrollPosition', 0))
       sessionStorage.removeItem('yScrollPosition')
    }, [firstLoaded])
+
+   // Scroll to top when page changes
+   useDidMountEffect(() => {
+      window.scrollTo(0, 0)
+   }, [page])
 
    const updateSearchParamsOnPageChanges = (page: number) => {
       const temp: SearchParamsExtended = {
@@ -146,34 +155,46 @@ const Search = () => {
             setSortMethod={setSortMethod}
             ifParamsParsed={ifParamsParsed}
             setIfParamsParsed={setIfParamsParsed}
+            isMobileFilterOpen={isMobileFilterOpen}
+            setIsMobileFilterOpen={setIsMobileFilterOpen}
             loadAnnouncementTrigger={loadAnnouncementTrigger}
             setLoadAnnouncementTrigger={setLoadAnnouncementTrigger}
          />
-         <div className={styles.sortSelector}>
-            <p>There are {count} offers for your search</p>
-            <Select
-               status="default"
-               value={
-                  sortMethod ? sortMethod.description : 'Latest offers first'
-               }
-               onChange={handleSortMethodSelection}>
-               {sortMethods.map(s => (
-                  <option
-                     key={s.description}
-                     value={s.description}
-                     label={s.description}
-                  />
-               ))}
-            </Select>
+         <div className={styles.wrapper}>
+            <div className={styles.sortSelector}>
+               <p>There are {count} offers for your search</p>
+               <Select
+                  status="default"
+                  value={
+                     sortMethod ? sortMethod.description : 'Latest offers first'
+                  }
+                  onChange={handleSortMethodSelection}>
+                  {sortMethods.map(s => (
+                     <option
+                        key={s.description}
+                        value={s.description}
+                        label={s.description}
+                     />
+                  ))}
+               </Select>
+            </div>
+            <AnnouncementsList
+               announcements={announcements}
+               announcementsLoading={announcementsLoading}
+            />
+            <PagesBar
+               count={count}
+               selectedPage={page}
+               page={page}
+               setPage={setPage}
+               updateSearchParamsOnPageChanges={updateSearchParamsOnPageChanges}
+            />
          </div>
-         <AnnouncementsList announcements={announcements} />
-         <PagesBar
-            count={count}
-            selectedPage={page}
-            page={page}
-            setPage={setPage}
-            updateSearchParamsOnPageChanges={updateSearchParamsOnPageChanges}
-         />
+         <div
+            className={styles.mobileFilterFooter}
+            onClick={() => setIsMobileFilterOpen(true)}>
+            <p>Filter</p>
+         </div>
       </div>
    )
 }

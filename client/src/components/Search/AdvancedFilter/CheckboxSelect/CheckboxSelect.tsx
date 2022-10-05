@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { Checkbox, useOutsideClick } from '@chakra-ui/react'
 
 import styles from './CheckboxSelect.module.scss'
-import { CheckboxKeys, SearchParams } from '../../shared/types'
+import { CheckboxKeys, SearchParams } from '../../../../shared/types'
 
 type Props = {
    keyName: CheckboxKeys
@@ -38,7 +38,7 @@ const CheckboxSelect = ({
    return (
       <div className={styles.container}>
          <div
-            className={`${styles.selector} ${isOpen && styles.openSelector}`}
+            className={`${styles.selector} ${isOpen && styles.openSelector} ${(text !== 'All') && styles.selected}`}
             onClick={() => {
                setIsOpen(true)
             }}>

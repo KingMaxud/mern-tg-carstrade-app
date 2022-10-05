@@ -1,11 +1,9 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Checkbox, FormLabel, Box } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { createSearchParams, useLocation, useNavigate } from 'react-router-dom'
 
 import {
    CheckboxKeys,
-   Generation,
    GenerationsData,
    GenerationsFilterArray,
    GenerationsVars,
@@ -40,7 +38,7 @@ import useCustomSearchParams from '../../../shared/hooks/useCustomSearchParams'
 import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
 import styles from './AdvancedFilter.module.scss'
 import Select from '../../shared/Select'
-import CheckboxSelect from '../../shared/CheckboxSelect'
+import CheckboxSelect from './CheckboxSelect/CheckboxSelect'
 import CheckboxSelectGeneration from './CheckboxSelectGeneration/CheckboxSelectGeneration'
 
 type Props = {
@@ -50,6 +48,8 @@ type Props = {
    setSortMethod: Dispatch<SetStateAction<SortMethod | null>>
    ifParamsParsed: boolean
    setIfParamsParsed: Dispatch<SetStateAction<boolean>>
+   isMobileFilterOpen: boolean
+   setIsMobileFilterOpen: Dispatch<SetStateAction<boolean>>
    loadAnnouncementTrigger: boolean
    setLoadAnnouncementTrigger: Dispatch<SetStateAction<boolean>>
 }
@@ -61,6 +61,8 @@ const AdvancedFilter = ({
    setSortMethod,
    ifParamsParsed,
    setIfParamsParsed,
+   isMobileFilterOpen,
+   setIsMobileFilterOpen,
    setLoadAnnouncementTrigger,
    loadAnnouncementTrigger
 }: Props) => {
@@ -170,6 +172,14 @@ const AdvancedFilter = ({
    useEffect(() => {
       parseSearch()
    }, [location])
+
+   useEffect(() => {
+      if (isMobileFilterOpen) {
+         document.body.style.overflowY = 'hidden'
+      } else {
+         document.body.style.overflowY = 'visible'
+      }
+   }, [isMobileFilterOpen])
 
    // Load models when mark changes
    useDidMountEffect(() => {
@@ -343,246 +353,276 @@ const AdvancedFilter = ({
    }
 
    return (
-      <div className={styles.container}>
-         {ifParamsParsed && (
-            <div className={styles.wrapper}>
-               <label htmlFor="condition">Condition</label>
-               <Select
-                  status={isSelected('condition')}
-                  value={conditionDefaultValue}
-                  id="condition"
-                  onChange={handleConditionSelection}>
-                  <option value="Used & New" label="Used & New" />
-                  <option value="Used" label="Used" />
-                  <option value="New" label="New" />
-               </Select>
-
-               <label htmlFor="model">Mark</label>
-               <Select
-                  disabled={!marksData.getMarks.length}
-                  value={params.mark || ''}
-                  status={isSelected('mark')}
-                  id="mark"
-                  onChange={e => {
-                     handleSelection(e, 'mark')
-                  }}>
-                  <option value="" label={'All marks'} />
-                  {marksData.getMarks.map(m => (
-                     <option value={m.name} label={m.name} key={m._id} />
-                  ))}
-               </Select>
-
-               <label htmlFor="model">Model</label>
-               <Select
-                  disabled={!modelsData.getModels.length}
-                  value={params.model || ''}
-                  id="model"
-                  status={isSelected('model')}
-                  onChange={e => {
-                     handleSelection(e, 'model')
-                  }}>
-                  <option value="" label={'All models'} />
-                  {modelsData.getModels.map(m => (
-                     <option value={m.name} label={m.name} key={m._id} />
-                  ))}
-               </Select>
-
-               <label htmlFor="generation">Generation</label>
-               <CheckboxSelectGeneration
-                  text={
-                     !params.generation || params.generation.length === 0
-                        ? 'All'
-                        : params.generation.join(', ')
-                  }
-                  generationsData={generationsData}
-                  disabled={generationsData.length === 0}
-                  handleCheckbox={handleCheckbox}
-               />
-
-               <label htmlFor="bodyStyle">Body Style</label>
-               <CheckboxSelect
-                  keyName="bodyStyle"
-                  values={bodyStyles}
-                  handleCheckbox={handleCheckbox}
-                  params={params}
-                  text={params.bodyStyle ? params.bodyStyle.join(', ') : 'All'}
-               />
-
-               <label htmlFor="minYear">Year</label>
-               <div className={styles.selectWrapper}>
+      <div
+         className={`${styles.container} ${isMobileFilterOpen && styles.open}`}>
+         <div className={`${styles.wrapper}`}>
+            <div
+               className={styles.overlay}
+               onClick={() => setIsMobileFilterOpen(false)}
+            />
+            {ifParamsParsed && (
+               <div className={styles.filterWrapper}>
+                  <div className={styles.mobileHeader}>
+                     <p>Filter</p>
+                     <i onClick={() => setIsMobileFilterOpen(false)}>
+                        <svg
+                           xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 0 94.926 94.926">
+                           <path d="M55.931,47.463L94.306,9.09c0.826-0.827,0.826-2.167,0-2.994L88.833,0.62C88.436,0.224,87.896,0,87.335,0   c-0.562,0-1.101,0.224-1.498,0.62L47.463,38.994L9.089,0.62c-0.795-0.795-2.202-0.794-2.995,0L0.622,6.096   c-0.827,0.827-0.827,2.167,0,2.994l38.374,38.373L0.622,85.836c-0.827,0.827-0.827,2.167,0,2.994l5.473,5.476   c0.397,0.396,0.936,0.62,1.498,0.62s1.1-0.224,1.497-0.62l38.374-38.374l38.374,38.374c0.397,0.396,0.937,0.62,1.498,0.62   s1.101-0.224,1.498-0.62l5.473-5.476c0.826-0.827,0.826-2.167,0-2.994L55.931,47.463z" />
+                        </svg>
+                     </i>
+                  </div>
+                  <label htmlFor="condition">Condition</label>
                   <Select
-                     value={params.minYear || ''}
-                     status={isSelected('minYear')}
-                     onChange={e => handleSelection(e, 'minYear')}>
-                     <option value="" label={'From'} />
-                     {yearsFrom.map(year => (
-                        <option
-                           value={year}
-                           label={year.toString()}
-                           key={year}
-                        />
+                     status={isSelected('condition')}
+                     value={conditionDefaultValue}
+                     id="condition"
+                     onChange={handleConditionSelection}>
+                     <option value="Used & New" label="Used & New" />
+                     <option value="Used" label="Used" />
+                     <option value="New" label="New" />
+                  </Select>
+
+                  <label htmlFor="model">Mark</label>
+                  <Select
+                     disabled={!marksData.getMarks.length}
+                     value={params.mark || ''}
+                     status={isSelected('mark')}
+                     id="mark"
+                     onChange={e => {
+                        handleSelection(e, 'mark')
+                     }}>
+                     <option value="" label={'All marks'} />
+                     {marksData.getMarks.map(m => (
+                        <option value={m.name} label={m.name} key={m._id} />
                      ))}
                   </Select>
+
+                  <label htmlFor="model">Model</label>
                   <Select
-                     value={params.maxYear || ''}
-                     status={isSelected('maxYear')}
-                     onChange={e => handleSelection(e, 'maxYear')}>
-                     <option value="" label={'To'} />
-                     {yearsTo.map(year => (
-                        <option
-                           value={year}
-                           label={year.toString()}
-                           key={year}
-                        />
+                     disabled={!modelsData.getModels.length}
+                     value={params.model || ''}
+                     id="model"
+                     status={isSelected('model')}
+                     onChange={e => {
+                        handleSelection(e, 'model')
+                     }}>
+                     <option value="" label={'All models'} />
+                     {modelsData.getModels.map(m => (
+                        <option value={m.name} label={m.name} key={m._id} />
                      ))}
                   </Select>
+
+                  <label htmlFor="generation">Generation</label>
+                  <CheckboxSelectGeneration
+                     text={
+                        !params.generation || params.generation.length === 0
+                           ? 'All'
+                           : params.generation.join(', ')
+                     }
+                     generationsData={generationsData}
+                     disabled={generationsData.length === 0}
+                     handleCheckbox={handleCheckbox}
+                  />
+
+                  <label htmlFor="bodyStyle">Body Style</label>
+                  <CheckboxSelect
+                     keyName="bodyStyle"
+                     values={bodyStyles}
+                     handleCheckbox={handleCheckbox}
+                     params={params}
+                     text={
+                        params.bodyStyle ? params.bodyStyle.join(', ') : 'All'
+                     }
+                  />
+
+                  <label htmlFor="minYear">Year</label>
+                  <div className={styles.selectWrapper}>
+                     <Select
+                        value={params.minYear || ''}
+                        status={isSelected('minYear')}
+                        onChange={e => handleSelection(e, 'minYear')}>
+                        <option value="" label={'From'} />
+                        {yearsFrom.map(year => (
+                           <option
+                              value={year}
+                              label={year.toString()}
+                              key={year}
+                           />
+                        ))}
+                     </Select>
+                     <Select
+                        value={params.maxYear || ''}
+                        status={isSelected('maxYear')}
+                        onChange={e => handleSelection(e, 'maxYear')}>
+                        <option value="" label={'To'} />
+                        {yearsTo.map(year => (
+                           <option
+                              value={year}
+                              label={year.toString()}
+                              key={year}
+                           />
+                        ))}
+                     </Select>
+                  </div>
+
+                  <label>Price</label>
+                  <div className={styles.selectWrapper}>
+                     <Select
+                        value={params.minPrice || ''}
+                        status={isSelected('minPrice')}
+                        onChange={e => handleSelection(e, 'minPrice')}>
+                        <option value="" label={'From'} />
+                        {pricesFrom.map(price => (
+                           <option
+                              value={price}
+                              label={price.toString()}
+                              key={price}
+                           />
+                        ))}
+                     </Select>
+                     <Select
+                        value={params.maxPrice || ''}
+                        status={isSelected('maxPrice')}
+                        onChange={e => handleSelection(e, 'maxPrice')}>
+                        <option value="" label={'To'} />
+                        {pricesTo.map(price => (
+                           <option
+                              value={price}
+                              label={price.toString()}
+                              key={price}
+                           />
+                        ))}
+                     </Select>
+                  </div>
+
+                  <label>Mileage</label>
+                  <div className={styles.selectWrapper}>
+                     <Select
+                        value={params.minMileage || ''}
+                        status={isSelected('minMileage')}
+                        onChange={e => handleSelection(e, 'minMileage')}>
+                        <option value="" label={'From'} />
+                        {mileagesFrom.map(mileage => (
+                           <option
+                              value={mileage}
+                              label={mileage.toString()}
+                              key={mileage}
+                           />
+                        ))}
+                     </Select>
+                     <Select
+                        value={params.maxMileage || ''}
+                        status={isSelected('maxMileage')}
+                        onChange={e => handleSelection(e, 'maxMileage')}>
+                        <option value="" label={'To'} />
+                        {mileagesTo.map(mileage => (
+                           <option
+                              value={mileage}
+                              label={mileage.toString()}
+                              key={mileage}
+                           />
+                        ))}
+                     </Select>
+                  </div>
+
+                  <label htmlFor="color">Color</label>
+                  <CheckboxSelect
+                     keyName="color"
+                     values={colors.map(c => c.color)}
+                     handleCheckbox={handleCheckbox}
+                     params={params}
+                     text={params.color ? params.color.join(', ') : 'All'}
+                  />
+
+                  <label htmlFor="transmission">Transmission</label>
+                  <CheckboxSelect
+                     keyName="transmission"
+                     values={transmission}
+                     handleCheckbox={handleCheckbox}
+                     params={params}
+                     text={
+                        params.transmission
+                           ? params.transmission.join(', ')
+                           : 'All'
+                     }
+                  />
+
+                  <label htmlFor="fuelType">Fuel Type</label>
+                  <CheckboxSelect
+                     keyName="fuelType"
+                     values={fuelTypes}
+                     handleCheckbox={handleCheckbox}
+                     params={params}
+                     text={params.fuelType ? params.fuelType.join(', ') : 'All'}
+                  />
+
+                  <label htmlFor="driveInit">Drive Init</label>
+                  <CheckboxSelect
+                     keyName="driveInit"
+                     values={driveInits}
+                     handleCheckbox={handleCheckbox}
+                     params={params}
+                     text={
+                        params.driveInit ? params.driveInit.join(', ') : 'All'
+                     }
+                  />
+
+                  <label>Engine Capacity</label>
+                  <div className={styles.selectWrapper}>
+                     <Select
+                        value={params.minEngineCapacity || ''}
+                        status={isSelected('minEngineCapacity')}
+                        onChange={e => handleSelection(e, 'minEngineCapacity')}>
+                        <option value="" label={'From'} />
+                        {engineCapacitiesFrom.map(e => (
+                           <option
+                              value={e}
+                              // Add '.0' when the number is int
+                              label={
+                                 e.toString().includes('.')
+                                    ? e.toString()
+                                    : `${e.toString()}.0`
+                              }
+                              key={e}
+                           />
+                        ))}
+                     </Select>
+                     <Select
+                        value={params.maxEngineCapacity || ''}
+                        status={isSelected('maxEngineCapacity')}
+                        onChange={e => handleSelection(e, 'maxEngineCapacity')}>
+                        <option value="" label={'To'} />
+                        {engineCapacitiesTo.map(e => (
+                           <option value={e} label={e.toString()} key={e} />
+                        ))}
+                     </Select>
+                  </div>
+
+                  <label>Power</label>
+                  <div className={styles.selectWrapper}>
+                     <Select
+                        value={params.minPower || ''}
+                        status={isSelected('minPower')}
+                        onChange={e => handleSelection(e, 'minPower')}>
+                        <option value="" label={'From'} />
+                        {powersFrom.map(p => (
+                           <option value={p} label={p.toString()} key={p} />
+                        ))}
+                     </Select>
+                     <Select
+                        value={params.maxPower || ''}
+                        status={isSelected('maxPower')}
+                        onChange={e => handleSelection(e, 'maxPower')}>
+                        <option value="" label={'To'} />
+                        {powersTo.map(p => (
+                           <option value={p} label={p.toString()} key={p} />
+                        ))}
+                     </Select>
+                  </div>
                </div>
-
-               <label>Price</label>
-               <div className={styles.selectWrapper}>
-                  <Select
-                     value={params.minPrice || ''}
-                     status={isSelected('minPrice')}
-                     onChange={e => handleSelection(e, 'minPrice')}>
-                     <option value="" label={'From'} />
-                     {pricesFrom.map(price => (
-                        <option
-                           value={price}
-                           label={price.toString()}
-                           key={price}
-                        />
-                     ))}
-                  </Select>
-                  <Select
-                     value={params.maxPrice || ''}
-                     status={isSelected('maxPrice')}
-                     onChange={e => handleSelection(e, 'maxPrice')}>
-                     <option value="" label={'To'} />
-                     {pricesTo.map(price => (
-                        <option
-                           value={price}
-                           label={price.toString()}
-                           key={price}
-                        />
-                     ))}
-                  </Select>
-               </div>
-
-               <label>Mileage</label>
-               <div className={styles.selectWrapper}>
-                  <Select
-                     value={params.minMileage || ''}
-                     status={isSelected('minMileage')}
-                     onChange={e => handleSelection(e, 'minMileage')}>
-                     <option value="" label={'From'} />
-                     {mileagesFrom.map(mileage => (
-                        <option
-                           value={mileage}
-                           label={mileage.toString()}
-                           key={mileage}
-                        />
-                     ))}
-                  </Select>
-                  <Select
-                     value={params.maxMileage || ''}
-                     status={isSelected('maxMileage')}
-                     onChange={e => handleSelection(e, 'maxMileage')}>
-                     <option value="" label={'To'} />
-                     {mileagesTo.map(mileage => (
-                        <option
-                           value={mileage}
-                           label={mileage.toString()}
-                           key={mileage}
-                        />
-                     ))}
-                  </Select>
-               </div>
-
-               <label htmlFor="color">Color</label>
-               <CheckboxSelect
-                  keyName="color"
-                  values={colors.map(c => c.color)}
-                  handleCheckbox={handleCheckbox}
-                  params={params}
-                  text={params.color ? params.color.join(', ') : 'All'}
-               />
-
-               <label htmlFor="transmission">Transmission</label>
-               <CheckboxSelect
-                  keyName="transmission"
-                  values={transmission}
-                  handleCheckbox={handleCheckbox}
-                  params={params}
-                  text={
-                     params.transmission
-                        ? params.transmission.join(', ')
-                        : 'All'
-                  }
-               />
-
-               <label htmlFor="fuelType">Fuel Type</label>
-               <CheckboxSelect
-                  keyName="fuelType"
-                  values={fuelTypes}
-                  handleCheckbox={handleCheckbox}
-                  params={params}
-                  text={params.fuelType ? params.fuelType.join(', ') : 'All'}
-               />
-
-               <label htmlFor="driveInit">Drive Init</label>
-               <CheckboxSelect
-                  keyName="driveInit"
-                  values={driveInits}
-                  handleCheckbox={handleCheckbox}
-                  params={params}
-                  text={params.driveInit ? params.driveInit.join(', ') : 'All'}
-               />
-
-               <label>Engine Capacity</label>
-               <div className={styles.selectWrapper}>
-                  <Select
-                     value={params.minEngineCapacity || ''}
-                     status={isSelected('minEngineCapacity')}
-                     onChange={e => handleSelection(e, 'minEngineCapacity')}>
-                     <option value="" label={'From'} />
-                     {engineCapacitiesFrom.map(e => (
-                        <option value={e} label={e.toString()} key={e} />
-                     ))}
-                  </Select>
-                  <Select
-                     value={params.maxEngineCapacity || ''}
-                     status={isSelected('maxEngineCapacity')}
-                     onChange={e => handleSelection(e, 'maxEngineCapacity')}>
-                     <option value="" label={'To'} />
-                     {engineCapacitiesTo.map(e => (
-                        <option value={e} label={e.toString()} key={e} />
-                     ))}
-                  </Select>
-               </div>
-
-               <label>Power</label>
-               <div className={styles.selectWrapper}>
-                  <Select
-                     value={params.minPower || ''}
-                     status={isSelected('minPower')}
-                     onChange={e => handleSelection(e, 'minPower')}>
-                     <option value="" label={'From'} />
-                     {powersFrom.map(p => (
-                        <option value={p} label={p.toString()} key={p} />
-                     ))}
-                  </Select>
-                  <Select
-                     value={params.maxPower || ''}
-                     status={isSelected('maxPower')}
-                     onChange={e => handleSelection(e, 'maxPower')}>
-                     <option value="" label={'To'} />
-                     {powersTo.map(p => (
-                        <option value={p} label={p.toString()} key={p} />
-                     ))}
-                  </Select>
-               </div>
-            </div>
-         )}
+            )}
+         </div>
       </div>
    )
 }

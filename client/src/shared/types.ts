@@ -129,6 +129,7 @@ export type Announcement = {
    mark: string
    model: string
    driveInit: string
+   engineCapacity: number
    _id: string
 }
 

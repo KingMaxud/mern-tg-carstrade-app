@@ -2,8 +2,13 @@ import React, { useRef, useState } from 'react'
 import { Checkbox, useOutsideClick } from '@chakra-ui/react'
 
 import styles from './CheckboxSelectGeneration.module.scss'
-import { CheckboxKeys, GenerationsFilterArray } from '../../../../shared/types'
+import {
+   CheckboxKeys,
+   GenerationsFilterArray,
+   SearchParams
+} from '../../../../shared/types'
 import { getImageBySize } from '../../../../shared/utils/utils'
+import useDidMountEffect from '../../../../shared/hooks/useDidMountEffect'
 
 type Props = {
    text: string
@@ -21,6 +26,13 @@ const CheckboxSelectGeneration = ({
    const [isOpen, setIsOpen] = useState(false)
 
    const ref = useRef<HTMLDivElement>(null)
+
+   // Close selection, when generationsData is empty
+   useDidMountEffect(() => {
+      if (generationsData.length === 0) {
+         setIsOpen(false)
+      }
+   }, [generationsData])
 
    useOutsideClick({
       ref: ref,
@@ -44,7 +56,7 @@ const CheckboxSelectGeneration = ({
             }}
             className={`${styles.selector} ${isOpen && styles.openSelector} ${
                disabled && styles.disabledSelector
-            }`}>
+            } ${text !== 'All' && styles.selected}`}>
             <p>{text}</p>
             <i>
                <svg
@@ -63,7 +75,11 @@ const CheckboxSelectGeneration = ({
             </i>
          </div>
          {isOpen && (
-            <div className={styles.selectWindow} ref={ref}>
+            <div
+               className={`${styles.selectWindow} ${
+                  generationsData.length === 1 && styles.one
+               } ${generationsData.length === 2 && styles.two}`}
+               ref={ref}>
                {generationsData.map(g => {
                   return (
                      <div

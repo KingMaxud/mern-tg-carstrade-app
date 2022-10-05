@@ -187,6 +187,7 @@ export const GET_ANNOUNCEMENTS = gql`
          mark
          model
          driveInit
+         engineCapacity
          _id
       }
    }
@@ -243,39 +244,42 @@ export const CHANGE_PRICE = gql`
 `
 
 export const LOGIN_USER = gql`
-    mutation LoginUser($email: String!, $password: String!) {
-        loginUser(email: $email, password: $password) {
-            accessToken
-        }
-    }
+   mutation LoginUser($email: String!, $password: String!) {
+      loginUser(email: $email, password: $password) {
+         accessToken
+      }
+   }
 `
 
 export const REGISTER_USER = gql`
-    mutation Register($name: String!, $email: String!, $password: String!) {
-        registerUser(name: $name, email: $email, password: $password) {
-            accessToken
-        }
-    }
+   mutation Register($name: String!, $email: String!, $password: String!) {
+      registerUser(name: $name, email: $email, password: $password) {
+         accessToken
+      }
+   }
 `
 
 export const LOGOUT = gql`
-    mutation Logout {
-        logout {
-            success
-            message
-        }
-    }
+   mutation Logout {
+      logout {
+         success
+         message
+      }
+   }
 `
 
 export const GET_USERS_ANNOUNCEMENTS = gql`
-    query GetUsersAnnouncements($filter: FilterInput, $pagination: PaginationInput!) {
-        getAnnouncements(filter: $filter, pagination: $pagination) {
-            _id
-            mark
-            model
-            year
-            photos
-            price
-        }
-    }
+   query GetUsersAnnouncements(
+      $filter: FilterInput
+      $pagination: PaginationInput!
+   ) {
+      getAnnouncements(filter: $filter, pagination: $pagination) {
+         _id
+         mark
+         model
+         year
+         photos
+         price
+      }
+   }
 `

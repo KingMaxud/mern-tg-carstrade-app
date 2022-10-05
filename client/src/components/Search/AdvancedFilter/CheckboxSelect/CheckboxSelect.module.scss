@@ -9,6 +9,7 @@
 .selector {
    height: 2.5rem;
    background-color: #f0f0f0;
+   transition: background-color 0.2s;
    border-radius: 0.5rem;
    display: flex;
    flex-direction: row;
@@ -28,6 +29,10 @@
    svg {
       margin-right: 0.25rem;
    }
+}
+
+.selected {
+   background-color: rgba(255, 179, 25, 0.65);
 }
 
 .selectWindow {
