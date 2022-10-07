@@ -79,18 +79,6 @@ const Photos = ({ photos, alt }: Props) => {
       setCurrentImage(photos ? { src: photos[0], number: 0 } : null)
    }, [photos])
 
-   const tempPhotos = [
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg',
-      'https://res.cloudinary.com/dxl170evw/image/upload/w_144,h_108,c_fill/v1663759246/images/n2ro3ae4olmbvxv9pr6o.jpg'
-   ]
-
    return (
       <div className={styles.container}>
          {!currentImage ? (
@@ -115,7 +103,7 @@ const Photos = ({ photos, alt }: Props) => {
          <div>
             {photos && (
                <div className={styles.photosContainer}>
-                  {tempPhotos.map((p, index) => (
+                  {photos.map((p, index) => (
                      <img
                         key={`${index} photo`}
                         onClick={() => {
