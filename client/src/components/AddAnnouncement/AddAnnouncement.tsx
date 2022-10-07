@@ -36,8 +36,6 @@ import useWindowSize from '../../shared/hooks/useWindowDimensions'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 
 const AddAnnouncement = () => {
-   const width = useWindowSize().width
-
    const [announcementLoading, setAnnouncementLoading] = useState(false)
    const [marksData, setMarksData] = useState<MarksData>({ getMarks: [] })
    const [modelsData, setModelsData] = useState<ModelsData>({ getModels: [] })
@@ -48,7 +46,7 @@ const AddAnnouncement = () => {
    const [years, setYears] = useState(getYears(1940, 2022))
    const [bodyStyles, setBodyStyles] = useState<string[]>([])
    const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
-      (width || 1000) <= 600
+      window.innerWidth <= 600
    )
 
    const { addPhoto, addPhotoComponent } = useAddPhoto()
@@ -162,8 +160,8 @@ const AddAnnouncement = () => {
    }, [])
    // Change isMobile, when width changes
    useDidMountEffect(() => {
-      setIsSmallDevice((width || 0) <= 600)
-   }, [width])
+      setIsSmallDevice(window.innerWidth <= 600)
+   }, [useWindowSize().width])
 
    // Load models, when mark changes
    useEffect(() => {

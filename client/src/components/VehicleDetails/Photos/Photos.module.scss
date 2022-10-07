@@ -1,0 +1,33 @@
+.container {
+   grid-area: photos;
+}
+
+.photosContainer {
+   display: grid;
+   grid-template-columns: repeat(5, 1fr);
+   grid-gap: 0.125rem;
+}
+
+@media (min-width: 600px) and (max-width: 759px) {
+   .photosContainer {
+      grid-template-columns: repeat(4, 1fr);
+   }
+}
+@media (min-width: 440px) and (max-width: 599px) {
+   .photosContainer {
+      grid-template-columns: repeat(3, 1fr);
+   }
+}
+@media (min-width: 350px) and (max-width: 439px) {
+   .photosContainer {
+      grid-template-columns: repeat(2, 1fr);
+   }
+   img {
+      width: 10rem;
+   }
+}
+@media (min-width: 220px) and (max-width: 349px) {
+   .photosContainer {
+      grid-template-columns: repeat(2, 1fr);
+   }
+}

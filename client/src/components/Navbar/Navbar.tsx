@@ -15,12 +15,11 @@ import useWindowSize from '../../shared/hooks/useWindowDimensions'
 const Navbar = () => {
    const { state, dispatch } = useAuth()
    const location = useLocation()
-   const width = useWindowSize().width
 
    const [isMyAnnouncementsShown, setIsMyAnnouncementsShown] = useState(false)
    const [isMessageShown, setIsMessageShown] = useState(false)
    const [isMobile, setIsMobile] = useState<boolean>(
-      (width || 1000) <= 768
+      window.innerWidth <= 768
    )
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -41,8 +40,8 @@ const Navbar = () => {
    }, [location])
    // Change isMobile, when width changes
    useEffect(() => {
-      setIsMobile((width || 0) <= 768)
-   }, [width])
+      setIsMobile(window.innerWidth <= 768)
+   }, [useWindowSize().width])
    // Close unwanted menus, when isMobile changes
    useDidMountEffect(() => {
       setIsMessageShown(false)

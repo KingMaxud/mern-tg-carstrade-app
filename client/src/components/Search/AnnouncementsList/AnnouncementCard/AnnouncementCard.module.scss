@@ -16,7 +16,6 @@
    .imageBlock {
       justify-self: center;
       align-self: center;
-      padding-left: 0.875rem;
       grid-area: imageBlock;
       width: 240px;
       height: 180px;
@@ -61,6 +60,12 @@
 
    .engineCapacity {
       grid-area: engineCapacity;
+   }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+   .imageBlock {
+      padding-left: 0.875rem;
    }
 }
 

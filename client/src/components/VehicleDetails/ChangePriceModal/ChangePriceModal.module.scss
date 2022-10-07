@@ -1,0 +1,13 @@
+.button {
+   border-radius: 0.375rem;
+   background-color: #ffb319;
+   box-shadow: rgba(0, 0, 0, 0.35) 0 15px 10px -15px;
+   font-family: 'Poppins', sans-serif;
+   transition: background-color 0.2s;
+   font-size: 1rem;
+   padding: 0.25rem 0.125rem;
+
+   &:hover {
+      background-color: #fec247;
+   }
+}

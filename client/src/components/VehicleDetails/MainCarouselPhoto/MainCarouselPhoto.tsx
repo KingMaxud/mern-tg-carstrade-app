@@ -1,8 +1,8 @@
 import { Skeleton } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { getImageBySize } from '../../shared/utils/utils'
 import styles from './MainCarouselPhoto.module.scss'
+import { getImageBySize } from '../../../shared/utils/utils'
 
 type Props = {
    image: string | null
@@ -49,6 +49,7 @@ const MainCarouselPhoto = ({
 
    return (
       <div
+         className={styles.container}
          onMouseEnter={() => setHovered(true)}
          onMouseLeave={() => setHovered(false)}
          style={{
