@@ -5,9 +5,20 @@
    font-family: 'Poppins', sans-serif;
    transition: background-color 0.2s;
    font-size: 1rem;
-   padding: 0.25rem 0.125rem;
+   padding: 0.25rem;
 
    &:hover {
       background-color: #fec247;
+   }
+}
+
+.modalBody {
+   display: flex;
+   align-items: center;
+
+   p {
+      white-space: nowrap;
+      font-size: 1.25rem;
+      margin-right: 1rem;
    }
 }

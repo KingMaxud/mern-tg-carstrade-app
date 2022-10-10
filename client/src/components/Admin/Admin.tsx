@@ -4,8 +4,8 @@ import {
    useMutation,
    useQuery
 } from '@apollo/client'
-import { useState } from 'react'
-import { Box, Button, useDisclosure } from '@chakra-ui/react'
+import React, {useEffect, useState} from 'react'
+import { Box, useDisclosure } from '@chakra-ui/react'
 
 import {
    GET_MARKS,
@@ -26,17 +26,19 @@ import {
    DeleteGenerationVars,
    Generation
 } from '../../shared/types'
-import AddGeneration from './AddGeneration'
-import AddModel from './AddModel'
-import AddMark from './AddMark'
+import AddGeneration from './AddGeneration/AddGeneration'
+import AddModel from './AddModel/AddModel'
+import AddMark from './AddMark/AddMark'
 import useDidMountEffect from '../../shared/hooks/useDidMountEffect'
 import DeleteModal from '../DeleteModal'
+import styles from './Admin.module.scss'
 
 const Admin = () => {
    const [selectedMark, setSelectedMark] = useState('')
    const [selectedModel, setSelectedModel] = useState('')
    const [generationsData, setGenerationsData] = useState<Generation[]>([])
    const [deleteObject, setDeleteObject] = useState('')
+   const [hoveredName, setHoveredName] = useState('')
 
    let deletionTarget = ''
    const { isOpen, onOpen, onClose } = useDisclosure()
@@ -74,12 +76,17 @@ const Admin = () => {
    useDidMountEffect(() => {
       loadGenerations()
    }, [selectedModel])
+   // Change Title
+   useEffect(() => {
+      document.title = 'Admin Panel'
+   }, [])
 
    const [deleteMark] = useMutation<
       { deleteMark: MutationDetails },
       ModelsVars
    >(DELETE_MARK, {
-      update: cache => {         // Delete mark from the cache
+      update: cache => {
+         // Delete mark from the cache
          const cachedMarks = cache.readQuery<MarksData>({
             query: GET_MARKS
          })
@@ -248,22 +255,21 @@ const Admin = () => {
    const [handleDelete, setHandleDelete] = useState<HandleDelete>(() => {})
 
    return (
-      <>
+      <div className={styles.container}>
          {/*Modal window that pops up when admin deletes*/}
          <DeleteModal
             isOpen={isOpen}
             onClose={onClose}
             onOpen={onOpen}
             deleteObject={deleteObject}>
-            <Button
-               colorScheme="blue"
-               mr={3}
+            <button
+               className={styles.button}
                onClick={() => {
                   handleDelete()
                   onClose()
                }}>
                Delete
-            </Button>
+            </button>
          </DeleteModal>
 
          {selectedModel ? (
@@ -273,50 +279,62 @@ const Admin = () => {
          ) : (
             <AddMark />
          )}
-         {marksData &&
-            marksData.getMarks.map(mark => (
-               <Box key={mark._id}>
+         <div className={styles.marksContainer}>
+            {marksData &&
+               marksData.getMarks.map(mark => (
                   <div
+                     className={`${styles.item} ${
+                        mark.name === selectedMark && styles.chosen
+                     } ${hoveredName === mark.name && styles.deleteObject}`}
                      onClick={() => {
-                        setSelectedMark(mark.name)
+                        if (selectedMark !== mark.name) {
+                           setSelectedMark(mark.name)
+                        } else {
+                           setSelectedMark('')
+                        }
                         setSelectedModel('')
-                     }}>
-                     {mark.name}
-                  </div>
-                  <Button
-                     colorScheme="blue"
-                     mr={3}
-                     onClick={() => {
-                        setDeleteObject(mark.name)
-                        deletionTarget = mark.name
-                        setHandleDelete(() => () => {
-                           deleteMark({
-                              variables: {
-                                 markName: deletionTarget
-                              }
+                     }}
+                     key={mark._id}>
+                     <p>{mark.name}</p>
+                     <i
+                        onClick={e => {
+                           setDeleteObject(mark.name)
+                           deletionTarget = mark.name
+                           setHandleDelete(() => () => {
+                              deleteMark({
+                                 variables: {
+                                    markName: deletionTarget
+                                 }
+                              })
                            })
-                        })
-                        onOpen()
-                     }}>
-                     Delete
-                  </Button>
-               </Box>
-            ))}
-         <div>
-            {!selectedMark && 'Select Mark'}
+                           onOpen()
+                           e.stopPropagation()
+                        }}
+                        onMouseEnter={() => setHoveredName(mark.name)}
+                        onMouseLeave={() => setHoveredName('')}>
+                        <svg
+                           xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 0 94.926 94.926">
+                           <path d="M55.931,47.463L94.306,9.09c0.826-0.827,0.826-2.167,0-2.994L88.833,0.62C88.436,0.224,87.896,0,87.335,0   c-0.562,0-1.101,0.224-1.498,0.62L47.463,38.994L9.089,0.62c-0.795-0.795-2.202-0.794-2.995,0L0.622,6.096   c-0.827,0.827-0.827,2.167,0,2.994l38.374,38.373L0.622,85.836c-0.827,0.827-0.827,2.167,0,2.994l5.473,5.476   c0.397,0.396,0.936,0.62,1.498,0.62s1.1-0.224,1.497-0.62l38.374-38.374l38.374,38.374c0.397,0.396,0.937,0.62,1.498,0.62   s1.101-0.224,1.498-0.62l5.473-5.476c0.826-0.827,0.826-2.167,0-2.994L55.931,47.463z" />
+                        </svg>
+                     </i>
+                  </div>
+               ))}
+         </div>
+         <div className={styles.modelsContainer}>
             {modelsData &&
                modelsData.getModels.map(model => (
-                  <Box key={model._id}>
-                     <div
-                        onClick={() => {
-                           setSelectedModel(model.name)
-                        }}>
-                        {model.name}
-                     </div>
-                     <Button
-                        colorScheme="blue"
-                        mr={3}
-                        onClick={() => {
+                  <div
+                     className={`${styles.item} ${
+                        model.name === selectedModel && styles.chosen
+                     } ${hoveredName === model.name && styles.deleteObject}`}
+                     key={model._id}
+                     onClick={() => {
+                        setSelectedModel(model.name)
+                     }}>
+                     <p>{model.name}</p>
+                     <i
+                        onClick={e => {
                            setDeleteObject(model.name)
                            deletionTarget = model.name
                            setHandleDelete(() => () => {
@@ -328,22 +346,30 @@ const Admin = () => {
                               })
                            })
                            onOpen()
-                        }}>
-                        Delete
-                     </Button>
-                  </Box>
+                           e.stopPropagation()
+                        }}
+                        onMouseEnter={() => setHoveredName(model.name)}
+                        onMouseLeave={() => setHoveredName('')}>
+                        <svg
+                           xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 0 94.926 94.926">
+                           <path d="M55.931,47.463L94.306,9.09c0.826-0.827,0.826-2.167,0-2.994L88.833,0.62C88.436,0.224,87.896,0,87.335,0   c-0.562,0-1.101,0.224-1.498,0.62L47.463,38.994L9.089,0.62c-0.795-0.795-2.202-0.794-2.995,0L0.622,6.096   c-0.827,0.827-0.827,2.167,0,2.994l38.374,38.373L0.622,85.836c-0.827,0.827-0.827,2.167,0,2.994l5.473,5.476   c0.397,0.396,0.936,0.62,1.498,0.62s1.1-0.224,1.497-0.62l38.374-38.374l38.374,38.374c0.397,0.396,0.937,0.62,1.498,0.62   s1.101-0.224,1.498-0.62l5.473-5.476c0.826-0.827,0.826-2.167,0-2.994L55.931,47.463z" />
+                        </svg>
+                     </i>
+                  </div>
                ))}
          </div>
-         <div>
-            {!selectedModel && 'Select Model'}
+         <div className={styles.generationsContainer}>
             {generationsData &&
                generationsData.map(generation => (
-                  <Box key={generation._id}>
-                     {generation.name}
-                     <Button
-                        colorScheme="blue"
-                        mr={3}
-                        onClick={() => {
+                  <div
+                     className={`${styles.item} ${
+                        hoveredName === generation.name && styles.deleteObject
+                     }`}
+                     key={generation._id}>
+                     <p>{generation.name}</p>
+                     <i
+                        onClick={e => {
                            setDeleteObject(generation.name)
                            deletionTarget = generation.name
                            setHandleDelete(() => () => {
@@ -356,13 +382,20 @@ const Admin = () => {
                               })
                            })
                            onOpen()
-                        }}>
-                        Delete
-                     </Button>
-                  </Box>
+                           e.stopPropagation()
+                        }}
+                        onMouseEnter={() => setHoveredName(generation.name)}
+                        onMouseLeave={() => setHoveredName('')}>
+                        <svg
+                           xmlns="http://www.w3.org/2000/svg"
+                           viewBox="0 0 94.926 94.926">
+                           <path d="M55.931,47.463L94.306,9.09c0.826-0.827,0.826-2.167,0-2.994L88.833,0.62C88.436,0.224,87.896,0,87.335,0   c-0.562,0-1.101,0.224-1.498,0.62L47.463,38.994L9.089,0.62c-0.795-0.795-2.202-0.794-2.995,0L0.622,6.096   c-0.827,0.827-0.827,2.167,0,2.994l38.374,38.373L0.622,85.836c-0.827,0.827-0.827,2.167,0,2.994l5.473,5.476   c0.397,0.396,0.936,0.62,1.498,0.62s1.1-0.224,1.497-0.62l38.374-38.374l38.374,38.374c0.397,0.396,0.937,0.62,1.498,0.62   s1.101-0.224,1.498-0.62l5.473-5.476c0.826-0.827,0.826-2.167,0-2.994L55.931,47.463z" />
+                        </svg>
+                     </i>
+                  </div>
                ))}
          </div>
-      </>
+      </div>
    )
 }
 

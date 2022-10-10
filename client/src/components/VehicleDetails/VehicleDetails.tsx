@@ -176,9 +176,8 @@ const VehicleDetails = () => {
                      onOpen={onOpen}
                      onClose={onClose}
                      deleteObject="your announcement">
-                     <Button
-                        colorScheme="blue"
-                        mr={3}
+                     <button
+                        className={styles.button}
                         onClick={() => {
                            deleteAnnouncement({
                               variables: {
@@ -189,7 +188,7 @@ const VehicleDetails = () => {
                         }}>
                         {/*Change it to little icon above "price"*/}
                         Delete
-                     </Button>
+                     </button>
                   </DeleteModal>
                </div>
             )}

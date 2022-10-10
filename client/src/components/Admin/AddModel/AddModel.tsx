@@ -2,14 +2,17 @@ import { useMutation } from '@apollo/client'
 import React, { useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { Input } from '@chakra-ui/react'
 
-import { ADD_MODEL, GET_MODELS } from '../../shared/utils/graphql'
+
+import { ADD_MODEL, GET_MODELS } from '../../../shared/utils/graphql'
 import {
    ModelHandleVars,
    ModelsData,
    ModelsVars,
    MutationDetailsWithId
-} from '../../shared/types'
+} from '../../../shared/types'
+import styles from './AddModel.module.scss'
 
 type AddMarkProps = {
    mark: string
@@ -40,7 +43,8 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
       { addModel: MutationDetailsWithId },
       ModelHandleVars
    >(ADD_MODEL, {
-      update(cache, data) {         // Add a new model to the cache
+      update(cache, data) {
+         // Add a new model to the cache
          const cachedModels = cache.readQuery<ModelsData, ModelsVars>({
             query: GET_MODELS,
             variables: {
@@ -83,26 +87,30 @@ const AddModel = ({ mark }: AddMarkProps): JSX.Element => {
    })
 
    return (
-      <>
-         <h1>Add Model</h1>
+      <div className={styles.container}>
+         <h1 className={styles.title}>Add Model</h1>
          <form onSubmit={formik.handleSubmit}>
-            <label htmlFor="modelName">Model: </label>
-            <input
-               id="modelName"
-               name="modelName"
-               type="text"
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               value={formik.values.modelName}
-            />
+            <div className={styles.inputWrapper}>
+               <label htmlFor="modelName">Model: </label>
+               <Input
+                  id="modelName"
+                  name="modelName"
+                  type="text"
+                  outline="1px solid rgba(0, 0, 0, 0.7)"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.modelName}
+               />
+            </div>
             {formik.touched.modelName && formik.errors.modelName ? (
-               <div>{formik.errors.modelName}</div>
+               <div className={styles.error}>{formik.errors.modelName}</div>
             ) : null}
 
-            <button type="submit">Add</button>
-            {error && error}
+            <button className={styles.button} type="submit">
+               Add
+            </button>
          </form>
-      </>
+      </div>
    )
 }
 

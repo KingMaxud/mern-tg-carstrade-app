@@ -1,0 +1,86 @@
+.container {
+   margin-left: auto;
+   margin-right: auto;
+   padding-left: 0.75rem;
+   padding-right: 0.75rem;
+   display: flex;
+   flex-direction: column;
+   max-width: 51.5rem;
+}
+
+.button {
+   border-radius: 0.375rem;
+   background-color: #ffb319;
+   box-shadow: rgba(0, 0, 0, 0.35) 0 15px 10px -15px;
+   font-family: 'Poppins', sans-serif;
+   transition: background-color 0.2s;
+   font-size: 1rem;
+   padding: 0.25rem;
+
+   &:hover {
+      background-color: #fec247;
+   }
+}
+
+.marksContainer {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+   gap: 0.375rem;
+   margin-bottom: 1rem;
+}
+
+.modelsContainer {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+   gap: 0.375rem;
+   margin-bottom: 1rem;
+}
+
+.generationsContainer {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+   gap: 0.375rem;
+   margin-bottom: 1rem;
+}
+
+.item {
+   height: 5rem;
+   background-color: #f4f4f4;
+   border-radius: 0.375rem;
+   border: 2px solid rgba(255, 255, 255, 0);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   cursor: pointer;
+   transition: background-color 0.2s, border 0.2s;
+   position: relative;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+
+   &:hover {
+      background-color: #fec247;
+   }
+
+   p {
+      font-size: 1.125rem;
+   }
+
+   i {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.25rem;
+
+      svg {
+         width: 1rem;
+         opacity: 0.7;
+      }
+   }
+}
+
+.chosen {
+   background-color: #fec247;
+}
+
+.deleteObject {
+   border: 2px solid #cc0000a5;
+}

@@ -17,7 +17,7 @@ const AdminProtected = () => {
    return (
       <>
          {!isAdmin[1] ? (
-            <div>Loading</div>
+            <div></div>
          ) : !isAdmin[0] ? (
             <Navigate to="/" replace={true} />
          ) : (

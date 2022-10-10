@@ -7,7 +7,7 @@ import {
    ModalFooter,
    ModalBody,
    ModalCloseButton,
-   Button,
+   Input,
    useDisclosure
 } from '@chakra-ui/react'
 import { ChangeEvent, useState } from 'react'
@@ -84,15 +84,20 @@ const ChangePriceModal = ({ currentPrice, id }: Props) => {
             <ModalContent>
                <ModalHeader>Type a new price for your car</ModalHeader>
                <ModalCloseButton />
-               <ModalBody>
-                  New price:{' '}
-                  <input type="text" value={newPrice} onChange={handleChange} />
+               <ModalBody className={styles.modalBody}>
+                  <p>New price:</p>
+                  <Input
+                     type="text"
+                     outline="1px solid rgba(0, 0, 0, 0.7)"
+                     value={newPrice}
+                     onChange={handleChange}
+                  />
                   <div>{inputError}</div>
                </ModalBody>
                <ModalFooter>
-                  <Button onClick={handleClick}>
-                     Change price to {Number(newPrice) ? newPrice : ''}$
-                  </Button>
+                  <button className={styles.button} onClick={handleClick}>
+                     Change price to {Number(newPrice) ? newPrice : ''}€
+                  </button>
                </ModalFooter>
             </ModalContent>
          </Modal>

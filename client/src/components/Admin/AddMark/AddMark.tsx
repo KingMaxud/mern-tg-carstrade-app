@@ -2,13 +2,15 @@ import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
+import { Input } from '@chakra-ui/react'
 
-import { ADD_MARK, GET_MARKS } from '../../shared/utils/graphql'
+import { ADD_MARK, GET_MARKS } from '../../../shared/utils/graphql'
 import {
    MarksData,
    ModelsVars,
    MutationDetailsWithId
-} from '../../shared/types'
+} from '../../../shared/types'
+import styles from './AddMark.module.scss'
 
 const AddMark = (): JSX.Element => {
    const [error, setError] = useState('')
@@ -33,7 +35,8 @@ const AddMark = (): JSX.Element => {
       { addMark: MutationDetailsWithId },
       ModelsVars
    >(ADD_MARK, {
-      update(cache, data) {         // Add a new model to the cache
+      update(cache, data) {
+         // Add a new model to the cache
          const cachedMarks = cache.readQuery<MarksData>({
             query: GET_MARKS
          })
@@ -70,26 +73,30 @@ const AddMark = (): JSX.Element => {
    })
 
    return (
-      <>
-         <h1>Add Mark</h1>
+      <div className={styles.container}>
+         <h1 className={styles.title}>Add Mark</h1>
          <form onSubmit={formik.handleSubmit}>
-            <label htmlFor="modelName">Mark: </label>
-            <input
-               id="markName"
-               name="markName"
-               type="text"
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               value={formik.values.markName}
-            />
+            <div className={styles.inputWrapper}>
+               <label htmlFor="modelName">Mark: </label>
+               <Input
+                  id="markName"
+                  name="markName"
+                  type="text"
+                  outline="1px solid rgba(0, 0, 0, 0.7)"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.markName}
+               />
+            </div>
             {formik.touched.markName && formik.errors.markName ? (
-               <div>{formik.errors.markName}</div>
+               <div className={styles.error}>{formik.errors.markName}</div>
             ) : null}
 
-            <button type="submit">Add</button>
-            {error && error}
+            <button className={styles.button} type="submit">
+               Add
+            </button>
          </form>
-      </>
+      </div>
    )
 }
 

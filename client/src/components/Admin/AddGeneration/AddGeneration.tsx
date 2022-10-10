@@ -1,21 +1,20 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { useMutation } from '@apollo/client'
-import { Checkbox, Button } from '@chakra-ui/react'
+import { Checkbox, Input } from '@chakra-ui/react'
 
-import {
-   ADD_GENERATION,
-   GET_GENERATIONS
-} from '../../shared/utils/graphql'
-import useAddPhoto from '../../shared/hooks/useAddPhoto'
+import { ADD_GENERATION, GET_GENERATIONS } from '../../../shared/utils/graphql'
+import useAddPhoto from '../../../shared/hooks/useAddPhoto'
 import {
    AddGenerationVars,
    GenerationsData,
    GenerationsVars,
    MutationDetailsWithId
-} from '../../shared/types'
-import { bodyStyles } from '../../shared/data'
+} from '../../../shared/types'
+import { bodyStyles } from '../../../shared/data'
+import styles from './AddGeneration.module.scss'
+import AddGenerationSelect from './AddGenerationSelect/AddGenerationSelect'
 
 type Props = {
    mark: string
@@ -34,7 +33,8 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
    const { addPhoto, addPhotoComponent } = useAddPhoto()
 
    const [error, setError] = useState('')
-   const [addGenerationLoading, setAddGenerationLoadingLoading] = useState(false)
+   const [addGenerationLoading, setAddGenerationLoadingLoading] =
+      useState(false)
    const [photoUrlError, setPhotoUrlError] = useState('')
 
    const AddGenerationSchema = Yup.object().shape({
@@ -80,7 +80,8 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
       { addGeneration: MutationDetailsWithId },
       AddGenerationVars
    >(ADD_GENERATION, {
-      update(cache, data) {      // Add a new generation to the cache
+      update(cache, data) {
+         // Add a new generation to the cache
          const cachedGenerations = cache.readQuery<
             GenerationsData,
             GenerationsVars
@@ -130,75 +131,91 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
       }
    })
 
+   useEffect(() => {
+      console.log(formik.values.bodyStyles)
+   }, [formik.values.bodyStyles])
+
    return (
-      <>
-         <h1>Add Model</h1>
+      <div
+         className={styles.container}>
+         <h1 className={styles.title}>Add Model</h1>
          <form onSubmit={formik.handleSubmit}>
-            <label htmlFor="modelName">Generation: </label>
-            <input
-               id="generationName"
-               name="generationName"
-               type="text"
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               value={formik.values.generationName}
-            />
+            <div className={styles.inputWrapper}>
+               <label htmlFor="modelName">Generation: </label>
+               <Input
+                  id="generationName"
+                  name="generationName"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.generationName}
+               />
+            </div>
             {formik.touched.generationName && formik.errors.generationName ? (
-               <div>{formik.errors.generationName}</div>
+               <div className={styles.error}>
+                  {formik.errors.generationName}
+               </div>
             ) : null}
 
-            <label htmlFor="modelName">Start Year: </label>
-            <input
-               id="startYear"
-               name="startYear"
-               type="text"
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               value={formik.values.startYear}
-            />
+            <div className={styles.inputWrapper}>
+               <label htmlFor="modelName">Start Year: </label>
+               <Input
+                  id="startYear"
+                  name="startYear"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.startYear}
+               />
+            </div>
             {formik.touched.startYear && formik.errors.startYear ? (
-               <div>{formik.errors.startYear}</div>
+               <div className={styles.error}>{formik.errors.startYear}</div>
             ) : null}
 
-            <label htmlFor="modelName">End Year: </label>
-            <input
-               id="endYear"
-               name="endYear"
-               type="text"
-               onChange={formik.handleChange}
-               onBlur={formik.handleBlur}
-               value={formik.values.endYear}
-            />
+            <div className={styles.inputWrapper}>
+               <label htmlFor="modelName">End Year: </label>
+               <Input
+                  id="endYear"
+                  name="endYear"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.endYear}
+               />
+            </div>
             {formik.touched.endYear && formik.errors.endYear ? (
-               <div>{formik.errors.endYear}</div>
+               <div className={styles.error}>{formik.errors.endYear}</div>
             ) : null}
 
-            {bodyStyles.map(b => (
-               <Checkbox
-                  key={b}
-                  onChange={() => {
-                     if (formik.values.bodyStyles.includes(b)) {
-                        formik.setFieldValue(
-                           'bodyStyles',
-                           formik.values.bodyStyles.filter(v => v !== b)
-                        )
-                     } else {
-                        formik.values.bodyStyles.push(b)
-                     }
-                  }}>
-                  {b}
-               </Checkbox>
-            ))}
+            <AddGenerationSelect>
+               {bodyStyles.map(b => (
+                  <Checkbox
+                     key={b}
+                     onChange={() => {
+                        if (formik.values.bodyStyles.includes(b)) {
+                           formik.setFieldValue(
+                              'bodyStyles',
+                              formik.values.bodyStyles.filter(v => v !== b)
+                           )
+                        } else {
+                           formik.values.bodyStyles.push(b)
+                        }
+                     }}>
+                     {b}
+                  </Checkbox>
+               ))}
+            </AddGenerationSelect>
             {formik.touched.bodyStyles && formik.errors.bodyStyles ? (
-               <div>{formik.errors.bodyStyles}</div>
+               <div className={styles.error}>{formik.errors.bodyStyles}</div>
             ) : null}
 
             {addPhotoComponent}
-            {photoUrlError}
-            {error && error}
-            <Button type="submit">Add</Button>
+            <div className={styles.error}>{photoUrlError}</div>
+            <button className={styles.button} type="submit">
+               Add
+            </button>
          </form>
-      </>
+      </div>
    )
 }
 
