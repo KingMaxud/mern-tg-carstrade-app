@@ -138,7 +138,7 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
    return (
       <div
          className={styles.container}>
-         <h1 className={styles.title}>Add Model</h1>
+         <h1 className={styles.title}>Add Generation</h1>
          <form onSubmit={formik.handleSubmit}>
             <div className={styles.inputWrapper}>
                <label htmlFor="modelName">Generation: </label>
