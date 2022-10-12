@@ -5,14 +5,14 @@ import { Skeleton } from '@chakra-ui/react'
 import { Announcement } from '../../../../shared/types'
 import {
    divideByThreeChars,
-   getImageBySize,
-   reverseString
+   getImageBySize
 } from '../../../../shared/utils/utils'
 import styles from './AnnouncementCard.module.scss'
+import noImage from '../../../../images/NO_IMAGE.svg'
 
 const AnnouncementCard = ({ a }: { a: Announcement }) => {
    const img = a.photos[0]
-   const imageUrl = getImageBySize(img, 240, 180)
+   const imageUrl = img ? getImageBySize(img, 240, 180) : noImage
    const [showImageSkeleton, setShowImageSkeleton] = useState(true)
 
    return (

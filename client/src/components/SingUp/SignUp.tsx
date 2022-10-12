@@ -52,7 +52,14 @@ const SignUp = () => {
       validationSchema: SignUpSchema,
       onSubmit: values => {
          setLoading(true)
-         register({ variables: values })
+         register({
+            variables: {
+               name: values.name.toLowerCase(),
+               email: values.email.toLowerCase(),
+               password: values.password,
+               confirmPassword: values.confirmPassword
+            }
+         })
       }
    })
 
@@ -77,7 +84,8 @@ const SignUp = () => {
    return (
       <div className={styles.container}>
          {!isMobile && (
-            <img className={styles.image}
+            <img
+               className={styles.image}
                src="https://res.cloudinary.com/dxl170evw/image/upload/w_400,h_600,c_fill/v1665470000/images/jake-blucker-tMzCrBkM99Y-unsplash_z6hib7.jpg"
                alt="Lonely road"
             />

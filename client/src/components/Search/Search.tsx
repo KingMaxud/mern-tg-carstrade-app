@@ -45,6 +45,7 @@ const Search = () => {
       GetAnnouncementsData,
       GetAnnouncementsVars
    >(GET_ANNOUNCEMENTS, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: data => {
          setAnnouncements(data.getAnnouncements)
          setAnnouncementsLoading(false)
@@ -56,6 +57,7 @@ const Search = () => {
       GetFilteredAnnouncementCountData,
       GetFilteredAnnouncementCountVars
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: data => {
          setCount(data.getFilteredAnnouncementCount)
 

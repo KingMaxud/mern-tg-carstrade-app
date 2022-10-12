@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 
 import Home from './components/Home/Home'
 import Navbar from './components/Navbar/Navbar'
@@ -14,7 +14,6 @@ import AdminProtected from './components/Admin/AdminProtected'
 import VehicleDetails from './components/VehicleDetails/VehicleDetails'
 import AddAnnouncement from './components/AddAnnouncement/AddAnnouncement'
 import Search from './components/Search/Search'
-import Test from './Test'
 
 const App = () => {
    const [state, dispatch] = useReducer(authReducer, initialAuthState)
@@ -40,7 +39,6 @@ const App = () => {
                path="vehicledetails/:vehicleid"
                element={<VehicleDetails />}
             />
-            <Route path="test" element={<Test />} />
             <Route
                path="addannouncement"
                element={
@@ -67,6 +65,7 @@ const App = () => {
                }
             />
             <Route path="/admin" element={<AdminProtected />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
          </Routes>
       </AuthContext.Provider>
    )

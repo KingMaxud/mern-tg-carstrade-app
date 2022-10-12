@@ -85,11 +85,17 @@
 
 @media (max-width: 639px) {
    .container {
-      grid-template-columns: 20rem;
+      grid-template-columns: 70vw;
       grid-template-rows: 30rem;
 
       .image {
          display: none;
+      }
+
+      form {
+         input {
+            width: 60vw;
+         }
       }
    }
 }

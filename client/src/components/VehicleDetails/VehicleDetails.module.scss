@@ -182,3 +182,12 @@
       grid-template-columns: 12.5rem;
    }
 }
+
+.errorContainer {
+   height: 60vh;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   font-size: 2rem;
+   font-family: 'Poppins', sans-serif;
+}

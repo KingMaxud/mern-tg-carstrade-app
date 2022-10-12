@@ -49,6 +49,7 @@ const Filter = () => {
       GetFilteredAnnouncementCountData,
       GetFilteredAnnouncementCountVars
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: data => {
          setCount(data.getFilteredAnnouncementCount)
          setCountLoading(false)

@@ -8,7 +8,7 @@ export const getUser = async req => {
          process.env.JWT_SECRET
       )
       const user = await User.findById(decoded.sub).select(
-         'name email myAnnouncements isAdmin _id'
+         'name email isAdmin _id'
       )
       if (user) {
          return {

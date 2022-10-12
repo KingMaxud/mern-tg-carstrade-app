@@ -131,10 +131,6 @@ const AddGeneration = ({ mark, model }: Props): JSX.Element => {
       }
    })
 
-   useEffect(() => {
-      console.log(formik.values.bodyStyles)
-   }, [formik.values.bodyStyles])
-
    return (
       <div
          className={styles.container}>

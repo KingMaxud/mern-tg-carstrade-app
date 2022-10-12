@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
 import { Button } from '@chakra-ui/react'
@@ -50,6 +50,7 @@ const VehicleDetails = () => {
    window.scrollTo(0, 0)
 
    const location = useLocation()
+   const navigate = useNavigate()
    const { getIsAdmin, getUserId } = useGetUser()
 
    const [data, setData] = useState<Announcement | null>(null)
@@ -57,6 +58,7 @@ const VehicleDetails = () => {
    const [alt, setAlt] = useState('')
    const [isAdmin, setIsAdmin] = useState(false)
    const [isOwner, setIsOwner] = useState(false)
+   const [error, setError] = useState('')
 
    // Modal
    const [isOpen, setIsOpen] = useState(false)
@@ -69,6 +71,7 @@ const VehicleDetails = () => {
    >(GET_ANNOUNCEMENT, {
       variables: { id },
       onCompleted: ({ getAnnouncement }) => {
+         setError('')
          setData(getAnnouncement)
          // Set title
          document.title = `${getAnnouncement.mark} ${getAnnouncement.model} ${
@@ -77,13 +80,20 @@ const VehicleDetails = () => {
          setAlt(
             `${getAnnouncement.mark} ${getAnnouncement.model}, ${getAnnouncement.year} production year, View - `
          )
+      },
+      onError: () => {
+         setError('Nothing was found :c')
       }
    })
 
    const [deleteAnnouncement] = useMutation<
       { deleteAnnouncement: MutationDetails },
       DeleteAnnouncementVars
-   >(DELETE_ANNOUNCEMENT)
+   >(DELETE_ANNOUNCEMENT, {
+      onCompleted: () => {
+         navigate('/')
+      }
+   })
 
    // Refresh data when location changes
    useEffect(() => {
@@ -107,8 +117,16 @@ const VehicleDetails = () => {
       })
    }, [data])
 
+   // Display error instead of content
+   if (error) {
+      return <div className={styles.errorContainer}>{error}</div>
+   }
+
    return (
-      <div className={`${styles.container} ${data && isOwner && styles.hasButton}`}>
+      <div
+         className={`${styles.container} ${
+            data && isOwner && styles.hasButton
+         }`}>
          <Photos photos={data ? data.photos : null} alt={alt} />
          <div className={styles.topInfo}>
             <p className={styles.name}>
@@ -117,10 +135,7 @@ const VehicleDetails = () => {
             <div className={styles.price}>
                <p>{data?.price} €</p>
                {data && isOwner && (
-                  <ChangePriceModal
-                     currentPrice={data?.price || 0}
-                     id={id}
-                  />
+                  <ChangePriceModal currentPrice={data?.price || 0} id={id} />
                )}
             </div>
          </div>

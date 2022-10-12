@@ -41,7 +41,12 @@ const SignIn = () => {
       validationSchema: SignInSchema,
       onSubmit: values => {
          setLoading(true)
-         login({ variables: values })
+         login({
+            variables: {
+               email: values.email.toLowerCase(),
+               password: values.password
+            }
+         })
       }
    })
 

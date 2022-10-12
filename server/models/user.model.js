@@ -15,13 +15,7 @@ const userSchema = new mongoose.Schema(
          type: String,
          required: [true, 'Please add a password']
       },
-      isAdmin: Boolean,
-      myAnnouncements: [
-         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Announcement'
-         }
-      ]
+      isAdmin: Boolean
    },
    { timestamps: true }
 )

@@ -18,7 +18,8 @@ import { getImageBySize } from '../../../shared/utils/utils'
 import PagesBar from '../PagesBar'
 import loader from '../../../images/fading-balls.png'
 import useDidMountEffect from '../../../shared/hooks/useDidMountEffect'
-import useGetUser from "../../../shared/hooks/useGetUser";
+import useGetUser from '../../../shared/hooks/useGetUser'
+import noImage from '../../../images/NO_IMAGE.svg'
 
 const MyAnnouncements = () => {
    const [firstTimeLoaded, setFirstTimeLoaded] = useState(false)
@@ -103,7 +104,10 @@ const MyAnnouncements = () => {
             <p>You haven't published an announcements yet!</p>
          ) : (
             <div className={styles.container__loading}>
-               <div className={`${styles.overlay} ${loading && styles.displayed}`}></div>
+               <div
+                  className={`${styles.overlay} ${
+                     loading && styles.displayed
+                  }`}></div>
                {data.map(a => (
                   <Link
                      to={`/vehicledetails/${a._id}`}
@@ -112,7 +116,11 @@ const MyAnnouncements = () => {
                      <div className={styles.announcement}>
                         <img
                            className={styles.image}
-                           src={getImageBySize(a.photos[0], 224, 168)}
+                           src={
+                              a.photos.length > 0
+                                 ? getImageBySize(a.photos[0], 224, 168)
+                                 : noImage
+                           }
                            alt={`${a.mark} ${a.model}`}
                         />
                         <div className={styles.info}>

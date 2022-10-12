@@ -124,7 +124,7 @@ const AddAnnouncement = () => {
                driveInit: values.driveInit,
                engineCapacity: values.engineCapacity,
                power: values.power,
-               description: values.description,
+               description: values.description ? values.description : 'There is no description',
                photos: photoUrl || [],
                phoneNumber: '123456789'
             }
@@ -182,7 +182,7 @@ const AddAnnouncement = () => {
    >(ADD_ANNOUNCEMENT, {
       update() {
          setAnnouncementLoading(false)
-         navigate('/search')
+         navigate('/')
       }
    })
 
