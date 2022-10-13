@@ -1,17 +1,15 @@
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
 import dotenv from 'dotenv'
+import path from 'path'
 import depthLimit from 'graphql-depth-limit'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
-import { AuthenticationError } from 'apollo-server-errors'
-import jwt from 'jsonwebtoken'
 
 dotenv.config()
 
 import resolvers from './graphql/resolvers/index.js'
 import typeDefs from './graphql/typeDefs.js'
-import User from './models/user.model.js'
 import { getUser } from './utils/getUser.js'
 
 const app = express()
@@ -59,7 +57,14 @@ const startServer = async () => {
 
 startServer()
 
-app.listen({ port: process.env.PORT }, () => {
+if (process.env.NODE_ENV === 'production') {
+   app.use(express.static('../client/build'))
+   app.get('*', (req, res) => {
+      res.sendFile(path.resolve(__dirname, '..', 'client', 'build', 'index.html'))
+   })
+}
+
+app.listen({ port: process.env.PORT || 4000 }, () => {
    console.log(
       `Server is running at http://localhost:${process.env.PORT}${server.graphqlPath}`
    )

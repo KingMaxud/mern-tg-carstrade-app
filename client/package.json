@@ -16,6 +16,7 @@
       "@types/react-dom": "^18.0.0",
       "axios": "^0.27.2",
       "compressorjs": "^1.1.1",
+      "dotenv": "^16.0.3",
       "filepond": "^4.30.3",
       "filepond-plugin-file-validate-type": "^1.2.8",
       "filepond-plugin-image-exif-orientation": "^1.0.11",

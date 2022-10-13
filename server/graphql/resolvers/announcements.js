@@ -1,7 +1,6 @@
 import { ForbiddenError, UserInputError } from 'apollo-server-errors'
 
 import Announcement from '../../models/announcement.model.js'
-import User from '../../models/user.model.js'
 
 const createFilterObject = filter => {
    const {
