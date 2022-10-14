@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser')
 
 dotenv.config()
 
-const resolvers = require('./graphql/resolvers/index.js')
+const resolvers = require('./graphql/resolvers')
 const typeDefs = require('./graphql/typeDefs.js')
 const getUser = require('./utils/getUser.js')
 

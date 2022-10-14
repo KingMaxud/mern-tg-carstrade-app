@@ -1,24 +1,31 @@
 {
-  "name": "mern-tg-carstrade-app",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd client && npm run build",
-    "install-client": "cd client && npm install",
-    "heroku-postbuild": "npm run install-client && npm run build",
-    "start": "cd server && node index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/KingMaxud/mern-tg-carstrade-app.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/KingMaxud/mern-tg-carstrade-app/issues"
-  },
-  "homepage": "https://github.com/KingMaxud/mern-tg-carstrade-app#readme"
+   "name": "mern-tg-carstrade-app",
+   "version": "1.0.0",
+   "description": "",
+   "main": "index.js",
+   "dependencies": {
+      "apollo-server-errors": "^3.3.1",
+      "apollo-server-express": "^3.6.7",
+      "bcryptjs": "^2.4.3",
+      "cookie-parser": "^1.4.6",
+      "cors": "^2.8.5",
+      "dotenv": "^16.0.0",
+      "express": "^4.17.3",
+      "graphql": "^16.4.0",
+      "graphql-depth-limit": "^1.1.0",
+      "jsonwebtoken": "^8.5.1",
+      "mongoose": "^6.3.0",
+      "uuid": "^8.3.2"
+   },
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "nodemon index.js",
+      "build": "cd client && npm run build",
+      "install-client": "cd client && npm install",
+      "heroku-postbuild": "npm run install-client && npm run build",
+      "start": "node index.js"
+   },
+   "author": "",
+   "license": "ISC",
+   "homepage": "https://github.com/KingMaxud/mern-tg-carstrade-app#readme"
 }
