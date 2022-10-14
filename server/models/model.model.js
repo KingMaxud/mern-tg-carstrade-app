@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const modelSchema = new mongoose.Schema({
    mark: {
@@ -30,4 +30,4 @@ const modelSchema = new mongoose.Schema({
    ]
 })
 
-export default mongoose.model('Model', modelSchema)
+module.exports = mongoose.model('Model', modelSchema)

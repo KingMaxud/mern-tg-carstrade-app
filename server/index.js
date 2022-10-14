@@ -1,16 +1,16 @@
-import express from 'express'
-import { ApolloServer } from 'apollo-server-express'
-import dotenv from 'dotenv'
-import path from 'path'
-import depthLimit from 'graphql-depth-limit'
-import mongoose from 'mongoose'
-import cookieParser from 'cookie-parser'
+const express = require('express')
+const { ApolloServer } = require('apollo-server-express')
+const dotenv = require('dotenv')
+const path = require('path')
+const depthLimit = require('graphql-depth-limit')
+const mongoose = require('mongoose')
+const cookieParser = require('cookie-parser')
 
 dotenv.config()
 
-import resolvers from './graphql/resolvers/index.js'
-import typeDefs from './graphql/typeDefs.js'
-import { getUser } from './utils/getUser.js'
+const resolvers = require('./graphql/resolvers/index.js')
+const typeDefs = require('./graphql/typeDefs.js')
+const getUser = require('./utils/getUser.js')
 
 const app = express()
 app.use(cookieParser())
@@ -64,7 +64,9 @@ if (process.env.NODE_ENV === 'production') {
    })
 }
 
-app.listen({ port: process.env.PORT || 4000 }, () => {
+const port = Number.parseInt(process.env.PORT) || 4000;
+
+app.listen({ port }, () => {
    console.log(
       `Server is running at http://localhost:${process.env.PORT}${server.graphqlPath}`
    )

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const markSchema = new mongoose.Schema(
    {
@@ -10,4 +10,4 @@ const markSchema = new mongoose.Schema(
    }
 )
 
-export default mongoose.model('Mark', markSchema)
+module.exports = mongoose.model('Mark', markSchema)

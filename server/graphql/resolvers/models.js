@@ -1,9 +1,9 @@
-import Mark from '../../models/mark.model.js'
-import Model from '../../models/model.model.js'
+const Mark = require('../../models/mark.model.js')
+const Model = require('../../models/model.model.js')
 
-import { ForbiddenError, UserInputError } from 'apollo-server-errors'
+const { ForbiddenError, UserInputError } = require('apollo-server-errors')
 
-export default {
+module.exports = {
    Query: {
       getMarks: async () => {
          try {

@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken'
-import User from '../models/user.model.js'
+const jwt = require('jsonwebtoken')
+const User = require('../models/user.model.js')
 
-export const getUser = async req => {
+const getUser = async req => {
    try {
       const decoded = await jwt.verify(
          req.headers.authorization.split(' ')[1],
@@ -24,3 +24,5 @@ export const getUser = async req => {
       }
    }
 }
+
+module.exports = getUser

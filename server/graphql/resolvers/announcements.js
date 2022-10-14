@@ -1,6 +1,6 @@
-import { ForbiddenError, UserInputError } from 'apollo-server-errors'
+const { ForbiddenError, UserInputError } = require('apollo-server-errors')
 
-import Announcement from '../../models/announcement.model.js'
+const Announcement = require('../../models/announcement.model.js')
 
 const createFilterObject = filter => {
    const {
@@ -43,7 +43,7 @@ const createFilterObject = filter => {
    return { ...minMaxKeys, ...rest }
 }
 
-export default {
+module.exports = {
    Query: {
       getAnnouncements: async (_, { filter, sort, pagination }) => {
          const filterObj = createFilterObject({ ...filter })

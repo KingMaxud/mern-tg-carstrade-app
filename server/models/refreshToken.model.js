@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
-import { v4 as uuid } from 'uuid'
+const mongoose = require('mongoose')
+const { v4: uuid } = require('uuid')
 
 const RefreshTokenModel = new mongoose.Schema({
    token: String,
@@ -30,4 +30,4 @@ RefreshTokenModel.statics.verifyExpiration = token => {
    return token.expiryDate.getTime() < new Date().getTime()
 }
 
-export default mongoose.model('RefreshToken', RefreshTokenModel)
+module.exports = mongoose.model('RefreshToken', RefreshTokenModel)

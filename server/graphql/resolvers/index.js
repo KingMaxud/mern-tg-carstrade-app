@@ -1,8 +1,8 @@
-import usersResolver from './users.js'
-import modelsResolver from './models.js'
-import announcementsResolver from './announcements.js'
+const usersResolver = require('./users.js')
+const modelsResolver = require('./models.js')
+const announcementsResolver = require('./announcements.js')
 
-export default {
+module.exports = {
    Query: {
       getUploadPreset: () => {
          return process.env.CLOUDINARY_UPLOAD_PRESET

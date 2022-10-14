@@ -1,4 +1,4 @@
-export const validateRegisterInput = (username, email, password) => {
+const validateRegisterInput = (username, email, password) => {
    const errors = {}
    if (username.trim() === '') {
       errors.username = 'Username must not be empty'
@@ -6,7 +6,8 @@ export const validateRegisterInput = (username, email, password) => {
    if (email.trim() === '') {
       errors.email = 'Email must not be empty'
    } else {
-      const regEx = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
+      const regEx =
+         /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/
       if (!email.match(regEx)) {
          errors.email = 'Email must be a valid email address'
       }
@@ -21,7 +22,7 @@ export const validateRegisterInput = (username, email, password) => {
    }
 }
 
-export const validateLoginInput = (email, password) => {
+const validateLoginInput = (email, password) => {
    const errors = {}
    if (email.trim() === '') {
       errors.username = 'Email must not be empty'
@@ -35,3 +36,5 @@ export const validateLoginInput = (email, password) => {
       valid: Object.keys(errors).length < 1
    }
 }
+
+module.exports = { validateRegisterInput, validateLoginInput }

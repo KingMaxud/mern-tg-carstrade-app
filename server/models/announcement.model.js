@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const modelSchema = new mongoose.Schema(
    {
@@ -87,4 +87,4 @@ function arrayLimit(val) {
    return val.length <= 9
 }
 
-export default mongoose.model('Announcement', modelSchema)
+module.exports = mongoose.model('Announcement', modelSchema)

@@ -1,19 +1,19 @@
-import {
+const {
    ApolloError,
    AuthenticationError,
    UserInputError
-} from 'apollo-server-errors'
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
+} = require('apollo-server-errors')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
-import User from '../../models/user.model.js'
-import RefreshToken from '../../models/refreshToken.model.js'
-import {
+const User = require('../../models/user.model.js')
+const RefreshToken = require('../../models/refreshToken.model.js')
+const {
    validateLoginInput,
    validateRegisterInput
-} from '../../utils/validators.js'
+} = require('../../utils/validators.js')
 
-export default {
+module.exports = {
    Query: {
       getUser: async (_, __, { req }) => {
          try {
