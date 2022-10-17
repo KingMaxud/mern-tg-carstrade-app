@@ -97,6 +97,7 @@ const Photos = ({ photos, alt }: Props) => {
                nextImage={nextImage}
                width={photoWidth}
                height={getHeightByWidth(photoWidth)}
+               isArrowsBlockShown={photos ? photos.length > 1 : false}
             />
          )}
 
@@ -105,6 +106,7 @@ const Photos = ({ photos, alt }: Props) => {
                <div className={styles.photosContainer}>
                   {photos.map((p, index) => (
                      <img
+                        className={styles.image}
                         key={`${index} photo`}
                         onClick={() => {
                            if (currentImage && index !== currentImage.number) {

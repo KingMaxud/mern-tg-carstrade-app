@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { useEffect, useState } from 'react'
-import { Button } from '@chakra-ui/react'
 
 import {
    DELETE_ANNOUNCEMENT,
@@ -201,7 +200,6 @@ const VehicleDetails = () => {
                            })
                            onClose()
                         }}>
-                        {/*Change it to little icon above "price"*/}
                         Delete
                      </button>
                   </DeleteModal>

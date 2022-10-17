@@ -30,13 +30,17 @@ const SignUp = () => {
    const SignUpSchema = Yup.object().shape({
       name: Yup.string()
          .min(2, 'Too short!')
-         .max(50, 'Too long!')
+         .max(40, 'Too long!')
          .required('Required')
          .matches(/^\w+$/, 'Name can only contain Latin letters and numbers.'),
-      email: Yup.string().email('Invalid email').required('Required'),
+      email: Yup.string()
+         .max(40, 'Too long!')
+         .email('Invalid email')
+         .required('Required'),
       password: Yup.string()
          .required('Required')
          .min(6, 'Password is too short - should be 6 chars minimum.')
+         .max(40, 'Too long!')
          .matches(
             /^\w+$/,
             'Password can only contain Latin letters and numbers.'

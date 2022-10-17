@@ -143,7 +143,10 @@ module.exports = {
          await Announcement.findById(body.announcementId).then(async function (
             data
          ) {
-            if (userInfo && (userInfo.isAdmin || data.user === userInfo._id)) {
+            if (
+               userInfo &&
+               (userInfo.isAdmin || userInfo._id.equals(userInfo._id))
+            ) {
                const valuesToChange = Object.assign({}, body)
                //    delete valuesToChange.announcementId
                await Announcement.updateOne(

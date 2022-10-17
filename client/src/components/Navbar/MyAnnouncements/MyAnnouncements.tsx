@@ -36,13 +36,15 @@ const MyAnnouncements = () => {
       GetFilteredAnnouncementCountData,
       GetUsersAnnouncementCountVars
    >(GET_FILTERED_ANNOUNCEMENTS_COUNT, {
-      onCompleted: data => setCount(data.getFilteredAnnouncementCount)
+      onCompleted: data => setCount(data.getFilteredAnnouncementCount),
+      fetchPolicy: 'cache-and-network',
    })
 
    const [getUsersAnnouncementsData] = useLazyQuery<
       GetUsersAnnouncementsData,
       GetUsersAnnouncementsVars
    >(GET_USERS_ANNOUNCEMENTS, {
+      fetchPolicy: 'cache-and-network',
       onCompleted: data => {
          setData(data.getAnnouncements)
          setFirstTimeLoaded(true)
@@ -100,8 +102,8 @@ const MyAnnouncements = () => {
             <div className={styles.firstLoader}>
                <img alt="loader" className={styles.loading} src={loader} />
             </div>
-         ) : error || !data ? (
-            <p>You haven't published an announcements yet!</p>
+         ) : error || data.length === 0 ? (
+            <div className={styles.empty}>You haven't published any announcements yet!</div>
          ) : (
             <div className={styles.container__loading}>
                <div

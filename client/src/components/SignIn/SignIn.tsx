@@ -29,8 +29,8 @@ const SignIn = () => {
    }, [useWindowSize().width])
 
    const SignInSchema = Yup.object().shape({
-      email: Yup.string().email('Invalid email').required('Required'),
-      password: Yup.string().required('Required')
+      email: Yup.string().max(40, 'Too long!').email('Invalid email').required('Required'),
+      password: Yup.string().max(40, 'Too long!').required('Required')
    })
 
    const formik = useFormik({
