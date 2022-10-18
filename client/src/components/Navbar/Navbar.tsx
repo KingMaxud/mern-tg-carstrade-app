@@ -21,13 +21,16 @@ const Navbar = () => {
    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768)
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-   const [removeRefreshToken] = useMutation(LOGOUT)
+   const [removeRefreshToken] = useMutation(LOGOUT, {
+      update: () => {
+         window.location.reload()
+      }
+   })
 
    const handleLogOut = () => {
       tokenService.removeLocalAccessToken()
-      removeRefreshToken()
       dispatch(signOut())
-      window.location.reload()
+      removeRefreshToken()
    }
 
    // Hide popups and menu

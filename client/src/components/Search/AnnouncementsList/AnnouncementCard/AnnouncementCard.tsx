@@ -56,7 +56,7 @@ const AnnouncementCard = ({ a }: { a: Announcement }) => {
                className={styles.imageBlock}
                style={{ width: `${width}px`, height: `${height}px` }}>
                {showImageSkeleton && (
-                  <Skeleton height={`${width}px`} width={`${height}px`} />
+                  <Skeleton height={`${height}px`} width={`${width}px`} />
                )}
                <img
                   src={imageUrl}

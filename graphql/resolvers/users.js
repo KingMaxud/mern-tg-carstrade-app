@@ -63,7 +63,7 @@ module.exports = {
          if (user) {
             const accessToken = generateAccessToken(user._id)
 
-            const refreshToken = RefreshToken.createToken(user)
+            const refreshToken = await RefreshToken.createToken(user)
             // Set refreshToken to Cookie
             res.cookie('refreshToken', refreshToken, {
                maxAge: 1000 * 60 * 60 * 24 * 30,
