@@ -11,6 +11,7 @@ import { signIn } from '../../context/reducer'
 import { REGISTER_USER } from '../../shared/utils/graphql'
 import styles from './SignUp.module.scss'
 import useWindowSize from '../../shared/hooks/useWindowDimensions'
+import ErrorMessage from '../shared/ErrorMessage'
 
 const SignUp = () => {
    const { dispatch } = useAuth()
@@ -98,42 +99,80 @@ const SignUp = () => {
             <form onSubmit={formik.handleSubmit}>
                <h1 className={styles.title}>CarTrader</h1>
 
-               <FormLabel htmlFor="name">Name</FormLabel>
-               <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.name}
-               />
-               <FormLabel htmlFor="email">Email Address</FormLabel>
-               <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.email}
-               />
-               <FormLabel htmlFor="password">Password</FormLabel>
-               <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.password}
-               />
-               <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-               <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.confirmPassword}
-               />
+               <div className={styles.inputWrapper}>
+                  {formik.errors.name && formik.touched.name && (
+                     <ErrorMessage
+                        name="Name"
+                        error={formik.errors.name}
+                     />
+                  )}
+                  <FormLabel htmlFor="name">Name</FormLabel>
+                  <Input
+                     id="name"
+                     name="name"
+                     type="text"
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     value={formik.values.name}
+                  />
+               </div>
+
+               <div className={styles.inputWrapper}>
+                  {formik.errors.email && formik.touched.email && (
+                     <ErrorMessage
+                        name="Email"
+                        error={formik.errors.email}
+                     />
+                  )}
+                  <FormLabel htmlFor="email">Email Address</FormLabel>
+                  <Input
+                     id="email"
+                     name="email"
+                     type="email"
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     value={formik.values.email}
+                  />
+               </div>
+
+               <div className={styles.inputWrapper}>
+                  {formik.errors.password && formik.touched.password && (
+                     <ErrorMessage
+                        name="Password"
+                        error={formik.errors.password}
+                     />
+                  )}
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <Input
+                     id="password"
+                     name="password"
+                     type="password"
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     value={formik.values.password}
+                  />
+               </div>
+
+               <div className={styles.inputWrapper}>
+                  {formik.errors.confirmPassword && formik.touched.confirmPassword && (
+                     <ErrorMessage
+                        name="Confirm Password"
+                        error={formik.errors.confirmPassword}
+                     />
+                  )}
+                  <FormLabel htmlFor="confirmPassword">
+                     Confirm Password
+                  </FormLabel>
+                  <Input
+                     id="confirmPassword"
+                     name="confirmPassword"
+                     type="password"
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     value={formik.values.confirmPassword}
+                  />
+               </div>
+
                <button
                   className={styles.button}
                   type="submit"

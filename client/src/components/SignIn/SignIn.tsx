@@ -11,6 +11,7 @@ import tokenService from '../../shared/utils/token.service'
 import { LOGIN_USER } from '../../shared/utils/graphql'
 import styles from './SignIn.module.scss'
 import useWindowSize from '../../shared/hooks/useWindowDimensions'
+import ErrorMessage from '../shared/ErrorMessage'
 
 const SignIn = () => {
    const { dispatch } = useAuth()
@@ -29,7 +30,10 @@ const SignIn = () => {
    }, [useWindowSize().width])
 
    const SignInSchema = Yup.object().shape({
-      email: Yup.string().max(40, 'Too long!').email('Invalid email').required('Required'),
+      email: Yup.string()
+         .max(40, 'Too long!')
+         .email('Invalid email')
+         .required('Required'),
       password: Yup.string().max(40, 'Too long!').required('Required')
    })
 
@@ -81,24 +85,39 @@ const SignIn = () => {
             <form onSubmit={formik.handleSubmit}>
                <h1 className={styles.title}>CarTrader</h1>
 
-               <FormLabel htmlFor="email">Email</FormLabel>
-               <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.email}
-               />
-               <FormLabel htmlFor="email">Password Address</FormLabel>
-               <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.password}
-               />
+               <div className={styles.inputWrapper}>
+                  {formik.errors.email && formik.touched.email && (
+                     <ErrorMessage name="Email" error={formik.errors.email} />
+                  )}
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <Input
+                     id="email"
+                     name="email"
+                     type="email"
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     value={formik.values.email}
+                  />
+               </div>
+
+               <div className={styles.inputWrapper}>
+                  {formik.errors.password && formik.touched.password && (
+                     <ErrorMessage
+                        name="Password"
+                        error={formik.errors.password}
+                     />
+                  )}
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <Input
+                     id="password"
+                     name="password"
+                     type="password"
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     value={formik.values.password}
+                  />
+               </div>
+
                <button
                   className={styles.button}
                   type="submit"

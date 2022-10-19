@@ -1,0 +1,19 @@
+.container {
+   z-index: 1;
+   position: absolute;
+   background: #fff;
+   width: 100%;
+   cursor: pointer;
+
+   .name {
+      font-weight: 500;
+   }
+
+   .error {
+      color: #cc0000a5
+   }
+}
+
+.closed {
+   display: none;
+}

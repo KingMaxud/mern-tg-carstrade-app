@@ -19,7 +19,7 @@ interface DecodedToken {
 }
 
 const link = createHttpLink({
-   uri: '/graphql',
+   uri: 'http://localhost:4000/graphql',
    fetchOptions: { credentials: 'include' }
 })
 
@@ -37,7 +37,7 @@ const authLink = setContext(async (_, { headers }) => {
       const decodedToken: DecodedToken = jwtDecode(token)
 
       if (Date.now() >= decodedToken.exp * 1000) {
-         const response = await fetch('/graphql', {
+         const response = await fetch('http://localhost:4000/graphql', {
             credentials: 'include',
             method: 'POST',
             headers: {
