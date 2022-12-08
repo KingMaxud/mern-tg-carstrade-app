@@ -16,9 +16,8 @@ const app = express()
 app.use(cookieParser())
 
 const whitelist = [
-   'http://localhost:3000',
    'https://studio.apollographql.com',
-   'https://kingmaxud-cartrader.herokuapp.com'
+   process.env.DOMAIN
 ]
 
 mongoose.connect(process.env.MONGO_URI)
