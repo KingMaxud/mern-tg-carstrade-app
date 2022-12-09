@@ -20,6 +20,8 @@ const whitelist = [
    process.env.DOMAIN
 ]
 
+console.log(whitelist)
+
 mongoose.connect(process.env.MONGO_URI)
 mongoose.connection.on('error', err => {
    console.log('err', err)
